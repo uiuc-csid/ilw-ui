@@ -2,8 +2,8 @@
 
 Accessible Svelte 5 components that look and behave like the
 [Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/). They cover what
-the toolkit lacks: so far, a sortable table heading and a modal with close
-events, focus return and a promise API. Where the toolkit already has a
+the toolkit lacks: so far, a sortable table heading, a modal with close
+events, focus return and a promise API, and a filtering combobox. Where the toolkit already has a
 component (page chrome, accordion, the modal dialog itself), `ilw-ui` uses it
 rather than replacing it.
 
@@ -13,11 +13,12 @@ Status: pre-release (`private: true`), first consumer
 ## Install and use
 
 The package ships source (`.svelte`/`.ts`); your Vite + Svelte build compiles it.
-Peer dependency: `svelte ^5.57`.
+Peer dependency: `svelte ^5.57`. Dependencies: `@zag-js/combobox` and
+`@zag-js/svelte`, pinned exactly.
 
 ```js
-import { SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
-import { nextSort } from 'ilw-ui/core';
+import { Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
+import { nextSort, filterItems, blurMatch } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
@@ -31,7 +32,9 @@ properties, each with its brand value as a fallback in case the brand
 stylesheet fails to load. It has no rules on bare `th`/`td`.
 
 **CSP:** nothing here uses `eval`, `new Function`, `{@html}` or `innerHTML`, so
-it runs under a same-origin-scripts, no-`eval` policy.
+it runs under a same-origin-scripts, no-`eval` policy. Nothing sets inline
+`style` attributes either: `tests/e2e/combobox-csp.spec.ts` runs the open
+combobox under `style-src-attr 'none'`.
 
 ## Components
 
@@ -39,12 +42,12 @@ it runs under a same-origin-scripts, no-`eval` policy.
 
 A sortable column heading: a `<th>` holding a button.
 
-| Prop     | Type                                | |
-| -------- | ----------------------------------- | - |
-| `key`    | `string`                            | Column key, also `data-sort` |
-| `label`  | `string`                            | Visible heading text |
-| `sort`   | `{ key: string, dir: 1 \| -1 }`     | The table's current sort |
-| `onsort` | `(key: string) => void`             | Called on click / Enter / Space |
+| Prop     | Type                            |                                 |
+| -------- | ------------------------------- | ------------------------------- |
+| `key`    | `string`                        | Column key, also `data-sort`    |
+| `label`  | `string`                        | Visible heading text            |
+| `sort`   | `{ key: string, dir: 1 \| -1 }` | The table's current sort        |
+| `onsort` | `(key: string) => void`         | Called on click / Enter / Space |
 
 Use `nextSort(sort, key)` from `ilw-ui/core` in `onsort`: the same key flips the
 direction, another key starts ascending.
@@ -110,6 +113,82 @@ DOM contract:
 `title`, `size`, `body`/`message`, `buttons` and
 `onclose(reason: 'button' | 'dismiss', value)`, and opens on mount.
 
+### `Combobox`
+
+A single-select filtering combobox on the [Zag](https://zagjs.com/) combobox
+machine: a text input that filters a listbox of options, for picking one of many
+(people, courses). Free text that matches nothing stays in the input.
+
+```svelte
+<label id="fac-label" for="fac-cb">Faculty</label>
+<Combobox id="fac-cb" labelId="fac-label" {items} {value} onchange={(v) => (value = v)} />
+```
+
+| Prop                              | Type                    | Default       |                                                                     |
+| --------------------------------- | ----------------------- | ------------- | ------------------------------------------------------------------- |
+| `id`                              | `string`                | required      | The input's id                                                      |
+| `popupId`                         | `string`                | `${id}-popup` | The listbox's id                                                    |
+| `items`                           | `ComboboxItem[]`        | required      | `{ value, label, search?, group? }`; `search` defaults to `label`   |
+| `value`                           | `string \| null`        | `null`        | The selection (controlled: update it in `onchange`)                 |
+| `onchange`                        | `(value, item) => void` | required      | On each commit; `value`/`item` are `null` when text matches nothing |
+| `labelId`                         | `string`                |               | The `<label>`'s id; also labels the listbox                         |
+| `placeholder`                     | `string`                | `''`          | Also the listbox's `aria-label` when there is no `labelId`          |
+| `minChars`                        | `number`                | `2`           | Typing opens the list at this length                                |
+| `max`                             | `number`                | `200`         | Options shown before the "…N more" row                              |
+| `block`                           | `boolean`               | `false`       | Adds `cb-block` (full-width)                                        |
+| `disabled`, `invalid`, `required` | `boolean`               | `false`       |                                                                     |
+
+Matching (`filterItems` in `ilw-ui/core`) is a trimmed, case-insensitive
+substring search over each item's `search` text. Groups keep first-seen order.
+On blur (`blurMatch`), the combobox commits an exact label or value match, else
+the only match, else `null`.
+
+There is no `name` or hidden form input: Zag would submit the label text. Keep
+the value in your own field (ta-manager keeps a hidden `<select>`).
+
+Keyboard:
+
+| Key                 | Action                                                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Typing              | Filters; opens the list at `minChars` characters, closes it below. A lone match is highlighted.                       |
+| ArrowDown / ArrowUp | Open the list (on the current text, or every item when the text is the selection), then move the highlight, wrapping. |
+| Alt+ArrowDown       | Opens the list without highlighting.                                                                                  |
+| Enter               | Commits the highlighted option and closes.                                                                            |
+| Escape              | Closes; focus stays in the input.                                                                                     |
+| Tab / blur          | Commits an exact label/value match or the only match; otherwise the text stays and the value becomes `null`.          |
+
+These differ from the APG combobox pattern, following Zag:
+
+- While the list is open, Home and End move the highlight, not the caret.
+- Keys with Ctrl or Shift held are ignored.
+- Tab doesn't accept the highlighted option; only the blur match applies.
+
+DOM contract (consumers' tests select on it):
+
+```html
+<span class="combobox" data-scope="combobox" data-part="root">
+  <input id="fac-cb" class="combobox-input" role="combobox" aria-autocomplete="list"
+         aria-expanded="true" aria-controls="fac-cb-popup"
+         aria-activedescendant="fac-cb-popup-opt-aadams" autocomplete="off" />
+  <div id="fac-cb-popup" class="combobox-popup" role="listbox" aria-labelledby="fac-label">
+    <div id="fac-cb-popup-group-Faculty" role="group" aria-labelledby="fac-cb-popup-group-Faculty-label">
+      <div id="fac-cb-popup-group-Faculty-label" class="combobox-group-label" role="presentation">Faculty</div>
+      <div id="fac-cb-popup-opt-aadams" role="option" data-value="aadams" data-highlighted>Avery Adams</div>
+    </div>
+    <div class="combobox-more" role="option" aria-disabled="true" aria-selected="false">…12 more — keep typing to narrow</div>
+  </div>
+</span>
+```
+
+- With `block`, the root's class is `combobox cb-block`.
+- The listbox is `hidden` while closed.
+- Option ids are `${popupId}-opt-${encodeURIComponent(value)}`.
+- Only the selected option has `aria-selected="true"`.
+- `aria-activedescendant` is set only while the list is open and the highlighted option is rendered.
+- With no matches, the list shows a disabled `.combobox-empty` "No matches" row in place of the "more" row.
+- The popup is placed with CSS, with no inline `style`, so it runs under `style-src-attr 'none'`.
+- While the list is open on macOS and iOS, Zag adds a visually hidden `span[role=alert]` to `<body>`. It re-announces the highlight for VoiceOver.
+
 ## Tests
 
 Accessibility is proven by tests. Each component has three layers, all driven by
@@ -136,7 +215,7 @@ pnpm test:e2e         # layer 2, against storybook-static/
 ```
 
 `mise run test` runs the last three in order. `pnpm storybook` starts the
-workbench on http://localhost:6006.
+workbench on <http://localhost:6006>.
 
 Every push publishes Storybook to [Chromatic](https://www.chromatic.com/) for
 visual review (`.github/workflows/chromatic.yml`, the official
@@ -155,7 +234,8 @@ CAPTCHA-blocks automated browsers. See the README there to refresh it.
 
 ## The import rule
 
-`src/` imports only `svelte` and its own files, and uses no HTML sinks
+`src/` imports only `svelte`, `@zag-js/*` (pinned exactly, in lockstep) and its
+own files, and uses no HTML sinks
 (`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
 `eval`, `new Function`). `tests/unit/guard.test.ts` enforces this and reports
 each violation as file:line.
@@ -163,7 +243,8 @@ each violation as file:line.
 ## Known issues
 
 Upstream `<ilw-modal>` (1.2.1) gaps. Each is worked around once, inside `Modal`,
-and none has an upstream issue filed yet.
+where a workaround is possible. None is filed upstream yet. Draft issues are in
+[docs/upstream-issues/ilw-modal.md](docs/upstream-issues/ilw-modal.md).
 
 - **No open/close events.** `Modal` watches the reflected `open` attribute with a
   `MutationObserver`.
@@ -179,6 +260,23 @@ and none has an upstream issue filed yet.
   focus trap.
 - **`aria-describedby` points at the whole body slot,** so the buttons are read
   as part of the description.
+
+Upstream Zag (`@zag-js/combobox` 1.44.0) gaps. Each is worked around once,
+inside `Combobox`. None is filed upstream yet. Draft issues are in
+[docs/upstream-issues/zag.md](docs/upstream-issues/zag.md).
+
+- **`openOnChange` as a function sees the text from before the keystroke,** so
+  `length >= 2` opens on the third character. `Combobox` sets
+  `openOnChange: false` and opens the list from `onInputValueChange`.
+- **Zag rewrites the input text when the value changes** (reason `'script'`),
+  which wiped free text after an unmatched blur. `Combobox` controls
+  `inputValue` and accepts only `'input-change'` and `'item-select'`.
+- **`mergeProps` runs handlers in reverse order:** the last argument's handler
+  runs first. `Combobox` passes its own handlers last.
+- **`aria-activedescendant` can point at an option that isn't rendered.** Zag
+  sets it from the highlighted value even while the list is closed or the option
+  is filtered out, which axe flags as an invalid IDREF. `Combobox` overrides the
+  attribute in its markup.
 
 ## License
 

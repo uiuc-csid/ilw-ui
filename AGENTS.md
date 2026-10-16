@@ -1,6 +1,6 @@
 # ilw-ui
 
-Accessible Svelte 5 components that look and behave like the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>), filling gaps the toolkit leaves (sortable headings, modal with events/focus restore; later combobox, autocomplete, data table, pager). First consumer: ta-manager (`uiuc-csid/ta-manager`). [docs/plans/2026-10-16-ilw-ui-scaffold.md](docs/plans/2026-10-16-ilw-ui-scaffold.md) holds the design and the contracts that consumer depends on.
+Accessible Svelte 5 components that look and behave like the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>), filling gaps the toolkit leaves (sortable headings, modal with events/focus restore; later combobox, autocomplete, data table, pager). First consumer: ta-manager (`uiuc-csid/ta-manager`). [docs/old-plans/2026-10-16-ilw-ui-scaffold.md](docs/old-plans/2026-10-16-ilw-ui-scaffold.md) holds the design and the contracts that consumer depends on.
 
 ## Tech Stack
 
@@ -30,7 +30,7 @@ The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `export
 ## Rules
 
 - **Layering:** Illinois toolkit first, native HTML second, `ilw-ui` third. Never re-implement what the toolkit does well (page chrome, accordion, the modal dialog itself).
-- **Imports:** `src/` imports only `svelte` and its own files (later also `@zag-js/*`, `@tanstack/*`, pinned exactly in lockstep). `tests/unit/guard.test.ts` enforces it.
+- **Imports:** `src/` imports only `svelte`, `@zag-js/*` and its own files (later also `@tanstack/*`). Pin each library family exactly, in lockstep. `tests/unit/guard.test.ts` enforces it.
 - **No HTML sinks:** no `{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function` in `src/`. Rich content is passed as Svelte snippets. Consumers run a strict CSP (same-origin scripts, no `eval`).
 - **Brand colors and fonts only:** `--il-*` custom properties (from `https://cdn.brand.illinois.edu/illinois.css`) with fallbacks; never hard-coded hex. No rules on bare `th`/`td` (`<ilw-page class="ilw-format">` restyles them with high-specificity selectors).
 - **Read the toolkit component's docs and source before wrapping it:** `https://builder3.toolkit.illinois.edu/component/<name>/index.html` and `https://github.com/web-illinois/<name>`. The prose docs lag the code; follow the code. Upstream gaps go under **Known issues** in the README with an issue link, not patched around in markup.
