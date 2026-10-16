@@ -27,3 +27,102 @@
   gap: 12px;
   margin-top: 1rem;
 }
+
+/* Combobox: the field mirrors the toolkit's ilw-input (which styles inputs
+   only inside <ilw-content>); the popup is placed by CSS, not Floating UI. */
+.combobox {
+  position: relative;
+  display: inline-block;
+}
+
+.combobox.cb-block {
+  display: block;
+}
+
+.combobox-input {
+  box-sizing: border-box;
+  width: 200px;
+  margin: 0;
+  padding: 10px;
+  border: thin solid var(--il-storm-10, #252525);
+  border-radius: 5px;
+  background-color: var(--il-white, #ffffff);
+  color: var(--il-storm-10, #252525);
+  font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.cb-block .combobox-input {
+  width: 100%;
+}
+
+.combobox-input:hover,
+.combobox-input:focus {
+  background-color: var(--il-arches-90, #c7edf8);
+}
+
+.combobox-input:focus-visible {
+  outline: 3px solid var(--il-altgeld, #c84113);
+}
+
+/* No brand red: the darker Altgeld, at double width so it isn't colour alone. */
+.combobox-input[aria-invalid='true'] {
+  border: 2px solid var(--il-altgeld-darker-1, #983220);
+}
+
+.combobox-input:disabled {
+  background-color: var(--il-storm-95, #f4f4f4);
+  border-color: var(--il-storm-60, #8e9090);
+  color: var(--il-storm-30, #474948);
+  cursor: not-allowed;
+}
+
+.combobox-popup {
+  position: absolute;
+  top: calc(100% + 2px);
+  inset-inline: 0;
+  z-index: 10;
+  min-width: 200px;
+  max-height: 20rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 4px 0;
+  border: thin solid var(--il-storm-60, #8e9090);
+  border-radius: 5px;
+  background-color: var(--il-white, #ffffff);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--il-storm-10, #252525) 20%, transparent);
+  font: 1rem/1.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.combobox-popup[hidden] {
+  display: none;
+}
+
+.combobox-popup [role='option'] {
+  padding: 6px 10px;
+  color: var(--il-storm-10, #252525);
+  cursor: pointer;
+}
+
+.combobox-popup [role='option'][data-highlighted] {
+  background-color: var(--il-arches-90, #c7edf8);
+}
+
+.combobox-popup [role='option'][aria-selected='true'] {
+  font-weight: 700;
+}
+
+.combobox-group-label {
+  padding: 8px 10px 2px;
+  color: var(--il-storm-30, #474948);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.combobox-popup .combobox-more,
+.combobox-popup .combobox-empty {
+  color: var(--il-storm-30, #474948);
+  font-style: italic;
+  cursor: default;
+}
