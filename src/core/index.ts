@@ -17,3 +17,28 @@ export function nextId(prefix: string): string {
   counters.set(prefix, n);
   return `${prefix}-${n}`;
 }
+
+export interface ComboboxItem {
+  value: string;
+  label: string;
+  /** Text matched by filterItems; defaults to the label. */
+  search?: string;
+  group?: string;
+}
+
+/** Case-insensitive substring match of the trimmed query over each item's search text (or label), capped at `max`. */
+export function filterItems(items: ComboboxItem[], query: string, max: number): { shown: ComboboxItem[]; more: number } {
+  const needle = query.trim().toLowerCase();
+  const matches = items.filter((i) => (i.search ?? i.label).toLowerCase().includes(needle));
+  return { shown: matches.slice(0, max), more: Math.max(0, matches.length - max) };
+}
+
+/** The item typed text commits to on blur: an exact label or value match, else the only substring match, else null. */
+export function blurMatch(items: ComboboxItem[], text: string): ComboboxItem | null {
+  const typed = text.trim().toLowerCase();
+  if (!typed) return null;
+  const exact = items.find((i) => i.label.toLowerCase() === typed || i.value.toLowerCase() === typed);
+  if (exact) return exact;
+  const subs = items.filter((i) => (i.search ?? i.label).toLowerCase().includes(typed));
+  return subs.length === 1 ? subs[0] : null;
+}
