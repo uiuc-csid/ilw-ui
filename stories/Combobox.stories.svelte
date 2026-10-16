@@ -12,6 +12,12 @@
     { value: 'dadams', label: 'Drew Adams', search: 'Drew Adams dadams', group: 'Staff' },
   ];
 
+  const plain: ComboboxItem[] = people.map(({ group: _, ...item }) => item);
+  const many: ComboboxItem[] = Array.from({ length: 500 }, (_, i) => {
+    const n = String(i + 1).padStart(3, '0');
+    return { value: `s${n}`, label: `Student ${n}` };
+  });
+
   const { Story } = defineMeta({
     title: 'Combobox',
     component: ComboboxDemo,
@@ -95,3 +101,109 @@
     await expect(input).toHaveAttribute('aria-expanded', 'false');
   }}
 />
+
+
+<Story
+  name="Basic"
+  args={{ items: plain }}
+  play={async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    await expect(input).toHaveAttribute('autocomplete', 'off');
+    await expect(input).toHaveAttribute('placeholder', 'Select faculty or type NetID');
+    await userEvent.click(input);
+    await userEvent.keyboard('brown');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await expect(canvas.queryAllByRole('group')).toEqual([]);
+    const option = canvas.getByRole('option', { name: 'Blake Brown' });
+    await expect(option.id).toBe('person-popup-opt-bbrown');
+    // Zag marks only the selected option; the others carry no aria-selected.
+    await expect(option).not.toHaveAttribute('aria-selected');
+    await userEvent.keyboard('{Enter}');
+    await expect(canvas.getByTestId('selected')).toHaveTextContent('bbrown');
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await expect(canvas.getByRole('option', { name: 'Blake Brown' })).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('option', { name: 'Avery Adams' })).not.toHaveAttribute('aria-selected');
+  }}
+/>
+
+<Story
+  name="Many"
+  args={{ items: many }}
+  play={async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('student');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    const options = canvas.getAllByRole('option');
+    await expect(options).toHaveLength(201);
+    const more = options[200];
+    await expect(more).toHaveTextContent('…300 more — keep typing to narrow');
+    await expect(more).toHaveAttribute('aria-disabled', 'true');
+    // The highlight wraps from the last real option, skipping the "more" row.
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-s200'));
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-s001');
+  }}
+/>
+
+<Story
+  name="Free text"
+  play={async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('newperson');
+    await waitFor(() => expect(canvas.getByRole('option', { name: 'No matches' })).toBeVisible());
+    await userEvent.tab();
+    await expect(input).toHaveValue('newperson');
+    await expect(canvas.getByTestId('selected')).toHaveTextContent('');
+    await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
+  }}
+/>
+
+<Story
+  name="Disabled"
+  args={{ value: 'aadams', disabled: true }}
+  play={async ({ canvas }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await expect(input).toBeDisabled();
+    await expect(input).toHaveValue('Avery Adams');
+  }}
+/>
+
+<Story
+  name="Invalid"
+  args={{ invalid: true, required: true }}
+  play={async ({ canvas }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(input).toBeRequired();
+  }}
+/>
+
+<Story
+  name="Block"
+  args={{ block: true }}
+  play={async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('.combobox')!.className).toBe('combobox cb-block');
+  }}
+/>
+
+<!-- Left open with a highlighted option so axe scans the open listbox. -->
+<Story
+  name="Open"
+  play={async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('ad');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-aadams'));
+  }}
+/>
+
+<!-- Fixtures for the Playwright keyboard spec: no play function. -->
+<Story name="Fixture" />
+<Story name="Fixture preselected" args={{ value: 'cclark' }} />
