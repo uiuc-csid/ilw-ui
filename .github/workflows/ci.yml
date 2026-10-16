@@ -35,3 +35,22 @@ jobs:
         with:
           name: storybook-static
           path: storybook-static
+
+  # Publishes the Storybook built by `test` to Chromatic for visual review.
+  # Runs on pushes only (a PR's branch push already covers it) and needs the
+  # CHROMATIC_PROJECT_TOKEN repository secret. Settings: chromatic.config.json.
+  chromatic:
+    needs: test
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # Chromatic walks git history to find baselines
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: storybook-static
+          path: storybook-static
+      - uses: chromaui/action@18599f2ae5010524d496b86099c9b69a37f5d8d2 # v18.12.2
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
