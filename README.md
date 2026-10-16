@@ -216,6 +216,14 @@ pnpm test:e2e         # layer 2, against storybook-static/
 `mise run test` runs the last three in order. `pnpm storybook` starts the
 workbench on <http://localhost:6006>.
 
+Every push publishes Storybook to [Chromatic](https://www.chromatic.com/) for
+visual review (`.github/workflows/chromatic.yml`, the official
+`chromaui/action`; settings in `chromatic.config.json`). It needs the
+`CHROMATIC_PROJECT_TOKEN` repository secret. Visual changes don't fail CI; they
+are accepted or denied in Chromatic, and pushes to `main` are auto-accepted as
+the new baselines. To publish from your machine:
+`CHROMATIC_PROJECT_TOKEN=… pnpm chromatic`.
+
 Screen-reader checks can't be automated: [docs/at-smoke.md](docs/at-smoke.md)
 has the NVDA + Firefox and VoiceOver + Safari checklist. **Running it is a human
 task**; log each run there.
