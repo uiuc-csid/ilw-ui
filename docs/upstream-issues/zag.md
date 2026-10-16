@@ -72,4 +72,3 @@ then typing text that matched nothing.
 
 **Workaround in ilw-ui:** set `aria-activedescendant` after spreading the input
 props, gated on `api.open` and on the value being among the rendered items.
-
