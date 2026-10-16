@@ -155,7 +155,8 @@ each violation as file:line.
 ## Known issues
 
 Upstream `<ilw-modal>` (1.2.1) gaps. Each is worked around once, inside `Modal`,
-and none has an upstream issue filed yet.
+where a workaround is possible. None is filed upstream yet. Draft issues are in
+[docs/upstream-issues/ilw-modal.md](docs/upstream-issues/ilw-modal.md).
 
 - **No open/close events.** `Modal` watches the reflected `open` attribute with a
   `MutationObserver`.

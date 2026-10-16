@@ -1,6 +1,6 @@
 # ilw-ui
 
-Accessible Svelte 5 components that look and behave like the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>), filling gaps the toolkit leaves (sortable headings, modal with events/focus restore; later combobox, autocomplete, data table, pager). First consumer: ta-manager (`uiuc-csid/ta-manager`). [docs/plans/2026-10-16-ilw-ui-scaffold.md](docs/plans/2026-10-16-ilw-ui-scaffold.md) holds the design and the contracts that consumer depends on.
+Accessible Svelte 5 components that look and behave like the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>), filling gaps the toolkit leaves (sortable headings, modal with events/focus restore; later combobox, autocomplete, data table, pager). First consumer: ta-manager (`uiuc-csid/ta-manager`). [docs/old-plans/2026-10-16-ilw-ui-scaffold.md](docs/old-plans/2026-10-16-ilw-ui-scaffold.md) holds the design and the contracts that consumer depends on.
 
 ## Tech Stack
 
