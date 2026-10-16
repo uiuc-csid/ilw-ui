@@ -147,7 +147,8 @@ CAPTCHA-blocks automated browsers. See the README there to refresh it.
 
 ## The import rule
 
-`src/` imports only `svelte` and its own files, and uses no HTML sinks
+`src/` imports only `svelte`, `@zag-js/*` (pinned exactly, in lockstep) and its
+own files, and uses no HTML sinks
 (`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
 `eval`, `new Function`). `tests/unit/guard.test.ts` enforces this and reports
 each violation as file:line.
