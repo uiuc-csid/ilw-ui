@@ -9,6 +9,8 @@ const config: StorybookConfig = {
     '@storybook/addon-docs',
     '@storybook/addon-a11y',
     '@storybook/addon-vitest',
+    // MCP server for coding agents at http://localhost:6006/mcp (see .mcp.json).
+    '@storybook/addon-mcp',
   ],
   // The toolkit is served locally: its CDN CAPTCHA-blocks automated browsers.
   staticDirs: [{ from: '../vendor/illinois-toolkit', to: '/toolkit' }],

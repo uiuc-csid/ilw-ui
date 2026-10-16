@@ -8,6 +8,7 @@ Accessible Svelte 5 components that look and behave like the **Illinois Web Tool
 - **Svelte 5** (runes), **Vite 8**, **TypeScript**, `svelte-check`
 - **Storybook 10** (`@storybook/svelte-vite`, Svelte CSF stories) — the workbench and the test fixture host
 - **Vitest** (browser mode, Playwright provider) and **@playwright/test**
+- **MCP servers** (`.mcp.json`): `svelte` (local `@sveltejs/mcp`: Svelte docs + autofixer), `storybook` (`@storybook/addon-mcp`, live only while `pnpm storybook` runs on :6006), `playwright` (drive stories in a real browser)
 
 ## Source Layout
 

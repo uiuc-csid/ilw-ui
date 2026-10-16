@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "svelte": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["dlx", "@sveltejs/mcp@0.1.26"]
+    },
+    "storybook": {
+      "type": "http",
+      "url": "http://localhost:6006/mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["dlx", "@playwright/mcp@0.0.83", "--headless", "--isolated"]
+    }
+  }
+}
