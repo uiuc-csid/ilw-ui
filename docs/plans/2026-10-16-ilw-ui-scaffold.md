@@ -4,7 +4,7 @@ _Standalone repository. Starting brief for an agent with no access to the consum
 
 ## Context
 
-ta-manager (a Django app for UIUC TA assignment) is moving its frontend from hand-written, string-built ES modules to **Svelte 5 islands** mounted in server-rendered pages. Its UI follows the University of Illinois brand through the **Illinois Web Toolkit** (`ilw-*` Lit web components, https://builder3.toolkit.illinois.edu/). The toolkit has no combobox, select, table, chips or toggle group, and its modal lacks events and focus restore, so ta-manager needs a small library of accessible widgets that look and behave like the toolkit.
+ta-manager (a Django app for UIUC TA assignment) is moving its frontend from hand-written, string-built ES modules to **Svelte 5 islands** mounted in server-rendered pages. Its UI follows the University of Illinois brand through the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>). The toolkit has no combobox, select, table, chips or toggle group, and its modal lacks events and focus restore, so ta-manager needs a small library of accessible widgets that look and behave like the toolkit.
 
 That library is **`ilw-ui`**, built as its own repository so other campus projects can use it. Its design, decided in ta-manager's migration plan:
 
@@ -35,7 +35,7 @@ That library is **`ilw-ui`**, built as its own repository so other campus projec
 
 ## Layout
 
-```
+```text
 .node-version  mise.toml  package.json  pnpm-lock.yaml  LICENSE  README.md
 tsconfig.json  svelte.config.js  vite.config.ts  vitest.config.ts  playwright.config.ts
 .storybook/
@@ -99,7 +99,7 @@ A sortable column heading. Contract (matches ta-manager's current `sortableTh()`
 - Tests: play asserts exact attributes/classes/text and that `aria-sort` flips; Playwright: Tab to a heading, Enter and Space toggle, focus remains on the button; unit: `nextSort`.
 
 ### 6. `Modal`, `alert()`, `confirm()`
-Wraps the toolkit's `<ilw-modal>` (https://github.com/web-illinois/ilw-modal); not a separate dialog implementation, which would add a second focus trap. Contract (matches ta-manager's `openModal`/`alertModal`/`confirmModal`, which its e2e helpers select on):
+Wraps the toolkit's `<ilw-modal>` (<https://github.com/web-illinois/ilw-modal>); not a separate dialog implementation, which would add a second focus trap. Contract (matches ta-manager's `openModal`/`alertModal`/`confirmModal`, which its e2e helpers select on):
 - One `<ilw-modal id="app-modal-N" size="small|…">` per open (N from a module counter), appended to `document.body`, opened with `.open = true`, **removed from the DOM** when closed.
 - Content: `<h2 slot="title">` when a title is given; the body from a **Svelte snippet** (for `alert`/`confirm`: a `<p>` with the plain-text message); then `<div class="modal-buttons">` holding `<button type="button" class="ilw-button">` per button, in the given order. Default buttons: one, `'Got it'` → `true`.
 - Resolution: a button click resolves its `value`; Escape, the × button and a backdrop click resolve `null`. `ilw-modal` fires no close event, so close is detected by **one `MutationObserver` on the reflected `open` attribute**, inside the component, which also emits `onclose(reason)` (`'button' | 'dismiss'`).
