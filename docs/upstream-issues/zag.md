@@ -56,3 +56,20 @@ mirrors `inputValue` loses the typed text.
 
 **Workaround in ilw-ui:** accept `inputValue` only for the reasons
 `'input-change'` and `'item-select'`.
+
+## 4. `aria-activedescendant` points at options that aren't rendered
+
+**Status:** Not filed.
+
+`getInputProps()` sets `aria-activedescendant` whenever `highlightedValue` is
+set (`combobox.connect.mjs`), even while the list is closed, or when the
+highlighted value (often the current selection) is no longer in the collection.
+The IDREF then names an element that doesn't exist, which fails axe
+`aria-valid-attr-value`. We saw it on WebKit in CI after selecting an option and
+then typing text that matched nothing.
+
+**Proposal:** emit it only when `open` and the value is in the collection.
+
+**Workaround in ilw-ui:** set `aria-activedescendant` after spreading the input
+props, gated on `api.open` and on the value being among the rendered items.
+

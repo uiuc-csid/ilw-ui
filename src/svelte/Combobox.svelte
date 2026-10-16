@@ -160,11 +160,18 @@
     ),
   );
 
+  // Zag points aria-activedescendant at the highlighted value even while
+  // closed or filtered out (e.g. the selection), leaving a dangling IDREF.
+  const activeDescendant = $derived.by(() => {
+    const v = api.highlightedValue;
+    return api.open && v != null && filtered.shown.some((i) => i.value === v) ? optionId(v) : undefined;
+  });
+
   let root: HTMLElement;
 </script>
 
 <span class={['combobox', block && 'cb-block']} {...api.getRootProps()} bind:this={root}>
-  <input class="combobox-input" {...inputProps} />
+  <input class="combobox-input" {...inputProps} aria-activedescendant={activeDescendant} />
   <div
     class="combobox-popup"
     {...api.getContentProps()}

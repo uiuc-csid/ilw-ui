@@ -70,6 +70,7 @@
     await expect(canvas.getAllByRole('option')).toHaveLength(4);
     await userEvent.keyboard('{Escape}');
     await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await expect(input).not.toHaveAttribute('aria-activedescendant');
     await expect(document.activeElement).toBe(input);
 
     // A unique match commits on blur.
@@ -87,6 +88,7 @@
     await expect(canvas.getByRole('option', { name: 'No matches' })).toHaveAttribute('aria-disabled', 'true');
     await userEvent.tab();
     await expect(input).toHaveValue('zz9');
+    await expect(input).not.toHaveAttribute('aria-activedescendant');
     await expect(selected).toHaveTextContent('');
     await expect(canvas.getByTestId('changes')).toHaveTextContent('3');
   }}

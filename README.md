@@ -184,6 +184,7 @@ DOM contract (consumers' tests select on it):
 - The listbox is `hidden` while closed.
 - Option ids are `${popupId}-opt-${encodeURIComponent(value)}`.
 - Only the selected option has `aria-selected="true"`.
+- `aria-activedescendant` is set only while the list is open and the highlighted option is rendered.
 - With no matches, the list shows a disabled `.combobox-empty` "No matches" row in place of the "more" row.
 - The popup is placed with CSS, with no inline `style`, so it runs under `style-src-attr 'none'`.
 - While the list is open on macOS and iOS, Zag adds a visually hidden `span[role=alert]` to `<body>`. It re-announces the highlight for VoiceOver.
@@ -272,6 +273,10 @@ inside `Combobox`. None is filed upstream yet. Draft issues are in
   `inputValue` and accepts only `'input-change'` and `'item-select'`.
 - **`mergeProps` runs handlers in reverse order:** the last argument's handler
   runs first. `Combobox` passes its own handlers last.
+- **`aria-activedescendant` can point at an option that isn't rendered.** Zag
+  sets it from the highlighted value even while the list is closed or the option
+  is filtered out, which axe flags as an invalid IDREF. `Combobox` overrides the
+  attribute in its markup.
 
 ## License
 
