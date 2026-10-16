@@ -44,10 +44,17 @@
       onclose(clicked ? 'button' : 'dismiss', clicked ? clicked.value : null);
     });
     observer.observe(modal, { attributes: true, attributeFilter: ['open'] });
+    // Mark the initial button only now, after insertion: WebKit queues a
+    // button inserted with `autofocus` as an autofocus candidate and focuses
+    // it at a later rendering update, pulling focus back to it after the user
+    // has already tabbed on. An attribute added later is never a candidate.
+    const initial = buttons.findIndex((button) => button.autofocus);
+    const target = initial === -1 ? null : (row.children[initial] as HTMLElement);
+    target?.setAttribute('autofocus', '');
     modal.open = true;
     // ilw-modal honours `autofocus` only on its direct slotted children, not
     // on buttons nested in .modal-buttons, so focus it once rendered.
-    modal.updateComplete.then(() => row.querySelector<HTMLElement>('[autofocus]')?.focus());
+    modal.updateComplete.then(() => target?.focus());
     return () => observer.disconnect();
   });
 
@@ -67,10 +74,7 @@
   {#if body}{@render body()}{:else if message}<p>{message}</p>{/if}
   <div class="modal-buttons" bind:this={row}>
     {#each buttons as button, i (i)}
-      <!-- svelte-ignore a11y_autofocus -- autofocus marks the safe choice in a dialog, where moving focus is expected -->
-      <button type="button" class="ilw-button" autofocus={button.autofocus} {@attach chooses(button)}
-        >{button.label}</button
-      >
+      <button type="button" class="ilw-button" {@attach chooses(button)}>{button.label}</button>
     {/each}
   </div>
 </ilw-modal>
