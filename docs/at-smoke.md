@@ -35,7 +35,7 @@ in new tab"), then add a row to the log below.
 - [ ] In Free text, unmatched text is read back as typed after Tab, and "No matches" is announced while the list is open.
 - [ ] Disabled and invalid stories announce "dimmed/unavailable" and "invalid entry" respectively.
 
-## DataTable and Pager (stories: DataTable → Fixture, Fixture paged)
+## DataTable and Pager (stories: DataTable → Fixture, Fixture paged accessible)
 
 - [ ] Table navigation reads the table's name ("People") and its column headers; the sorted heading announces its sort state.
 - [ ] Enter or Space on a heading re-sorts, and focus stays on that heading's button.

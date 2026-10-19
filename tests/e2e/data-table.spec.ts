@@ -25,7 +25,7 @@ test('Enter and Space on a TableSortTh sort and keep focus on its button', async
 });
 
 test('paging by keyboard keeps focus in the pager', async ({ page }) => {
-  await openStory(page, 'datatable--fixture-paged');
+  await openStory(page, 'datatable--fixture-paged-accessible');
   const pager = page.getByRole('navigation', { name: 'Pages, bottom' });
   const next = pager.getByRole('button', { name: 'Next page' });
   const currentPage = pager.locator('[aria-current="page"]');
@@ -50,7 +50,7 @@ test('paging by keyboard keeps focus in the pager', async ({ page }) => {
 });
 
 test('a sort goes back to page 1 and keeps focus on the heading', async ({ page }) => {
-  await openStory(page, 'datatable--fixture-paged');
+  await openStory(page, 'datatable--fixture-paged-accessible');
   const pager = page.getByRole('navigation', { name: 'Pages, top' });
   await pager.getByRole('button', { name: '3', exact: true }).click();
   await expect(pager.locator('[aria-current="page"]')).toHaveText('3');
@@ -60,4 +60,19 @@ test('a sort goes back to page 1 and keeps focus on the heading', async ({ page 
   await press(page, 'Enter');
   await expect(pager.locator('[aria-current="page"]')).toHaveText('1');
   await expect(group).toBeFocused();
+});
+
+test('the legacy pager keeps focus too', async ({ page }) => {
+  await openStory(page, 'datatable--fixture-paged');
+  const pager = page.locator('.picker-ctrl-row').last();
+  const next = pager.locator('button').last();
+  const currentPage = pager.locator('.picker-tog-on');
+
+  await next.focus();
+  for (let n = 2; n <= 6; n++) {
+    await press(page, 'Enter');
+    await expect(currentPage).toHaveText(String(n));
+  }
+  await expect(next).toBeDisabled();
+  await expect(currentPage).toBeFocused();
 });

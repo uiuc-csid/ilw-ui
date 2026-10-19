@@ -20,7 +20,7 @@ and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
 
 ```js
 import { Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
-import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
+import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter, ilwPagerClasses } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
@@ -202,7 +202,7 @@ page, using the page's own comparators and predicates. Pages never import
 ```svelte
 <script lang="ts">
   import { rowColumn } from 'ilw-ui/core';
-  import { createDataTable, DataTable, Pager, setTableFilter, TableSortTh } from 'ilw-ui/svelte';
+  import { createDataTable, DataTable, ilwPagerClasses, Pager, setTableFilter, TableSortTh } from 'ilw-ui/svelte';
 
   let { courses } = $props();
   const table = createDataTable({
@@ -220,7 +220,7 @@ page, using the page's own comparators and predicates. Pages never import
 </script>
 
 <input type="search" oninput={(e) => setTableFilter(table, 'code', e.currentTarget.value)} />
-<Pager {table} emptyLabel="No courses" />
+<Pager {table} emptyLabel="No courses" a11y classes={ilwPagerClasses} />
 <DataTable {table} class="courses">
   {#snippet header()}<tr><TableSortTh {table} id="code" label="Course" /><TableSortTh {table} id="hours" label="Hours" /></tr>{/snippet}
   {#snippet row(course)}<tr><td>{course.code}</td><td>{course.hours}</td></tr>{/snippet}
@@ -250,18 +250,31 @@ page, using the page's own comparators and predicates. Pages never import
   same DOM contract, driven by the table's sort: the sorted column flips and
   another column starts ascending. Focus stays on the button, even if the page
   re-renders the header.
-- **`Pager`** (`table`, `emptyLabel`, `label?`, `classes?`, `onpage?`) takes a
-  paged table only. A page may render two pagers over one table; they stay in
-  step. After paging by keyboard, focus stays on the pressed button, or on the
-  current page's button when the pressed one becomes disabled. `classes`
-  replaces the default class names, e.g. ta-manager's `picker-*` ones: `root`,
-  `label`, `button`, `current` (added to the current page's button),
-  `ellipsis`, `count`. Give each pager a distinct `label` when a page has two.
+- **`Pager`** (`table`, `emptyLabel`, `a11y?`, `label?`, `classes?`,
+  `onpage?`) takes a paged table only. A page may render two pagers over one
+  table; they stay in step. After paging by keyboard, focus stays on the pressed
+  button, or on the current page's button when the pressed one becomes
+  disabled. `classes` overrides the class names part by part (`root`, `label`,
+  `button`, `current` (added to the current page's button), `ellipsis`,
+  `count`) over `legacyPagerClasses`. Pass `ilwPagerClasses` for the
+  `.ilw-pager*` styles in `ilw-ui/styles.css`.
 
 `pageWindow(page, totalPages)` (`ilw-ui/core`) is the pager's page list: the
 first, the last, and two either side of `page`, with `null` for each gap.
 
-`Pager` DOM contract (default classes; page 1 of 6):
+**`Pager` renders ta-manager's legacy unranked-courses pager by default**, byte
+for byte: no whitespace between elements, no `type` on the buttons, and no ARIA.
+This lets ta-manager port pages 1:1 with unchanged aria snapshots. Page 1 of 6:
+
+```html
+<div class="picker-ctrl-row"><span class="picker-sort-lbl">Page:</span><button class="picker-tog picker-pg-btn" data-page="0" disabled>‹</button><button class="picker-tog picker-pg-btn picker-tog-on" data-page="1">1</button><button class="picker-tog picker-pg-btn" data-page="2">2</button><button class="picker-tog picker-pg-btn" data-page="3">3</button><span class="picker-pg-ellipsis">…</span><button class="picker-tog picker-pg-btn" data-page="6">6</button><button class="picker-tog picker-pg-btn" data-page="2">›</button><span class="picker-count">1–25 of 131</span></div>
+```
+
+**`a11y` is the accessible markup, and the target for consumers to switch to**
+(ta-manager's Phase 13, after its 1:1 port). It makes the root a `<nav>`
+labelled by `label` (default `"Pages"`; give two pagers distinct labels), adds
+`type="button"`, names previous and next, and marks the current page with
+`aria-current="page"`. With `a11y` and `ilwPagerClasses`:
 
 ```html
 <nav class="ilw-pager" aria-label="Pages">
@@ -276,6 +289,9 @@ first, the last, and two either side of `page`, with `null` for each gap.
   <span class="ilw-pager-count">1–25 of 131</span>
 </nav>
 ```
+
+(The real output has no whitespace between elements; it's added here to make
+the example readable.)
 
 The count isn't a live region: with two pagers it would be announced twice.
 Focus staying on the pressed button is what tells a screen-reader user the page

@@ -5,17 +5,22 @@
   over one table; they stay in step. After paging by keyboard, focus stays in
   this pager: on the pressed button, or on the current page's button when the
   pressed one is now disabled.
+
+  By default the markup is ta-manager's legacy unranked-courses pager, byte for
+  byte (no whitespace between elements, no ARIA). `a11y` adds the nav landmark,
+  type=button, named previous/next and aria-current.
 -->
 <script lang="ts" generics="T extends RowData">
   import type { RowData } from '@tanstack/svelte-table';
   import { flushSync } from 'svelte';
 
   import { pageWindow } from '../core/index.ts';
-  import type { PagedDataTableInstance, PagerClasses } from './data-table.ts';
+  import { legacyPagerClasses, type PagedDataTableInstance, type PagerClasses } from './data-table.ts';
 
   let {
     table,
     emptyLabel,
+    a11y = false,
     label = 'Pages',
     classes = {},
     onpage,
@@ -23,23 +28,17 @@
     table: PagedDataTableInstance<T>;
     /** The count text when no row passes the filters, e.g. "No courses". */
     emptyLabel: string;
-    /** The navigation landmark's accessible name. */
+    /** Render the accessible markup: a labelled `<nav>`, `type="button"`, named previous/next, `aria-current`. */
+    a11y?: boolean;
+    /** With `a11y`, the navigation landmark's accessible name. */
     label?: string;
-    /** Class names, e.g. a consumer's existing pager classes. */
+    /** Class names, merged over `legacyPagerClasses` (e.g. pass `ilwPagerClasses`). */
     classes?: Partial<PagerClasses>;
     /** Called after the page changes (1-based), e.g. to scroll the table into view. */
     onpage?: (page: number) => void;
   } = $props();
 
-  const cls = $derived({
-    root: 'ilw-pager',
-    label: 'ilw-pager-label',
-    button: 'ilw-pager-btn',
-    current: 'on',
-    ellipsis: 'ilw-pager-ellipsis',
-    count: 'ilw-pager-count',
-    ...classes,
-  });
+  const cls = $derived({ ...legacyPagerClasses, ...classes });
 
   let root: HTMLElement;
 
@@ -52,6 +51,7 @@
     total === 0 ? emptyLabel : `${first + 1}–${Math.min(first + pagination.pageSize, total)} of ${total}`,
   );
   const pages = $derived(pageWindow(page, totalPages));
+  const type = $derived(a11y ? 'button' : undefined);
 
   function go(event: MouseEvent & { currentTarget: HTMLButtonElement }) {
     const button = event.currentTarget;
@@ -61,42 +61,38 @@
     table.setPageIndex(p - 1);
     flushSync();
     if (hadFocus && (button.disabled || !button.isConnected)) {
-      root.querySelector<HTMLButtonElement>('[aria-current="page"]')?.focus();
+      root.querySelector<HTMLButtonElement>(`button.${cls.current.trim().split(/\s+/).map(CSS.escape).join('.')}`)?.focus();
     }
     onpage?.(p);
   }
 </script>
 
-<nav class={cls.root} aria-label={label} bind:this={root}>
-  <span class={cls.label}>Page:</span>
-  <button
-    type="button"
+<!-- No whitespace between elements: the legacy markup has none. -->
+<svelte:element
+  this={a11y ? 'nav' : 'div'}
+  class={cls.root}
+  aria-label={a11y ? label : undefined}
+  bind:this={root}
+  ><span class={cls.label}>Page:</span><button
+    {type}
     class={cls.button}
     data-page={page - 1}
     disabled={page <= 1}
-    aria-label="Previous page"
+    aria-label={a11y ? 'Previous page' : undefined}
     onclick={go}>‹</button
-  >
-  {#each pages as p, i (p ?? `gap-after-${pages[i - 1]}`)}
-    {#if p === null}
-      <span class={cls.ellipsis}>…</span>
-    {:else}
-      <button
-        type="button"
-        class={[cls.button, p === page && cls.current]}
+  >{#each pages as p, i (p ?? `gap-after-${pages[i - 1]}`)}{#if p === null}<span class={cls.ellipsis}>…</span
+      >{:else}<button
+        {type}
+        class={p === page ? `${cls.button} ${cls.current}` : cls.button}
         data-page={p}
-        aria-current={p === page ? 'page' : undefined}
+        aria-current={a11y && p === page ? 'page' : undefined}
         onclick={go}>{p}</button
-      >
-    {/if}
-  {/each}
-  <button
-    type="button"
+      >{/if}{/each}<button
+    {type}
     class={cls.button}
     data-page={page + 1}
     disabled={page >= totalPages}
-    aria-label="Next page"
+    aria-label={a11y ? 'Next page' : undefined}
     onclick={go}>›</button
-  >
-  <span class={cls.count}>{count}</span>
-</nav>
+  ><span class={cls.count}>{count}</span></svelte:element
+>

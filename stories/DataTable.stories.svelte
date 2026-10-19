@@ -2,6 +2,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { expect, waitFor, within } from 'storybook/test';
 
+  import { ilwPagerClasses } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import { byGroup, byName, people, stableSorted } from './table-data.ts';
 
@@ -12,8 +13,35 @@
 
   const NBSP = '\u00a0';
   const rowIds = (root: HTMLElement) => [...root.querySelectorAll('tbody tr[data-id]')].map((tr) => tr.getAttribute('data-id'));
-  const pagers = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('nav')];
-  const current = (pager: HTMLElement) => pager.querySelector('[aria-current="page"]')?.textContent;
+  const pagers = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('nav, .picker-ctrl-row')];
+  const current = (pager: HTMLElement) => pager.querySelector('[aria-current="page"], .picker-tog-on')?.textContent;
+
+  /** The element serialized without Svelte's comment anchors. */
+  function markup(el: Element): string {
+    const copy = el.cloneNode(true) as Element;
+    const walker = document.createTreeWalker(copy, NodeFilter.SHOW_COMMENT);
+    const comments: Node[] = [];
+    while (walker.nextNode()) comments.push(walker.currentNode);
+    for (const c of comments) c.parentNode?.removeChild(c);
+    return new XMLSerializer().serializeToString(copy);
+  }
+
+  /** HTML parsed and serialized the same way. */
+  function parsed(html: string): string {
+    return markup(new DOMParser().parseFromString(html, 'text/html').body.firstElementChild!);
+  }
+
+  // What ta-manager's unranked-courses-module.js builds for page 1 of 6.
+  const legacyPager =
+    '<div class="picker-ctrl-row"><span class="picker-sort-lbl">Page:</span>' +
+    '<button class="picker-tog picker-pg-btn" data-page="0" disabled>‹</button>' +
+    '<button class="picker-tog picker-pg-btn picker-tog-on" data-page="1">1</button>' +
+    '<button class="picker-tog picker-pg-btn" data-page="2">2</button>' +
+    '<button class="picker-tog picker-pg-btn" data-page="3">3</button>' +
+    '<span class="picker-pg-ellipsis">…</span>' +
+    '<button class="picker-tog picker-pg-btn" data-page="6">6</button>' +
+    '<button class="picker-tog picker-pg-btn" data-page="2">›</button>' +
+    '<span class="picker-count">1–25 of 131</span></div>';
 </script>
 
 <Story
@@ -96,12 +124,32 @@
   name="Paged"
   args={{ count: 131, pageSize: 25 }}
   play={async ({ canvas, canvasElement, userEvent }) => {
+    // The default is the legacy markup, byte for byte.
+    const [top, bottom] = pagers(canvasElement);
+    await expect(markup(top)).toBe(parsed(legacyPager));
+    await expect(markup(bottom)).toBe(parsed(legacyPager));
+    await expect(canvasElement.querySelector('nav, [aria-current], [aria-label="Next page"]')).toBeNull();
+
+    await userEvent.click(within(top).getByRole('button', { name: '3' }));
+    await expect(current(top)).toBe('3');
+    await expect(current(bottom)).toBe('3');
+    await expect(bottom.querySelector('.picker-count')?.textContent).toBe('51–75 of 131');
+    await userEvent.click(canvas.getByRole('button', { name: 'Group' }));
+    await expect(current(top)).toBe('1');
+  }}
+/>
+
+<Story
+  name="Paged accessible"
+  args={{ count: 131, pageSize: 25, a11y: true, classes: ilwPagerClasses }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
     const [top, bottom] = pagers(canvasElement);
     await expect(top).toHaveAccessibleName('Pages, top');
     await expect(top.className).toBe('ilw-pager');
     const pager = within(top);
     const prev = pager.getByRole('button', { name: 'Previous page' });
     const next = pager.getByRole('button', { name: 'Next page' });
+    for (const button of top.querySelectorAll('button')) await expect(button).toHaveAttribute('type', 'button');
     await expect(prev).toBeDisabled();
     await expect(prev).toHaveAttribute('data-page', '0');
     await expect(prev.textContent).toBe('‹');
@@ -152,29 +200,18 @@
 
 <Story
   name="Pager classes"
-  args={{
-    count: 60,
-    pageSize: 25,
-    classes: {
-      root: 'picker-ctrl-row',
-      label: 'picker-sort-lbl',
-      button: 'picker-tog picker-pg-btn',
-      current: 'picker-tog-on',
-      ellipsis: 'picker-pg-ellipsis',
-      count: 'picker-count',
-    },
-  }}
+  args={{ count: 60, pageSize: 25, classes: { root: 'pages', current: 'is-current' } }}
   play={async ({ canvasElement }) => {
-    const [top] = pagers(canvasElement);
-    await expect(top.className).toBe('picker-ctrl-row');
+    // Each class given replaces its legacy default; the rest stay.
+    const top = canvasElement.querySelector<HTMLElement>('.pages')!;
     await expect(top.querySelector('span')?.className).toBe('picker-sort-lbl');
-    await expect(top.querySelector('[aria-current="page"]')?.className).toBe('picker-tog picker-pg-btn picker-tog-on');
-    await expect(top.querySelector('[aria-label="Next page"]')?.className).toBe('picker-tog picker-pg-btn');
+    await expect(top.querySelector('.is-current')?.className).toBe('picker-tog picker-pg-btn is-current');
     await expect(top.querySelector('.picker-count')?.textContent).toBe('1–25 of 60');
-    await expect(top.querySelector('.ilw-pager-btn')).toBeNull();
+    await expect(top.querySelector('.picker-tog-on')).toBeNull();
   }}
 />
 
 <!-- Fixtures for the Playwright keyboard spec: no play function. -->
 <Story name="Fixture" args={{ count: 30 }} />
 <Story name="Fixture paged" args={{ count: 131, pageSize: 25 }} />
+<Story name="Fixture paged accessible" args={{ count: 131, pageSize: 25, a11y: true, classes: ilwPagerClasses }} />
