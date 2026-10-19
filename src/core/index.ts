@@ -42,3 +42,14 @@ export function blurMatch(items: ComboboxItem[], text: string): ComboboxItem | n
   const subs = items.filter((i) => (i.search ?? i.label).toLowerCase().includes(typed));
   return subs.length === 1 ? subs[0] : null;
 }
+
+export {
+  type Comparator,
+  comparatorSortFn,
+  type Predicate,
+  predicateFilterFn,
+  pageWindow,
+  type RowColumn,
+  rowColumn,
+  type RowColumnOptions,
+} from './table.ts';

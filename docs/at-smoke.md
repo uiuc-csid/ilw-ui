@@ -35,6 +35,15 @@ in new tab"), then add a row to the log below.
 - [ ] In Free text, unmatched text is read back as typed after Tab, and "No matches" is announced while the list is open.
 - [ ] Disabled and invalid stories announce "dimmed/unavailable" and "invalid entry" respectively.
 
+## DataTable and Pager (stories: DataTable → Fixture, Fixture paged)
+
+- [ ] Table navigation reads the table's name ("People") and its column headers; the sorted heading announces its sort state.
+- [ ] Enter or Space on a heading re-sorts, and focus stays on that heading's button.
+- [ ] Each pager is announced as a navigation landmark with its own name ("Pages, top" / "Pages, bottom").
+- [ ] The previous and next buttons are announced as "Previous page" and "Next page", and announced as dimmed or unavailable when disabled.
+- [ ] The current page's button is announced as the current page.
+- [ ] After pressing Next, focus stays on Next. On the last page, focus moves to the current page's button, and that is announced.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |

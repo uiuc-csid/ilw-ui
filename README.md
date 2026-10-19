@@ -3,7 +3,8 @@
 Accessible Svelte 5 components that look and behave like the
 [Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/). They cover what
 the toolkit lacks: so far, a sortable table heading, a modal with close
-events, focus return and a promise API, and a filtering combobox. Where the toolkit already has a
+events, focus return and a promise API, a filtering combobox, and a
+client-side sortable, filterable, paged table. Where the toolkit already has a
 component (page chrome, accordion, the modal dialog itself), `ilw-ui` uses it
 rather than replacing it.
 
@@ -13,12 +14,14 @@ Status: pre-release (`private: true`), first consumer
 ## Install and use
 
 The package ships source (`.svelte`/`.ts`); your Vite + Svelte build compiles it.
-Peer dependency: `svelte ^5.57`. Dependencies: `@zag-js/combobox` and
-`@zag-js/svelte`, pinned exactly.
+Peer dependency: `svelte ^5.57`. Dependencies, pinned exactly: `@zag-js/combobox`
+and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
+`@tanstack/svelte-table` (9.3.1).
 
 ```js
 import { Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
-import { nextSort, filterItems, blurMatch } from 'ilw-ui/core';
+import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
+import { nextSort, filterItems, blurMatch, rowColumn, pageWindow } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
@@ -189,6 +192,94 @@ DOM contract (consumers' tests select on it):
 - The popup is placed with CSS, with no inline `style`, so it runs under `style-src-attr 'none'`.
 - While the list is open on macOS and iOS, Zag adds a visually hidden `span[role=alert]` to `<body>`. It re-announces the highlight for VoiceOver.
 
+### `createDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`
+
+A client-side table on TanStack Table 9: filter, then sort, then (optionally)
+page, using the page's own comparators and predicates. Pages never import
+`@tanstack/*`.
+
+```svelte
+<script lang="ts">
+  import { rowColumn } from 'ilw-ui/core';
+  import { createDataTable, DataTable, Pager, setTableFilter, TableSortTh } from 'ilw-ui/svelte';
+
+  let { courses } = $props();
+  const table = createDataTable({
+    get data() {
+      return courses; // a getter, so new data reaches the table
+    },
+    columns: [
+      rowColumn('code', { compare: (a, b) => a.code.localeCompare(b.code), filter: (row, q) => !q || row.code.includes(q) }),
+      rowColumn('hours', { compare: (a, b) => a.hours - b.hours }),
+    ],
+    getRowId: (row) => row.id,
+    sorting: [{ id: 'code', desc: false }],
+    pageSize: 25, // omit for an unpaged table
+  });
+</script>
+
+<input type="search" oninput={(e) => setTableFilter(table, 'code', e.currentTarget.value)} />
+<Pager {table} emptyLabel="No courses" />
+<DataTable {table} class="courses">
+  {#snippet header()}<tr><TableSortTh {table} id="code" label="Course" /><TableSortTh {table} id="hours" label="Hours" /></tr>{/snippet}
+  {#snippet row(course)}<tr><td>{course.code}</td><td>{course.hours}</td></tr>{/snippet}
+  {#snippet empty()}<tr><td colspan="2">No courses.</td></tr>{/snippet}
+</DataTable>
+```
+
+- **`rowColumn(id, { compare?, filter? })`** (`ilw-ui/core`) builds a column over
+  the whole row. `compare` is the ascending `(a, b) => number` comparator:
+  TanStack negates it for descending and breaks ties by input order, so ties
+  keep the order a stable sort gives them in both directions. `filter` is a
+  `(row, value) => boolean` predicate. A filter is removed only when its value
+  is `undefined`; `''`, `null` and `false` reach the predicate, which decides.
+- **`createDataTable(options)`** returns a `PagedDataTableInstance` with
+  `pageSize`, else a `DataTableInstance` without the pagination APIs. One column
+  sorts at a time and never goes back to unsorted. Call it while a component
+  initialises.
+- **The page index is reset explicitly**, not by TanStack (its reset runs
+  lazily, during a render). `TableSortTh` goes back to page 1 after a sort, and
+  `setTableFilter(table, id, value)` after a filter. If you call TanStack's
+  `setFilterValue` yourself, call `table.setPageIndex(0)` too.
+- **`DataTable`** renders a native `<table>` (attributes pass through), a
+  `<thead>` from `header`, and a `<tbody>` from `row` (keyed by `getRowId`) or
+  `empty`. It adds no classes or styles. **`DataRows`** is just the rows, for a
+  `<table>` already in the page's HTML: mount it into the `<tbody>`.
+- **`TableSortTh`** (`table`, `id`, `label`) renders a `SortableTh` with the
+  same DOM contract, driven by the table's sort: the sorted column flips and
+  another column starts ascending. Focus stays on the button, even if the page
+  re-renders the header.
+- **`Pager`** (`table`, `emptyLabel`, `label?`, `classes?`, `onpage?`) takes a
+  paged table only. A page may render two pagers over one table; they stay in
+  step. After paging by keyboard, focus stays on the pressed button, or on the
+  current page's button when the pressed one becomes disabled. `classes`
+  replaces the default class names, e.g. ta-manager's `picker-*` ones: `root`,
+  `label`, `button`, `current` (added to the current page's button),
+  `ellipsis`, `count`. Give each pager a distinct `label` when a page has two.
+
+`pageWindow(page, totalPages)` (`ilw-ui/core`) is the pager's page list: the
+first, the last, and two either side of `page`, with `null` for each gap.
+
+`Pager` DOM contract (default classes; page 1 of 6):
+
+```html
+<nav class="ilw-pager" aria-label="Pages">
+  <span class="ilw-pager-label">Page:</span>
+  <button type="button" class="ilw-pager-btn" data-page="0" disabled aria-label="Previous page">‹</button>
+  <button type="button" class="ilw-pager-btn on" data-page="1" aria-current="page">1</button>
+  <button type="button" class="ilw-pager-btn" data-page="2">2</button>
+  <button type="button" class="ilw-pager-btn" data-page="3">3</button>
+  <span class="ilw-pager-ellipsis">…</span>
+  <button type="button" class="ilw-pager-btn" data-page="6">6</button>
+  <button type="button" class="ilw-pager-btn" data-page="2" aria-label="Next page">›</button>
+  <span class="ilw-pager-count">1–25 of 131</span>
+</nav>
+```
+
+The count isn't a live region: with two pagers it would be announced twice.
+Focus staying on the pressed button is what tells a screen-reader user the page
+changed.
+
 ## Tests
 
 Accessibility is proven by tests. Each component has three layers, all driven by
@@ -234,8 +325,9 @@ CAPTCHA-blocks automated browsers. See the README there to refresh it.
 
 ## The import rule
 
-`src/` imports only `svelte`, `@zag-js/*` (pinned exactly, in lockstep) and its
-own files, and uses no HTML sinks
+`src/` imports only `svelte`, `@zag-js/*`, `@tanstack/table-core` and
+`@tanstack/svelte-table` (each family pinned exactly, in lockstep) and its own
+files, and uses no HTML sinks
 (`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
 `eval`, `new Function`). `tests/unit/guard.test.ts` enforces this and reports
 each violation as file:line.
