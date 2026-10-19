@@ -2,7 +2,6 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { expect, waitFor, within } from 'storybook/test';
 
-  import { ilwPagerClasses } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import { byGroup, byName, people, stableSorted } from './table-data.ts';
 
@@ -121,10 +120,10 @@
 />
 
 <Story
-  name="Paged"
-  args={{ count: 131, pageSize: 25 }}
+  name="Paged legacy"
+  args={{ count: 131, pageSize: 25, legacy: true }}
   play={async ({ canvas, canvasElement, userEvent }) => {
-    // The default is the legacy markup, byte for byte.
+    // `legacy` renders the legacy markup, byte for byte.
     const [top, bottom] = pagers(canvasElement);
     await expect(markup(top)).toBe(parsed(legacyPager));
     await expect(markup(bottom)).toBe(parsed(legacyPager));
@@ -140,8 +139,8 @@
 />
 
 <Story
-  name="Paged accessible"
-  args={{ count: 131, pageSize: 25, a11y: true, classes: ilwPagerClasses }}
+  name="Paged"
+  args={{ count: 131, pageSize: 25 }}
   play={async ({ canvas, canvasElement, userEvent }) => {
     const [top, bottom] = pagers(canvasElement);
     await expect(top).toHaveAccessibleName('Pages, top');
@@ -202,16 +201,17 @@
   name="Pager classes"
   args={{ count: 60, pageSize: 25, classes: { root: 'pages', current: 'is-current' } }}
   play={async ({ canvasElement }) => {
-    // Each class given replaces its legacy default; the rest stay.
+    // Each class given replaces its default; the rest stay.
     const top = canvasElement.querySelector<HTMLElement>('.pages')!;
-    await expect(top.querySelector('span')?.className).toBe('picker-sort-lbl');
-    await expect(top.querySelector('.is-current')?.className).toBe('picker-tog picker-pg-btn is-current');
-    await expect(top.querySelector('.picker-count')?.textContent).toBe('1–25 of 60');
-    await expect(top.querySelector('.picker-tog-on')).toBeNull();
+    await expect(top.querySelector('span')?.className).toBe('ilw-pager-label');
+    await expect(top.querySelector('.is-current')?.className).toBe('ilw-pager-btn is-current');
+    await expect(top.querySelector('.is-current')).toHaveAttribute('aria-current', 'page');
+    await expect(top.querySelector('.ilw-pager-count')?.textContent).toBe('1–25 of 60');
+    await expect(top.querySelector('.on')).toBeNull();
   }}
 />
 
 <!-- Fixtures for the Playwright keyboard spec: no play function. -->
 <Story name="Fixture" args={{ count: 30 }} />
 <Story name="Fixture paged" args={{ count: 131, pageSize: 25 }} />
-<Story name="Fixture paged accessible" args={{ count: 131, pageSize: 25, a11y: true, classes: ilwPagerClasses }} />
+<Story name="Fixture paged legacy" args={{ count: 131, pageSize: 25, legacy: true }} />

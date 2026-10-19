@@ -9,12 +9,12 @@
     count = 8,
     pageSize,
     classes,
-    a11y = false,
+    legacy = false,
   }: {
     count?: number;
     pageSize?: number;
     classes?: Partial<PagerClasses>;
-    a11y?: boolean;
+    legacy?: boolean;
   } = $props();
 
   // svelte-ignore state_referenced_locally
@@ -49,7 +49,7 @@
   <label>Filter <input type="search" oninput={(e) => setTableFilter(table, 'name', e.currentTarget.value)} /></label>
   <button type="button" onclick={rename}>Rename r1</button>
 </p>
-{#if paged}<Pager table={paged} emptyLabel="No people" label="Pages, top" {classes} {a11y} />{/if}
+{#if paged}<Pager table={paged} emptyLabel="No people" label="Pages, top" {classes} {legacy} />{/if}
 <DataTable {table} class="people" aria-label="People">
   {#snippet header()}
     <tr><TableSortTh {table} id="name" label="Name" /><TableSortTh {table} id="group" label="Group" /></tr>
@@ -61,4 +61,4 @@
     <tr><td colspan="2">None.</td></tr>
   {/snippet}
 </DataTable>
-{#if paged}<Pager table={paged} emptyLabel="No people" label="Pages, bottom" {classes} {a11y} />{/if}
+{#if paged}<Pager table={paged} emptyLabel="No people" label="Pages, bottom" {classes} {legacy} />{/if}

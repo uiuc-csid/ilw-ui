@@ -6,21 +6,22 @@
   this pager: on the pressed button, or on the current page's button when the
   pressed one is now disabled.
 
-  By default the markup is ta-manager's legacy unranked-courses pager, byte for
-  byte (no whitespace between elements, no ARIA). `a11y` adds the nav landmark,
-  type=button, named previous/next and aria-current.
+  The markup is a labelled nav landmark with type=button, named previous/next
+  and aria-current. `legacy` instead renders ta-manager's legacy
+  unranked-courses pager byte for byte (a div, no ARIA, no whitespace between
+  elements), for 1:1 ports.
 -->
 <script lang="ts" generics="T extends RowData">
   import type { RowData } from '@tanstack/svelte-table';
   import { flushSync } from 'svelte';
 
   import { pageWindow } from '../core/index.ts';
-  import { legacyPagerClasses, type PagedDataTableInstance, type PagerClasses } from './data-table.ts';
+  import { ilwPagerClasses, legacyPagerClasses, type PagedDataTableInstance, type PagerClasses } from './data-table.ts';
 
   let {
     table,
     emptyLabel,
-    a11y = false,
+    legacy = false,
     label = 'Pages',
     classes = {},
     onpage,
@@ -28,17 +29,17 @@
     table: PagedDataTableInstance<T>;
     /** The count text when no row passes the filters, e.g. "No courses". */
     emptyLabel: string;
-    /** Render the accessible markup: a labelled `<nav>`, `type="button"`, named previous/next, `aria-current`. */
-    a11y?: boolean;
-    /** With `a11y`, the navigation landmark's accessible name. */
+    /** Render the legacy markup, without the landmark or ARIA, and default to `legacyPagerClasses`. */
+    legacy?: boolean;
+    /** The navigation landmark's accessible name (not rendered with `legacy`). */
     label?: string;
-    /** Class names, merged over `legacyPagerClasses` (e.g. pass `ilwPagerClasses`). */
+    /** Class names, merged over `ilwPagerClasses` (`legacyPagerClasses` with `legacy`). */
     classes?: Partial<PagerClasses>;
     /** Called after the page changes (1-based), e.g. to scroll the table into view. */
     onpage?: (page: number) => void;
   } = $props();
 
-  const cls = $derived({ ...legacyPagerClasses, ...classes });
+  const cls = $derived({ ...(legacy ? legacyPagerClasses : ilwPagerClasses), ...classes });
 
   let root: HTMLElement;
 
@@ -51,6 +52,7 @@
     total === 0 ? emptyLabel : `${first + 1}–${Math.min(first + pagination.pageSize, total)} of ${total}`,
   );
   const pages = $derived(pageWindow(page, totalPages));
+  const a11y = $derived(!legacy);
   const type = $derived(a11y ? 'button' : undefined);
 
   function go(event: MouseEvent & { currentTarget: HTMLButtonElement }) {

@@ -66,7 +66,7 @@ export interface PagerClasses {
   count: string;
 }
 
-/** `Pager`'s default class names: ta-manager's legacy unranked-courses pager. */
+/** `Pager`'s class names with `legacy`: ta-manager's legacy unranked-courses pager. */
 export const legacyPagerClasses: PagerClasses = {
   root: 'picker-ctrl-row',
   label: 'picker-sort-lbl',
@@ -76,7 +76,7 @@ export const legacyPagerClasses: PagerClasses = {
   count: 'picker-count',
 };
 
-/** Class names styled by `ilw-ui/styles.css` (`.ilw-pager*`). */
+/** `Pager`'s default class names, styled by `ilw-ui/styles.css` (`.ilw-pager*`). */
 export const ilwPagerClasses: PagerClasses = {
   root: 'ilw-pager',
   label: 'ilw-pager-label',
