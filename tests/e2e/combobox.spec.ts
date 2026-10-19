@@ -110,3 +110,79 @@ test('ArrowDown on a selected value opens the whole list at the selection', asyn
   await expect(selected).toHaveText('dadams');
   await expect(input).toHaveValue('Drew Adams');
 });
+
+test('Enter with nothing highlighted keeps the list open and does not submit', async ({ page }) => {
+  await openStory(page, 'combobox--fixture');
+  const { input } = parts(page);
+  const submits = page.getByTestId('submits');
+
+  await input.focus();
+  await type(page, 'ad');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  await expect(input).not.toHaveAttribute('aria-activedescendant');
+  await press(page, 'Enter');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  await expect(input).toHaveValue('ad');
+  await expect(submits).toHaveText('0');
+
+  // Closed, Enter is the input's own: it submits the form.
+  await press(page, 'Escape');
+  await press(page, 'Enter');
+  await expect(submits).toHaveText('1');
+});
+
+test('opening and closing leave the caret where it was', async ({ page }) => {
+  await openStory(page, 'combobox--fixture');
+  const { input } = parts(page);
+  const caret = () => input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd]);
+
+  await input.focus();
+  await type(page, 'adams');
+  await press(page, 'Escape');
+  for (let i = 0; i < 4; i++) await press(page, 'ArrowLeft');
+  await expect.poll(caret).toEqual([1, 1]);
+  await press(page, 'Alt+ArrowDown');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  await expect.poll(caret).toEqual([1, 1]);
+  await press(page, 'Escape');
+  await expect(input).toHaveAttribute('aria-expanded', 'false');
+  await expect.poll(caret).toEqual([1, 1]);
+});
+
+test('a click outside right after opening closes the list', async ({ page }) => {
+  await openStory(page, 'combobox--fixture');
+  const { input } = parts(page);
+
+  await input.focus();
+  await type(page, 'ad');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  // Blank page area, in the same frame as the open: zag's outside-click
+  // handling raced the blur and could leave the list open.
+  await page.mouse.click(700, 5);
+  await expect(input).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('#person-popup')).toBeHidden();
+});
+
+test('typing mid-text keeps the caret in place', async ({ page }) => {
+  await openStory(page, 'combobox--fixture');
+  const { input } = parts(page);
+  const caret = () => input.evaluate((el: HTMLInputElement) => el.selectionStart);
+
+  await input.focus();
+  // Storybook loads @testing-library/user-event, which, on focus, wraps the
+  // input's value setter and moves the caret to the end on every write. Pages
+  // using ilw-ui don't load it, so undo it here.
+  await input.evaluate((el) => {
+    for (const key of Object.getOwnPropertyNames(el)) {
+      if (key !== 'setSelectionRange' && !key.startsWith('__')) delete (el as unknown as Record<string, unknown>)[key];
+    }
+  });
+  await type(page, 'ams');
+  await press(page, 'Escape');
+  for (let i = 0; i < 3; i++) await press(page, 'ArrowLeft');
+  // Each keystroke reopens the list; the caret must stay after it.
+  await type(page, 'ad');
+  await expect(input).toHaveValue('adams');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  await expect.poll(caret).toBe(2);
+});

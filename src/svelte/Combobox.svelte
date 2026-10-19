@@ -139,6 +139,23 @@
       if (item) commit(item);
     },
   });
+
+  // Zag moves the caret to the end (dom-query's setCaretToEnd) after nearly
+  // every state change: opening, closing, even a keystroke that opens the list
+  // or moves the highlight. Typing mid-text then jumps to the end. A real text
+  // change already puts the caret at the end, so drop those calls.
+  $effect(() => {
+    const own = input.setSelectionRange;
+    input.setSelectionRange = function (start, end, direction) {
+      const len = this.value.length;
+      if (start === len && end === len && direction === undefined) return;
+      own.call(this, start, end, direction);
+    };
+    return () => {
+      input.setSelectionRange = own;
+    };
+  });
+
   const api = $derived(combobox.connect(service, normalizeProps));
 
   // mergeProps runs later arguments' handlers first, so ours go last.
@@ -149,12 +166,22 @@
         // Before zag's handler: ArrowDown/Up on a closed list opens it on the
         // current text, or everything when the text is just the selection.
         onkeydown(event: KeyboardEvent) {
+          // Zag closes the list and lets the form submit when Enter has
+          // nothing to pick. Do nothing instead (zag skips prevented events).
+          if (event.key === 'Enter' && api.open && api.highlightedValue == null) {
+            event.preventDefault();
+            return;
+          }
           if (api.open || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
           query = text === labelOf(value) ? '' : text;
         },
         onfocusout(event: FocusEvent) {
           if (root.contains(event.relatedTarget as Node | null)) return;
           commit(blurMatch(items, text));
+          // Close the way zag's own dismissal does. Its outside-click handling
+          // otherwise races the blur and can leave the list open or pull focus
+          // back into the input.
+          if (api.open) service.send({ type: 'LAYER.INTERACT_OUTSIDE', src: 'interact-outside', restoreFocus: false });
         },
       },
     ),
@@ -168,10 +195,11 @@
   });
 
   let root: HTMLElement;
+  let input: HTMLInputElement;
 </script>
 
 <span class={['combobox', block && 'cb-block']} {...api.getRootProps()} bind:this={root}>
-  <input class="combobox-input" {...inputProps} aria-activedescendant={activeDescendant} />
+  <input class="combobox-input" {...inputProps} aria-activedescendant={activeDescendant} bind:this={input} />
   <div
     class="combobox-popup"
     {...api.getContentProps()}
