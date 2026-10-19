@@ -153,7 +153,7 @@ Keyboard:
 | Typing              | Filters; opens the list at `minChars` characters, closes it below. A lone match is highlighted.                       |
 | ArrowDown / ArrowUp | Open the list (on the current text, or every item when the text is the selection), then move the highlight, wrapping. |
 | Alt+ArrowDown       | Opens the list without highlighting.                                                                                  |
-| Enter               | Commits the highlighted option and closes.                                                                            |
+| Enter               | Commits the highlighted option and closes. With nothing highlighted, does nothing (the form isn't submitted).         |
 | Escape              | Closes; focus stays in the input.                                                                                     |
 | Tab / blur          | Commits an exact label/value match or the only match; otherwise the text stays and the value becomes `null`.          |
 
@@ -162,6 +162,7 @@ These differ from the APG combobox pattern, following Zag:
 - While the list is open, Home and End move the highlight, not the caret.
 - Keys with Ctrl or Shift held are ignored.
 - Tab doesn't accept the highlighted option; only the blur match applies.
+- With the list closed, Enter is the input's own: it submits a surrounding form.
 
 DOM contract (consumers' tests select on it):
 
@@ -277,6 +278,21 @@ inside `Combobox`. None is filed upstream yet. Draft issues are in
   sets it from the highlighted value even while the list is closed or the option
   is filtered out, which axe flags as an invalid IDREF. `Combobox` overrides the
   attribute in its markup.
+- **Zag moves the caret to the end after nearly every state change** (opening,
+  closing, a keystroke that reopens the list), so typing mid-text jumps to the
+  end. `Combobox` drops Zag's caret-to-end `setSelectionRange` calls on its
+  input; a real text change already puts the caret at the end.
+- **With `allowCustomValue`, Enter with nothing highlighted closes the list and
+  submits the form.** `Combobox` prevents it while the list is open.
+- **An outside click within a frame of opening can leave the list open,** and
+  Zag's deferred open focus can then pull focus back to the input. `Combobox`
+  closes the list on blur itself (`LAYER.INTERACT_OUTSIDE`,
+  `restoreFocus: false`). The focus pull is a single-frame race and isn't worked
+  around.
+- **On Apple platforms Zag adds an `aria-live` region to `document.body`** while
+  the list is open, outside `<ilw-page>`, to announce the highlighted option
+  (VoiceOver doesn't read `aria-activedescendant` reliably). It's visually hidden
+  and removed on close. `Combobox` keeps it.
 
 ## License
 

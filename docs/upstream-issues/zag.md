@@ -72,3 +72,37 @@ then typing text that matched nothing.
 
 **Workaround in ilw-ui:** set `aria-activedescendant` after spreading the input
 props, gated on `api.open` and on the value being among the rendered items.
+
+## 5. The caret jumps to the end after open, close and many keystrokes
+
+**Status:** Not filed.
+
+`dom.focusInputEl` (used by `setInitialFocus` and `setFinalFocus`) and the
+`syncInputValue` action (in a microtask, for any event but `INPUT.CHANGE`) call
+`setCaretToEnd` from `@zag-js/dom-query`. Opening or closing the list, or a
+keystroke whose `onInputValueChange` opens the list or moves the highlight
+(so the current event is no longer `INPUT.CHANGE`), moves the caret to the end.
+
+**Repro:** type `ams`, press Escape, move the caret to the start, type `ad`. The
+text is `aamsd`, not `adams`.
+
+**Proposal:** move the caret only when the input text actually changed, or
+leave it to the browser, which already moves it to the end when `value` is set
+to a different string.
+
+**Workaround in ilw-ui:** the input's own `setSelectionRange` ignores calls
+that put a collapsed caret at the end with no direction.
+
+## 6. An outside click right after opening leaves the list open
+
+**Status:** Not filed. This needs a repro outside automation: it takes a click
+within about a frame of opening.
+
+The dismissable layer is tracked with `defer: true`, and `setInitialFocus`
+focuses the input in a `requestAnimationFrame`. A pointerdown outside in that
+window blurs the input without closing the list, then the deferred focus pulls
+focus back.
+
+**Workaround in ilw-ui:** on blur to outside the root, send
+`{ type: 'LAYER.INTERACT_OUTSIDE', src: 'interact-outside', restoreFocus: false }`
+when the list is open. The focus pull is not worked around.
