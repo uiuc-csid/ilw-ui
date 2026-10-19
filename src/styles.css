@@ -126,3 +126,56 @@
   font-style: italic;
   cursor: default;
 }
+
+/* Pager: a row of page buttons in the toolkit's outline-button look. The
+   current page is filled. Consumers with their own pager classes pass them via
+   `classes` and skip these. */
+.ilw-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0.75rem 0;
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+  color: var(--il-storm-10, #252525);
+}
+
+.ilw-pager-label {
+  font-weight: 700;
+}
+
+.ilw-pager-btn {
+  min-width: 2.25rem;
+  padding: 4px 8px;
+  border: 2px solid var(--il-blue, #13294b);
+  border-radius: 4px;
+  background-color: var(--il-white, #ffffff);
+  color: var(--il-blue, #13294b);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ilw-pager-btn:hover:not(:disabled) {
+  background-color: var(--il-arches-90, #c7edf8);
+}
+
+.ilw-pager-btn:focus-visible {
+  outline: 3px solid var(--il-altgeld, #c84113);
+  outline-offset: 2px;
+}
+
+.ilw-pager-btn.on {
+  background-color: var(--il-blue, #13294b);
+  color: var(--il-white, #ffffff);
+}
+
+.ilw-pager-btn:disabled {
+  border-color: var(--il-storm-60, #8e9090);
+  color: var(--il-storm-30, #474948);
+  cursor: not-allowed;
+}
+
+.ilw-pager-count {
+  margin-inline-start: 0.5rem;
+}
