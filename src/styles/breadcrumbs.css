@@ -1,0 +1,74 @@
+/* Breadcrumbs (B4), the CSS form of <ilw-breadcrumbs>. Markup:
+
+     <nav class="ilw-breadcrumbs" aria-label="Breadcrumbs">
+       <ol>
+         <li><a href="/">Home</a></li>
+         <li><span aria-current="page">Current page</span></li>
+       </ol>
+     </nav>
+
+   Colours come from the theme properties, so a theme class on the nav
+   (ilw-theme-blue, …) restyles it. */
+
+.ilw-breadcrumbs {
+  --ilw-breadcrumbs--separator-color: var(--il-altgeld, #c84113);
+  display: block;
+  padding: 0.5rem 0;
+  background-color: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}
+
+/* The toolkit's blue variant (theme="blue") has orange separators; so do the
+   filled blue themes. */
+.ilw-breadcrumbs:is(.ilw-theme-blue-1, .ilw-theme-blue-2, .ilw-theme-blue-inverse, .ilw-theme-blue-solid, [theme='blue']) {
+  --ilw-breadcrumbs--separator-color: var(--il-orange, #ff5f05);
+}
+
+.ilw-breadcrumbs ol {
+  /* Flex, so whitespace between the <li>s in server markup adds no gaps. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-breadcrumbs li {
+  font: 400 0.875rem/1.5rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* The separator is decoration: the empty alternative text keeps screen
+   readers from reading "greater than" between items (the first declaration is
+   for engines without alt text in `content`). */
+.ilw-breadcrumbs li + li::before {
+  content: '>';
+  content: '>' / '';
+  padding: 0 6px;
+  color: var(--ilw-breadcrumbs--separator-color);
+}
+
+.ilw-breadcrumbs a {
+  color: var(--ilw-color--link);
+  text-decoration: underline;
+}
+
+.ilw-breadcrumbs a:visited {
+  color: var(--ilw-color--text);
+}
+
+.ilw-breadcrumbs a:hover {
+  color: var(--ilw-color--link-hover);
+}
+
+.ilw-breadcrumbs a:focus {
+  color: var(--ilw-color--focus--text);
+  background-color: var(--ilw-color--focus--background);
+  border-bottom: 2px solid var(--ilw-color--focus--outline);
+  outline: none;
+  text-decoration: none;
+}
+
+.ilw-breadcrumbs a:focus:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,376 @@
+/* Footer (B3), the CSS form of <ilw-footer>: the site band, the campus band
+   and the legal band, with the toolkit's colours, borders and container
+   breakpoints. The campus links are ilw-ui/core's campusFooter. Markup in the
+   README ("Footer"). Unlike the rest of the page, the footer keeps the brand
+   colours in dark mode, as upstream: its bands are already strong colours. */
+
+.ilw-footer {
+  display: block;
+  container-type: inline-size;
+  font: 400 1rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  --ilw-footer--focus-text: var(--il-blue, #13294b);
+  --ilw-footer--focus-background: var(--il-arches-lighter-3, #a6d7eb);
+  --ilw-footer--focus-outline: solid var(--il-blue, #13294b) 1px;
+}
+
+.ilw-footer :where(a) {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.ilw-footer :where(a:focus) {
+  color: var(--ilw-footer--focus-text);
+  background-color: var(--ilw-footer--focus-background);
+  outline: var(--ilw-footer--focus-outline);
+  text-decoration-thickness: 0.1rem;
+}
+
+.ilw-footer-site,
+.ilw-footer-campus,
+.ilw-footer-legal {
+  padding: 1.875rem var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
+}
+
+/* Site band: site name, contact, actions, content. */
+
+.ilw-footer-site {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'site-name' 'contact' 'actions' 'content';
+  gap: 27px;
+  padding-bottom: 2.125rem;
+  background-color: var(--il-storm-lighter-4, #f4f4f4);
+  color: var(--il-blue, #13294b);
+  border-top: 0.5rem solid var(--il-blue, #13294b);
+}
+
+.ilw-footer-site--no-actions {
+  grid-template-areas: 'site-name' 'contact' 'content';
+}
+
+.ilw-footer-site-name {
+  grid-area: site-name;
+  margin-block: 0;
+  font: 700 24px/30px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-site-name a,
+.ilw-footer-primary-unit a {
+  color: var(--il-blue, #13294b);
+  text-decoration: none;
+}
+
+.ilw-footer-site-name a:hover,
+.ilw-footer-site-name a:focus,
+.ilw-footer-primary-unit a:hover,
+.ilw-footer-primary-unit a:focus {
+  text-decoration: underline;
+}
+
+.ilw-footer-contact {
+  grid-area: contact;
+}
+
+.ilw-footer-address {
+  display: block;
+  margin: 0;
+  font: normal 400 18px/30px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-address p {
+  margin: 0;
+}
+
+.ilw-footer-address a:hover {
+  color: var(--il-altgeld, #c84113);
+}
+
+.ilw-footer-primary-unit {
+  margin: 30px 0 0;
+  font: 700 18px/30px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-social {
+  padding-bottom: 27px;
+}
+
+.ilw-footer-social:last-child {
+  padding-bottom: 0;
+}
+
+.ilw-footer-social ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0 0 0 -0.35rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-footer-social a {
+  display: inline-block;
+  color: var(--il-blue, #13294b);
+  text-decoration: none;
+  font: 700 1rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-social a:hover,
+.ilw-footer-social a:focus {
+  text-decoration: underline;
+}
+
+.ilw-footer-social a:hover {
+  color: var(--il-altgeld, #c84113);
+}
+
+.ilw-footer-actions {
+  grid-area: actions;
+  justify-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* The toolkit's orange action buttons. */
+.ilw-footer-actions :is(a, button) {
+  display: inline-block;
+  padding: 0.5em 1em;
+  border: 2px solid var(--il-orange, #ff5f05);
+  border-radius: 0.2em;
+  background-color: var(--il-orange, #ff5f05);
+  color: var(--il-white, #ffffff);
+  font: 700 1.25em/1 var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ilw-footer-actions :is(a, button):hover {
+  background-color: var(--il-white, #ffffff);
+  color: var(--il-orange, #ff5f05);
+  text-decoration: underline;
+}
+
+.ilw-footer-actions :is(a, button):focus {
+  background-color: var(--ilw-footer--focus-background);
+  color: var(--ilw-footer--focus-text);
+  border-color: var(--ilw-footer--focus-text);
+  outline: var(--ilw-footer--focus-outline);
+  text-decoration: underline;
+}
+
+.ilw-footer-content {
+  grid-area: content;
+}
+
+.ilw-footer-menu {
+  margin-bottom: 2em;
+}
+
+.ilw-footer-menu h2 {
+  margin: 0;
+  color: var(--il-blue, #13294b);
+  font: 700 20px/25px var(--il-font-sans, 'Source Sans 3', sans-serif);
+  border-bottom: 1px solid var(--il-blue, #13294b);
+}
+
+.ilw-footer-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-footer-menu li {
+  margin: 12px 0 0;
+  font: 400 18px/25px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-menu a {
+  text-decoration: none;
+}
+
+.ilw-footer-menu a:hover,
+.ilw-footer-menu a:focus {
+  text-decoration: underline;
+}
+
+/* Campus band: the wordmark and the campus link sections. */
+
+.ilw-footer-campus {
+  background-color: var(--il-blue, #13294b);
+  color: var(--il-white, #ffffff);
+  border-top: 0.5rem solid var(--il-orange, #ff5f05);
+}
+
+.ilw-footer-logo {
+  margin: 0;
+  padding: 0.75rem 0.25rem 3.75rem;
+}
+
+.ilw-footer-logo a {
+  display: block;
+  width: 9.4375rem;
+  height: 1.5625rem;
+}
+
+.ilw-footer-logo a:hover {
+  outline: 2px dotted;
+}
+
+.ilw-footer-logo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ilw-footer-logo .illinois,
+.ilw-footer-logo .block-i .outline {
+  fill: var(--il-white, #ffffff);
+}
+
+.ilw-footer-logo .block-i .fill {
+  fill: var(--il-orange, #ff5f05);
+}
+
+.ilw-footer-logo a:focus .illinois,
+.ilw-footer-logo a:focus .block-i .outline {
+  fill: var(--il-blue, #13294b);
+}
+
+.ilw-footer-sections {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem 1.25rem;
+}
+
+.ilw-footer-section h3 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  color: inherit;
+  font: 600 1.5rem/1.5 var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-section ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-footer-section li {
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.ilw-footer-section a {
+  color: var(--il-white, #ffffff);
+  font: 400 1.125rem/1.5rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-decoration: none;
+}
+
+.ilw-footer-section a:hover,
+.ilw-footer-section a:focus {
+  text-decoration: underline;
+}
+
+.ilw-footer-section a:hover {
+  color: var(--il-orange, #ff5f05);
+}
+
+.ilw-footer-section a:focus {
+  color: var(--ilw-footer--focus-text);
+}
+
+/* Legal band: cookies button and the legal links. */
+
+.ilw-footer-legal {
+  background-color: var(--il-blue, #13294b);
+  color: var(--il-white, #ffffff);
+  border-top: 0.5rem solid var(--il-industrial-darker-2, #1f3d7b);
+}
+
+.ilw-footer-legal ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.875rem;
+  margin-block: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-footer-legal a {
+  display: block;
+  padding: 0.3125rem;
+  color: var(--il-white, #ffffff);
+  font: 400 1rem/1 var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-footer-legal a:hover {
+  outline: 2px dotted;
+}
+
+.ilw-footer-legal a:focus {
+  color: var(--ilw-footer--focus-text);
+}
+
+/* OneTrust's settings button (the page loads OneTrust itself). */
+.ilw-footer-legal .ot-sdk-show-settings {
+  display: inline-block;
+  margin: 6px 0;
+  padding: 12px 20px;
+  border: 2px solid var(--il-white, #ffffff);
+  border-radius: 0.25em;
+  background-color: var(--il-industrial-darker-2, #1f3d7b);
+  color: var(--il-white, #ffffff);
+  font: 700 1.188rem/1.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  letter-spacing: 0.01em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ilw-footer-legal .ot-sdk-show-settings:hover {
+  background-color: var(--il-white, #ffffff);
+  color: var(--il-blue, #13294b);
+  text-decoration: underline;
+}
+
+.ilw-footer-legal .ot-sdk-show-settings:focus {
+  background-color: var(--ilw-footer--focus-background);
+  color: var(--ilw-footer--focus-text);
+  border-color: var(--ilw-footer--focus-text);
+  outline: var(--ilw-footer--focus-outline);
+  text-decoration: underline;
+}
+
+@container (min-width: 600px) {
+  .ilw-footer-legal ul {
+    flex-direction: row;
+  }
+}
+
+@container (min-width: 650px) {
+  .ilw-footer-sections {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 960px) {
+  .ilw-footer-site {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    grid-template-areas: 'site-name actions' 'contact content';
+  }
+
+  /* No actions: the content starts level with the site name. */
+  .ilw-footer-site--no-actions {
+    grid-template-areas: 'site-name content' 'contact content';
+  }
+
+  .ilw-footer-actions {
+    justify-self: end;
+  }
+}
+
+@container (min-width: 1200px) {
+  .ilw-footer-sections {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

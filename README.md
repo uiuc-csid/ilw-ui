@@ -26,7 +26,8 @@ and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
 ```js
 import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
-import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce } from 'ilw-ui/core';
+import { Page, Footer, Breadcrumbs, PageTitle } from 'ilw-ui/svelte';
+import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce, campusFooter, campusLink } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
@@ -48,7 +49,12 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | ---------------- | --------------------------------------------------------- |
 | `tokens.css`     | `--ilw-color--*` defaults, theme classes, dark mode       |
 | `format.css`     | `.ilw-format`, `.ilw-font`, `.ilw-heading` prose          |
+| `button.css`     | `.ilw-button`, `ul.ilw-buttons`, `ul.ilw-buttons-left`    |
 | `table.css`      | `table.ilw-table`, tables in `.ilw-format`, stripes, `.ilw-table-responsive`, `.ilw-theme-table-*` |
+| `page.css`       | `.ilw-page` shell, `.ilw-skip-link`, links in `main` (B1) |
+| `page-title.css` | `.ilw-page-title` (B5)                                    |
+| `breadcrumbs.css`| `.ilw-breadcrumbs` (B4)                                   |
+| `footer.css`     | `.ilw-footer` (B3)                                        |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Modal, Combobox, Autocomplete, Pager |
 
 ## Themes and dark mode
@@ -192,7 +198,262 @@ the specificity of a single element, so a class of yours wins.
   (3.3:1). The head text is 1.2rem bold, which counts as large text, so it
   passes AA there; don't put smaller text in that head.
 
+## Page chrome
+
+The page shell, footer, breadcrumbs and page title replace `<ilw-page>`,
+`<ilw-footer>`, `<ilw-breadcrumbs>` and `<ilw-page-title>` with plain HTML and
+classes: no script, so a server template renders them as they are. Each also
+ships as a Svelte component that renders exactly this markup. The classes are
+named after the toolkit elements; their shadow-DOM parts are light-DOM
+children. The plan, including the header, section nav and back-to-top still to
+come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrome.md).
+
+### Page shell (`Page`)
+
+```html
+<div class="ilw-page ilw-format" id="top">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <header>…</header>
+  <main id="main-content" tabindex="-1">…</main>
+  <footer class="ilw-footer">…</footer>
+</div>
+```
+
+```svelte
+<Page format>
+  {#snippet header()}<header>…</header>{/snippet}
+  …the page content…
+  {#snippet footer()}<Footer>…</Footer>{/snippet}
+</Page>
+```
+
+- The skip link comes first and is visible only when focused. Its `href`
+  matches `main`'s `id`; `tabindex="-1"` makes following it move focus into
+  `main`, so the next Tab continues from the content. Props: `skipLinkText`,
+  `mainId` (default `main-content`), `id` (default `top`, the back-to-top
+  target).
+- The header and footer are direct children of the shell, outside `main`, so
+  they are the page's banner and content-info landmarks.
+- The shell sets the page background and text from `--ilw-color--background`
+  and `--ilw-color--text`, so it follows the theme and dark mode. Links in
+  `main` outside `.ilw-format` get `--ilw-color--link*` at zero specificity;
+  inside `.ilw-format`, the prose styles colour them.
+- Modifiers (props in Svelte): `ilw-format` (`format`), `ilw-margin` (`margin`:
+  side margins on `main`), `ilw-page--expanded` (`expanded`, the toolkit's
+  `expanded` attribute: top and bottom margin on `main`).
+- Differs from `<ilw-page>`: the skip link (the toolkit has none) and the page
+  colours (the toolkit leaves them to the host).
+
+### Footer (`Footer`)
+
+```html
+<footer class="ilw-footer">
+  <div class="ilw-footer-site">   <!-- + ilw-footer-site--no-actions without actions -->
+    <p class="ilw-footer-site-name"><a href="/">Site Name</a></p>
+    <div class="ilw-footer-contact">
+      <nav class="ilw-footer-social" aria-label="Social media"><ul><li><a href="…">…</a></li></ul></nav>
+      <address class="ilw-footer-address"><p>…</p></address>
+      <p class="ilw-footer-primary-unit"><a href="…">Primary Unit</a></p>
+    </div>
+    <div class="ilw-footer-actions"><a href="/give">Give</a></div>
+    <div class="ilw-footer-content">
+      <nav class="ilw-footer-menu" aria-labelledby="menu-1"><h2 id="menu-1">…</h2><ul>…</ul></nav>
+    </div>
+  </div>
+  <div class="ilw-footer-campus">
+    <h2 class="ilw-footer-logo"><a href="https://illinois.edu/?utm_source=…&utm_medium=web&utm_campaign=Footer">
+      <span class="ilw-visually-hidden">University of Illinois Urbana-Champaign</span><svg aria-hidden="true">…</svg></a></h2>
+    <div class="ilw-footer-sections">
+      <div class="ilw-footer-section"><h3>Explore Campus</h3><ul><li><a href="…">…</a></li></ul></div>
+    </div>
+  </div>
+  <div class="ilw-footer-legal">
+    <ul>
+      <li><button type="button" id="ot-sdk-btn" class="ot-sdk-show-settings">About Cookies</button></li>
+      <li><a href="…">Privacy Policy</a></li>
+      <li><a href="…">Copyright</a></li>
+      <li><a href="…">Your own legal link</a></li>
+      <li><a href="…">Accessibility</a></li>
+    </ul>
+  </div>
+</footer>
+```
+
+```svelte
+<Footer source="My_Site" cookiesButton legalLinks={[{ label: 'Terms', href: '/terms' }]}>
+  {#snippet siteName()}<a href="/">My Site</a>{/snippet}
+  {#snippet address()}<p>201 N Goodwin Ave<br />Urbana, IL 61801</p>{/snippet}
+  {#snippet social()}<li><a href="…">Bluesky</a></li>{/snippet}
+  {#snippet primaryUnit()}<a href="…">Primary Unit</a>{/snippet}
+  {#snippet actions()}<a href="/give">Give</a>{/snippet}
+  <nav class="ilw-footer-menu" aria-labelledby="menu-1">…</nav>
+</Footer>
+```
+
+- **Campus content.** The campus sections and the privacy, copyright and
+  accessibility links come from `campusFooter` in `ilw-ui/core`, a copy of
+  `https://api.brand.illinois.edu/footer` (Brand owns it; that API is the
+  source of truth). `<ilw-footer>` fetches it on every page view; ilw-ui ships
+  it, so the footer works without script, network or a `connect-src`
+  exception. `mise run vendor:footer` refreshes the copy; review the diff.
+  Server templates can render the same data: `campusLink(href, source)` adds
+  the toolkit's UTM parameters (`source` defaults to `Illinois_App`).
+- **Cookies.** `<ilw-footer>` injects the OneTrust script and its "About
+  Cookies" button. ilw-ui can't (no script; consumers run a same-origin CSP).
+  A site that needs the consent banner loads OneTrust itself and renders the
+  button (`cookiesButton` in Svelte); OneTrust binds to
+  `.ot-sdk-show-settings`.
+- The site name and the slots are snippets, as the toolkit's slots are; the
+  social snippet gives the `<li>`s, and the component writes the `nav` and
+  `ul`.
+- Phone links: the toolkit's README asks for an `aria-label` naming the
+  destination. If you add one, start it with the visible number (WCAG 2.5.3,
+  axe `label-content-name-mismatch`), or put the destination in the text.
+- The footer keeps its brand colours in dark mode, as upstream.
+- Differs from `<ilw-footer>`: no runtime fetch or script injection; the legal
+  links are a list; the wordmark's name is visually hidden text in the link
+  and the SVG is hidden (upstream names both the link and the SVG).
+
+### Breadcrumbs (`Breadcrumbs`)
+
+```html
+<nav class="ilw-breadcrumbs" aria-label="Breadcrumbs">
+  <ol>
+    <li><a href="/">Home</a></li>
+    <li><a href="/academics">Academics</a></li>
+    <li><span aria-current="page">Degree programs</span></li>
+  </ol>
+</nav>
+```
+
+```svelte
+<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Academics', href: '/academics' }]} current="Degree programs" />
+```
+
+- The current page is last, unlinked, with `aria-current="page"` (the toolkit
+  leaves it as a bare `span`).
+- The `>` separators are generated with empty alternative text, so screen
+  readers don't read them (the toolkit's are read in some).
+- A theme class on the `nav` restyles it (`class="ilw-theme-blue-1"` is the
+  toolkit's `theme="blue"`, with orange separators). Props: `label` (default
+  "Breadcrumbs"), `class`.
+- Not yet: the toolkit's `width` breakout; it comes with the layout utilities
+  (A5).
+
+### Page title (`PageTitle`)
+
+```html
+<div class="ilw-page-title">  <!-- + ilw-page-title--blue | --orange | --white, ilw-page-title--fade -->
+  <img class="ilw-page-title-background" src="…" alt="">
+  <div class="ilw-page-title-inner">
+    <div class="ilw-page-title-text"><h1>Graduate Programs</h1></div>
+  </div>
+</div>
+```
+
+```svelte
+<PageTitle theme="blue" image="/img/quad.jpg">Graduate Programs</PageTitle>
+```
+
+- The `<h1>` is the page's heading. The image is decorative (`alt=""`); the
+  text sits on a colour plate (85 % over the image, solid with `fade`), as
+  upstream.
+- Props: `theme` (`'blue' | 'orange' | 'white'`; unset is white on the heading
+  colour), `fade`, `image` (URL), `class`.
+- Not yet: the toolkit's `width` breakout (A5).
+
 ## Components
+
+### `Button` and `.ilw-button`
+
+The toolkit's buttons, from `button.css`: the same classes, so toolkit markup
+looks the same with no `toolkit.css`. Server templates use the classes;
+Svelte code can use `Button`, which renders that markup.
+
+```html
+<a class="ilw-button" href="/apply">Apply now</a>
+<button type="button" class="ilw-button ilw-button-large ilw-theme-blue-solid">Save</button>
+
+<!-- disabled -->
+<button type="button" class="ilw-button" disabled>Save</button>
+<a class="ilw-button" role="link" aria-disabled="true">Apply now</a>
+
+<!-- a row of buttons: ul.ilw-buttons styles its links and buttons and centres
+     them; ul.ilw-buttons-left only lays them out, so its items need .ilw-button -->
+<ul class="ilw-buttons">
+  <li><a href="/apply">Apply</a></li>
+  <li><a href="/visit">Visit</a></li>
+</ul>
+```
+
+| Class                                                                      | Effect                                                  |
+| -------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `.ilw-button` on `<a>` or `<button>`                                       | outline button in `--ilw-color--control*`               |
+| `.ilw-button-small`, `.ilw-button-large` (on the button or the `ul`)       | sizes; none is medium                                   |
+| none, `.ilw-theme-blue`, `.ilw-theme-blue-outline`                         | blue outline                                            |
+| `.ilw-theme-blue-1`, `.ilw-theme-blue-solid`                               | solid blue                                              |
+| `.ilw-theme-orange`, `.ilw-theme-orange-outline`                           | orange outline                                          |
+| `.ilw-theme-orange-1`, `.ilw-theme-orange-solid`                           | solid orange (white on orange: large text only, 3:1)    |
+| `.ilw-width-full`                                                          | full width (on a button; on the `ul`, its items grow to fill the row) |
+
+A theme class on an ancestor recolours the outline button too: inside
+`[theme=blue]` it is white on blue. Every rule weighs one class, so a page's own
+single-class rule overrides it, and prose link styles never do.
+
+```svelte
+<script>
+  import { Button } from 'ilw-ui/svelte';
+</script>
+
+<Button href="/apply">Apply now</Button>
+<Button theme="blue-solid" size="large" onclick={save}>Save</Button>
+<Button disabled>Save</Button>
+```
+
+| Prop       | Type                                                          |                                                          |
+| ---------- | ------------------------------------------------------------- | -------------------------------------------------------- |
+| `href`     | `string`                                                      | given: renders `<a>`; omitted: `<button type="button">`  |
+| `size`     | `'small' \| 'medium' \| 'large'`                              | default `'medium'`                                       |
+| `theme`    | `ButtonTheme`: one of the theme names above, without `ilw-theme-` | default none (blue outline)                          |
+| `disabled` | `boolean`                                                     | see below                                                |
+| `children` | snippet                                                       | the label                                                |
+
+Other attributes and handlers (`onclick`, `type="submit"`, `target`, `class`, …)
+pass through to the element.
+
+DOM contract (consumers' tests select on it): exactly the markup above. A
+disabled `<button>` gets `disabled`, never `aria-disabled`. A disabled link
+loses its `href` (so Tab skips it and clicking does nothing), gets
+`role="link"` and `aria-disabled="true"`, and drops `onclick` and `tabindex`.
+
+**Behaviour:** native. Enter activates both forms; Space presses a button and
+scrolls the page on a link, as links do. Disabled controls are out of the Tab
+order.
+
+**Differs from the toolkit:**
+
+- **Focus** shows on `:focus-visible` (the toolkit uses `:focus`, so a mouse
+  click shows it too), and adds a two-tone ring: a 2px band of
+  `--ilw-color--focus--background` around the border, then a 2px
+  `--ilw-color--focus--text` outline. One of the two reaches 3:1 against every
+  theme surface (WCAG 1.4.11), checked by the Focus Rings stories:
+
+  | Surface                    | Light: Blue line / Arches 90 band | Dark: white line / Blue 30 band |
+  | -------------------------- | --------------------------------- | ------------------------------- |
+  | white palette              | 14.5 / 1.2                        | 17.9 / 1.9                      |
+  | gray                       | 13.2 / 1.1                        | 15.3 / 1.6                      |
+  | blue                       | 1.0 / 11.7                        | 14.5 / 1.5                      |
+  | orange                     | 4.8 / 2.5                         | 3.1 / 3.1                       |
+  | Industrial (blue gradient) | 2.1 / 5.6                         | 7.0 / 1.4                       |
+  | Harvest (orange gradient)  | 8.0 / 1.5                         | 1.8 / 5.3                       |
+
+- **Disabled links** are styled like disabled buttons; the toolkit has no rule
+  for them.
+- **The disabled surface** is the white palette's background, so it turns
+  dark in dark mode; the toolkit's is always white.
+- **Size classes need `.ilw-button`** on a lone button (the toolkit also sizes a
+  bare `button.ilw-button-large`).
+- **No new-window icon** on `a.ilw-button[target=_blank]` yet.
 
 ### `SortableTh`
 
@@ -654,8 +915,10 @@ A node Vitest project also covers `core/` and the guard below, and
 
 **Parity stories.** Each story picks its stylesheets with `parameters.styles`:
 `'toolkit'` (`toolkit.css` only, inside `<ilw-page class="ilw-format">`),
-`'ilw-ui'` (`styles.css` only, inside a plain `<main>`) or `'both'` (the
-default). A replacement gets `stories/parity/<Name>.parity.stories.svelte` with
+`'ilw-ui'` (`styles.css` only, inside the `Page` shell: skip link, then
+`<main id="main-content">`) or `'both'` (the default). A story that renders a
+whole page (its own shell or footer) sets `parameters.shell: false` to skip
+the wrapper. A replacement gets `stories/parity/<Name>.parity.stories.svelte` with
 a `Toolkit` story (axe off: it documents upstream), an `IlwUi` story, and a
 `Side By Side` story that shows each in its own iframe, one row per variant.
 The **Theme** toolbar sets `html[data-theme]` (Light by default, Dark, or

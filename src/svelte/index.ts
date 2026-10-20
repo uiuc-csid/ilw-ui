@@ -1,4 +1,5 @@
 export { default as Autocomplete } from './Autocomplete.svelte';
+export { default as Button, type ButtonSize, type ButtonTheme } from './Button.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export {
   type AnyDataTable,
@@ -21,3 +22,7 @@ export { default as Pager } from './Pager.svelte';
 export { default as SortableTh } from './SortableTh.svelte';
 export { default as TableSortTh } from './TableSortTh.svelte';
 export { type IslandRegistry, mountIslands } from './islands.ts';
+export { default as Breadcrumbs, type Crumb } from './Breadcrumbs.svelte';
+export { default as Footer } from './Footer.svelte';
+export { default as Page } from './Page.svelte';
+export { default as PageTitle } from './PageTitle.svelte';

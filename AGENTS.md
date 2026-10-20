@@ -24,9 +24,11 @@ tests/
   unit/        node Vitest: core helpers, import/sink guard, tokens.css vs the vendored toolkit.css
   e2e/         Playwright keyboard/focus specs against the static Storybook build
 vendor/illinois-toolkit/   pinned toolkit.js/.css, served by Storybook at /toolkit
+scripts/       vendor-footer.mjs (mise run vendor:footer: refresh src/core/campus-footer.ts from the brand API)
 .storybook/    Storybook config; styles.ts adds toolkit.css and/or styles.css per story from parameters.styles
                ('toolkit' | 'ilw-ui' | 'both', default 'both'); IlwPage.svelte wraps 'toolkit'/'both' stories in
-               <ilw-page class="ilw-format"><main>, PlainMain.svelte wraps 'ilw-ui' ones in <main>
+               <ilw-page class="ilw-format"><main>, IlwUiPage.svelte wraps 'ilw-ui' ones in the Page shell (B1:
+               skip link + <main id="main-content">); parameters.shell = false skips both (whole-page stories)
 ```
 
 The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `exports`: `./core`, `./svelte`, `./styles.css`, `./styles/*`.
