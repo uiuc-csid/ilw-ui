@@ -11,13 +11,15 @@
     tags: ['autodocs'],
     component: SortableTh,
     args: { key: 'name', label: 'Name', onsort: fn() },
+    // ilw-ui's table.css only, no toolkit: the tables carry class="ilw-table".
+    parameters: { styles: 'ilw-ui' },
   });
 
   const NBSP = ' ';
 </script>
 
 {#snippet template(args: { key: string; label: string; sort: { key: string; dir: 1 | -1 }; onsort: (key: string) => void })}
-  <table>
+  <table class="ilw-table">
     <thead><tr><SortableTh {...args} /></tr></thead>
     <tbody><tr><td>Avery</td></tr></tbody>
   </table>

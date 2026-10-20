@@ -50,7 +50,7 @@
   <button type="button" onclick={rename}>Rename r1</button>
 </p>
 {#if paged}<Pager table={paged} emptyLabel="No people" label="Pages, top" {classes} {legacy} />{/if}
-<DataTable {table} class="people" aria-label="People">
+<DataTable {table} class="ilw-table" aria-label="People">
   {#snippet header()}
     <tr><TableSortTh {table} id="name" label="Name" /><TableSortTh {table} id="group" label="Group" /></tr>
   {/snippet}
