@@ -1,0 +1,197 @@
+/* Prose: .ilw-format, .ilw-font and .ilw-heading, under the toolkit's names.
+   Sizes and margins match the vendored toolkit.css: ilw-page's
+   `ilw-page.ilw-format main …` rules (its @layer pageIllinois) for text, and
+   its `ilw-content a …` rules for links and the new-window icon. Colours come
+   from the --ilw-color--* properties (tokens.css), so themes and dark mode
+   apply.
+
+   Differences from the toolkit:
+   - These apply inside any .ilw-format element, not only ilw-page's <main>.
+   - Every selector is wrapped in :where(), so each rule has zero specificity:
+     any class in a component, or a page's own bare `h2` rule, beats it.
+   - .ilw-format paints its own text colour and background (the toolkit leaves
+     both to the page), so prose stays readable in dark mode.
+   - Links get :visited and a :focus-visible outline; the toolkit's ilw-page
+     only changes the focused link's background.
+   - hr and pre have no toolkit rules; here hr is a 1px line in the theme's
+     border colour and pre gets prose margins and scrolls sideways instead of
+     widening the page. code, kbd and samp keep the browser's monospace, as
+     in the toolkit.
+   Tables (and caption) are the table styles' job. Only elements with no class
+   of their own are meant to be styled here: component markup sets its fonts on
+   a classed container, which these rules never touch. */
+
+:where(.ilw-format) {
+  background-color: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}
+
+:where(.ilw-format) :where(p, blockquote) {
+  display: block;
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+  color: inherit;
+  font: 400 1.125rem/1.667rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+:where(.ilw-format) :where(b, strong) {
+  font-weight: 700;
+}
+
+:where(.ilw-format) :where(i, em) {
+  font-style: italic;
+}
+
+/* Headings. .ilw-heading gives any element (a <p> in the toolkit's docs) the
+   h4 look without a heading's semantics. */
+:where(.ilw-format) :where(h1, h2, h3, h4, h5, h6, .ilw-heading) {
+  display: block;
+  margin-top: 1.8rem;
+  margin-bottom: 0;
+  color: var(--ilw-color--heading);
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+:where(.ilw-format) :where(h1) {
+  margin-top: 1.3125rem;
+  margin-bottom: 2rem;
+  font-family: var(--il-font-heading, 'Montserrat', sans-serif);
+  font-size: 2.5rem;
+  line-height: 2.875rem;
+}
+
+:where(.ilw-format) :where(h2) {
+  margin-top: 1.3125rem;
+  margin-bottom: 1.3125rem;
+  font-size: 2.188rem;
+  line-height: 2.688rem;
+}
+
+:where(.ilw-format) :where(h3) {
+  margin-top: 1.3125rem;
+  margin-bottom: 1.3125rem;
+  font-size: 1.813rem;
+  line-height: 2.188rem;
+}
+
+:where(.ilw-format) :where(h4, .ilw-heading) {
+  font-size: 1.563rem;
+  line-height: 1.813rem;
+}
+
+:where(.ilw-format) :where(h5) {
+  font-size: 1.313rem;
+  line-height: 1.75rem;
+}
+
+:where(.ilw-format) :where(h6) {
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+}
+
+:where(.ilw-format) :where(h4, h5, h6, .ilw-heading) {
+  margin-top: 1.3125rem;
+  margin-bottom: 0;
+}
+
+/* Lists. */
+:where(.ilw-format) :where(ul, ol) {
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+}
+
+:where(.ilw-format) :where(li) {
+  color: inherit;
+  font: 400 1.125rem/1.667 var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* Links, in link-visited-hover-focus order. */
+:where(.ilw-format) :where(a) {
+  color: var(--ilw-color--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+:where(.ilw-format) :where(a:visited) {
+  color: var(--ilw-color--link-visited);
+}
+
+:where(.ilw-format) :where(h1, h2, h3, h4, h5, h6, .ilw-heading) :where(a) {
+  color: var(--ilw-color--heading-link);
+}
+
+:where(.ilw-format) :where(h1, h2, h3, h4, h5, h6, .ilw-heading) :where(a:visited) {
+  color: var(--ilw-color--heading-link-visited);
+}
+
+:where(.ilw-format) :where(a:hover) {
+  color: var(--ilw-color--link-hover);
+}
+
+:where(.ilw-format) :where(h1, h2, h3, h4, h5, h6, .ilw-heading) :where(a:hover) {
+  color: var(--ilw-color--heading-link-hover);
+}
+
+:where(.ilw-format) :where(a:focus) {
+  background-color: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+}
+
+:where(.ilw-format) :where(a:focus-visible) {
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 2px;
+}
+
+/* The new-window icon: the brand's link icon, painted in the link's colour.
+   The --ilw-new-window--* properties are the toolkit's hooks for changing or
+   hiding it. It is decorative: say "opens in a new tab" in the link text. */
+:where(.ilw-format) :where(a[target='_blank'])::after {
+  display: var(--ilw-new-window--display, inline-block);
+  position: relative;
+  width: var(--ilw-new-window--width, 1em);
+  height: var(--ilw-new-window--height, 1em);
+  margin-left: var(--ilw-new-window--margin-left, 0);
+  background-color: var(--ilw-new-window--background-color, currentColor);
+  content: var(--ilw-new-window--content, '');
+  text-decoration: none;
+  vertical-align: middle;
+  mask-image: var(--ilw-new-window--mask-image, url('https://cdn.brand.illinois.edu/icons/solid/blue/link.svg'));
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+/* Quotes, rules and code. */
+:where(.ilw-format) :where(blockquote) {
+  margin-inline: 2.5rem;
+}
+
+:where(.ilw-format) :where(hr) {
+  margin: 1.2rem 0 0;
+  border: 0;
+  border-top: 1px solid var(--ilw-color--border);
+}
+
+:where(.ilw-format) :where(pre) {
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+  color: var(--ilw-color--text);
+  overflow-x: auto;
+}
+
+/* .ilw-font: the brand fonts without the rest of .ilw-format. Montserrat for
+   h1 (except in a hero or page title), Source Sans for the rest. */
+:where(.ilw-font) :where(h1) {
+  font-family: var(--il-font-heading, 'Montserrat', sans-serif);
+}
+
+:where(.ilw-font) :where(ilw-hero, ilw-page-title) :where(h1) {
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+:where(.ilw-font) :where(h2, h3, h4, p, li, div, input, select, textarea, summary, caption, blockquote) {
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
