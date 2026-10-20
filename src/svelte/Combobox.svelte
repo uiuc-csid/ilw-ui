@@ -4,7 +4,7 @@
   import { untrack } from 'svelte';
 
   import { blurMatch, type ComboboxItem, filterItems } from '../core/index.ts';
-  import { keepCaret, keepLiveRegionIn } from './zag-input.ts';
+  import { focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
@@ -82,7 +82,7 @@
     onchange(v, item);
   }
 
-  const service = useMachine(combobox.machine, {
+  const service = useMachine(focusStaysPut(combobox.machine, () => input), {
     get id() {
       return id;
     },

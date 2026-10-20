@@ -23,3 +23,20 @@ export async function press(page: Page, key: string): Promise<void> {
   await page.keyboard.press(macWebKit ? key.replace(/^(Shift\+)?Tab$/, 'Alt+$&') : key);
   await expectFocusNotOnBody(page);
 }
+
+/**
+ * Delays every animation frame by `ms`, before the page loads. Zag defers its
+ * focus calls by a frame; on a slow CI runner a key can land inside that frame,
+ * so this makes the race deterministic.
+ */
+export async function slowFrames(page: Page, ms = 150): Promise<void> {
+  await page.addInitScript((delay) => {
+    const own = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (cb) => own(() => setTimeout(() => own(cb), delay));
+  }, ms);
+}
+
+/** Resolves once every animation frame callback queued before it has run. */
+export async function framesSettled(page: Page): Promise<void> {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
