@@ -4,4 +4,5 @@
    each with its brand value as a fallback. */
 
 @import './styles/tokens.css';
+@import './styles/button.css';
 @import './styles/components.css';

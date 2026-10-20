@@ -1,0 +1,132 @@
+/* Buttons: a.ilw-button, button.ilw-button and the items of ul.ilw-buttons,
+   after the toolkit's rules of the same names. Colours come from the
+   --ilw-color--control* properties, so a theme class on the button or on any
+   ancestor recolours it (tokens.css). Every selector is one class with its
+   context in :where(), so all of them weigh (0,1,0) and source order decides:
+   a page's own single-class rule beats them, and the :where() prose rules in
+   format.css never do.
+
+   Differences from toolkit.css, all deliberate:
+   - The focus style is on :focus-visible, not :focus, and adds a two-tone ring
+     (focus-background inside a focus-text line) that reaches 3:1 against
+     every theme's surface in light and dark mode (WCAG 1.4.11).
+   - A link can be disabled: a.ilw-button[aria-disabled='true'], with no href.
+   - The disabled surface follows dark mode (the white palette's background)
+     instead of a fixed white.
+   - Size classes need .ilw-button (the toolkit also sizes a bare
+     button.ilw-button-large). */
+
+/* Lists of buttons. As in the toolkit, only ul.ilw-buttons styles its links
+   and buttons; ul.ilw-buttons-left only lays them out, so its items carry
+   .ilw-button themselves. */
+:where(ul).ilw-buttons,
+:where(ul).ilw-buttons-left {
+  display: flex;
+  flex-flow: row wrap;
+  column-gap: 16px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(ul).ilw-buttons {
+  justify-content: center;
+}
+
+:where(ul).ilw-buttons-left {
+  justify-content: left;
+}
+
+:where(ul).ilw-buttons :where(li),
+:where(ul).ilw-buttons-left :where(li) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-button:where(a, button),
+:where(ul).ilw-buttons :where(a, button) {
+  display: inline-block;
+  margin: 6px 0;
+  padding: 12px 20px;
+  border: 2px solid var(--ilw-color--control-text);
+  border-radius: 0.25em;
+  background: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+  font: 700 1.188rem/1.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Filled themes: the border takes the fill colour, in every state. */
+.ilw-button:where(a, button):where(.ilw-theme-blue-1, .ilw-theme-blue-solid, .ilw-theme-orange-1, .ilw-theme-orange-solid),
+:where(ul).ilw-buttons :where(a, button):where(.ilw-theme-blue-1, .ilw-theme-blue-solid, .ilw-theme-orange-1, .ilw-theme-orange-solid) {
+  border-color: var(--ilw-color--control);
+}
+
+/* A visited link keeps the button's colours, whatever the prose rules say. */
+.ilw-button:where(a:visited),
+:where(ul).ilw-buttons :where(a:visited) {
+  color: var(--ilw-color--control-text);
+}
+
+.ilw-button:where(a, button):where(:hover),
+:where(ul).ilw-buttons :where(a, button):where(:hover) {
+  background: var(--ilw-color--control-text);
+  color: var(--ilw-color--control);
+  text-decoration: underline;
+}
+
+/* Two rings in the focused button's own colours: --focus--background just
+   outside the border, then a --focus--text line. The pair is dark-on-light
+   (Blue on Arches 90) in light mode and light-on-dark (white on Blue 30) in
+   dark mode, so on every theme's surface at least one ring stands out from it
+   by 3:1 or more (WCAG 1.4.11; the README lists the ratios). */
+.ilw-button:where(a, button):where(:focus-visible),
+:where(ul).ilw-buttons :where(a, button):where(:focus-visible) {
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  text-decoration: underline;
+  outline: 2px solid var(--ilw-color--focus--text);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ilw-color--focus--background);
+}
+
+.ilw-button:where(button:disabled, a[aria-disabled='true']),
+:where(ul).ilw-buttons :where(button:disabled, a[aria-disabled='true']) {
+  border-color: var(--il-storm-lighter-1, #707372);
+  background: var(--ilw-color--white--background);
+  color: var(--il-storm-lighter-1, #707372);
+  text-decoration: none;
+  cursor: default;
+}
+
+.ilw-button:where(a, button):where(.ilw-button-large),
+:where(ul).ilw-buttons:where(.ilw-button-large) :where(a, button) {
+  padding: 20px 40px;
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+
+.ilw-button:where(a, button):where(.ilw-button-small),
+:where(ul).ilw-buttons:where(.ilw-button-small) :where(a, button) {
+  padding: 4px 6px;
+}
+
+.ilw-button:where(.ilw-width-full) {
+  display: block;
+  width: 100%;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.ilw-buttons:where(.ilw-width-full) {
+  margin: 0;
+}
+
+.ilw-buttons:where(.ilw-width-full) :where(li) {
+  flex-grow: 2;
+}
