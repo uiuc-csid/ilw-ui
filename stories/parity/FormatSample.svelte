@@ -1,0 +1,69 @@
+<script lang="ts">
+  let { theme }: { theme?: string } = $props();
+  // `theme` isn't a typed HTML attribute; the toolkit selects on it ([theme=blue]).
+  const attrs = $derived(theme ? { theme } : {});
+</script>
+
+<!-- A long sample page: every element .ilw-format styles. The same markup on
+     both sides of the parity pair; the toolkit styles it through the story
+     wrapper's <ilw-page class="ilw-format"><main>, ilw-ui through this div. -->
+<div class="ilw-format sample" {...attrs}>
+  <h1 id="format-top">Graduate admissions</h1>
+  <p>
+    The department admits students to the <strong>MS</strong> and <strong>PhD</strong> programs each fall. Read the
+    <a href="#format-requirements">requirements</a> before you apply, and see the
+    <a href="https://grad.illinois.edu/" target="_blank" rel="noopener">Graduate College (opens in a new tab)</a> for
+    university-wide rules. Deadlines are <em>firm</em>.
+  </p>
+
+  <h2 id="format-requirements">Requirements</h2>
+  <p>Every application needs the following:</p>
+  <ul>
+    <li>A statement of purpose</li>
+    <li>
+      Three letters of recommendation
+      <ul>
+        <li>at least two from faculty</li>
+        <li>submitted by the recommenders themselves</li>
+      </ul>
+    </li>
+    <li>Transcripts from every institution attended</li>
+  </ul>
+
+  <h3>How to apply</h3>
+  <ol>
+    <li>Create an account in the application system.</li>
+    <li>Fill in each section and upload your documents.</li>
+    <li>Pay the fee and submit.</li>
+  </ol>
+
+  <h4>Fee waivers</h4>
+  <p>Waivers are available for McNair Scholars and for applicants with financial need.</p>
+
+  <h5>Eligibility</h5>
+  <p>Ask the graduate office before you submit; waivers can't be applied afterwards.</p>
+
+  <h6>Note</h6>
+  <p>Fee waivers do not carry over between terms.</p>
+
+  <p class="ilw-heading">A paragraph styled as a heading</p>
+  <p>The <code>.ilw-heading</code> class gives the h4 look without heading semantics.</p>
+
+  <blockquote>
+    <p>The best part of the program was the freedom to follow a question wherever it led.</p>
+  </blockquote>
+
+  <hr />
+
+  <h2><a href="#format-top">A heading that is a link</a></h2>
+  <p>Run <code>pnpm install</code>, then start the workbench:</p>
+  <pre><code>pnpm storybook</code></pre>
+  <p><b>Bold</b>, <i>italic</i> and <a href="#format-requirements">a second link</a> in one line.</p>
+</div>
+
+<style>
+  /* Story-only: room around the sample, so a painted .ilw-format background shows. */
+  .sample {
+    padding: 0.5rem 1rem 1.5rem;
+  }
+</style>

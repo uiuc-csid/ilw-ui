@@ -48,6 +48,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | Partial          | Holds                                                     |
 | ---------------- | --------------------------------------------------------- |
 | `tokens.css`     | `--ilw-color--*` defaults, theme classes, dark mode       |
+| `format.css`     | `.ilw-format`, `.ilw-font`, `.ilw-heading` prose          |
 | `table.css`      | `table.ilw-table`, tables in `.ilw-format`, stripes, `.ilw-table-responsive`, `.ilw-theme-table-*` |
 | `page.css`       | `.ilw-page` shell, `.ilw-skip-link`, links in `main` (B1) |
 | `page-title.css` | `.ilw-page-title` (B5)                                    |
@@ -113,6 +114,50 @@ preference too**, since `tokens.css` overrides the toolkit's properties; set
 it runs under a same-origin-scripts, no-`eval` policy. Nothing sets inline
 `style` attributes either: `tests/e2e/combobox-csp.spec.ts` runs the open
 combobox under `style-src-attr 'none'`.
+
+## Prose: `.ilw-format`, `.ilw-font`, `.ilw-heading`
+
+`format.css` gives the toolkit's prose look to everything inside a
+`.ilw-format` element: headings, paragraphs, `b`/`strong`, `i`/`em`, lists,
+links, `blockquote`, `hr` and `pre`. Sizes and margins match the toolkit's
+`ilw-page.ilw-format main` rules; colours come from the `--ilw-color--*`
+properties, so themes and dark mode apply.
+
+```html
+<main class="ilw-format">
+  <h1>Graduate admissions</h1>
+  <p>Read the <a href="/requirements">requirements</a> first.</p>
+  <p class="ilw-heading">Looks like an h4, isn't a heading</p>
+</main>
+```
+
+- **Any element**, not only `ilw-page`'s `<main>`. `<ilw-page class="ilw-format">`
+  markup keeps working.
+- **Zero specificity.** Every selector is wrapped in `:where()`, so a
+  component's classed rules, or a page's own bare `h2` rule, always win. The
+  **Format → Components inside** story checks this with a `Combobox` and a
+  `DataTable`.
+- **Paints the theme.** `.ilw-format` sets `color` and `background-color` from
+  `--ilw-color--text` and `--ilw-color--background` (the toolkit leaves both
+  to the page), so prose is readable in dark mode and in a theme on the same
+  element (`<section class="ilw-format" theme="blue">`).
+- **Links** use `--ilw-color--link`, `-link-visited` and `-link-hover`; links
+  inside headings use the `-heading-link*` colours. Focus shows the
+  `--ilw-color--focus--*` background plus a 2px outline (the toolkit has no
+  outline). `target="_blank"` links end in the brand link icon, hooked to the
+  toolkit's `--ilw-new-window--*` properties (set
+  `--ilw-new-window--display: none` to hide it). The icon is decorative: put
+  "opens in a new tab" in the link text. In the toolkit only `<ilw-content>`
+  draws the icon.
+- **`hr` and `pre`** have no toolkit rules: `hr` is a 1px line in
+  `--ilw-color--border`, `pre` gets paragraph spacing and scrolls sideways
+  rather than widening the page. `code`, `kbd` and `samp` keep the browser's
+  monospace, as in the toolkit.
+- **`.ilw-heading`** gives any element inside `.ilw-format` the h4 look.
+- **`.ilw-font`** sets only the brand fonts: Montserrat on `h1` (except inside
+  `ilw-hero` and `ilw-page-title`), Source Sans on other headings, text and
+  form fields. `.ilw-format` already sets the same fonts on what it styles.
+- **Tables and captions** are not part of this: see [Tables](#tables).
 
 ## Tables
 
