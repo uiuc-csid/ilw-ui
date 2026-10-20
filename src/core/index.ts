@@ -65,3 +65,12 @@ export {
 } from './table.ts';
 
 export { announce, type AnnounceOptions, type Politeness } from './announce.ts';
+
+export {
+  type CampusFooterData,
+  type CampusFooterSection,
+  type CampusLink,
+  campusFooter,
+  campusLink,
+  DEFAULT_FOOTER_SOURCE,
+} from './campus-footer.ts';

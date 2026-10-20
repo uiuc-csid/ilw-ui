@@ -26,3 +26,7 @@ done
 # files don't exist, so point them back at the CDN.
 perl -pi -e 's#url\\(\\.\\./svg/#url(https://cdn.toolkit.illinois.edu/svg/#g' "$dir/toolkit.css"
 """
+
+[tasks."vendor:footer"]
+description = "Refresh the campus footer content (src/core/campus-footer.ts) from the brand API"
+run = "node scripts/vendor-footer.mjs"
