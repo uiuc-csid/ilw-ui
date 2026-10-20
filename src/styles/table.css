@@ -1,0 +1,199 @@
+/* Tables: the toolkit's table rules, under its class names. They style
+   table.ilw-table anywhere, and every table inside .ilw-format or
+   <ilw-content> (toolkit.css: `ilw-page.ilw-format main table`; ours drop the
+   page/main context so any .ilw-format element works). Context selectors sit
+   in :where(), so these rules have the specificity of their last part alone and
+   a component's class beats them. Colours come only from the
+   --ilw-color--table-* properties (and --ilw-color--text), so the theme classes
+   in tokens.css and below restyle a table without naming it.
+
+   The toolkit's responsive table scrolls sideways; it has no stacked
+   small-screen layout, and neither does this (it would need display: block on
+   table parts, which drops table semantics in some browsers). */
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) {
+  border: 1px solid var(--ilw-color--table-border);
+  border-collapse: collapse;
+  box-sizing: border-box;
+  overflow: auto;
+  width: 100%;
+}
+
+@media (width <= 599px) {
+  :where(.ilw-format table, ilw-content table, table.ilw-table) {
+    border: none;
+  }
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) caption {
+  background: var(--ilw-color--table-background);
+  color: var(--ilw-color--text);
+  display: table-caption;
+  font: 700 1.25rem/1.8rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  padding: 1rem 0;
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) tr {
+  background: var(--ilw-color--table-background);
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) :is(th, td) {
+  border: 1px solid var(--ilw-color--table-border);
+  border-left: none;
+  box-sizing: border-box;
+  color: var(--ilw-color--text);
+  overflow-wrap: normal;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  word-break: normal;
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) :is(th, td):first-of-type {
+  border-left: 1px solid var(--ilw-color--table-border);
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) :is(th, td):last-of-type {
+  border-right: 1px solid var(--ilw-color--table-border);
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) th {
+  font: 700 1.2rem/1.667rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  vertical-align: middle;
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) td {
+  font: 400 1.125rem/1.667rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  vertical-align: top;
+}
+
+/* Header cells, in the head or as row headers: the toolkit hard-codes white
+   text here; every palette's --table-head-color is white. */
+:where(.ilw-format table, ilw-content table, table.ilw-table) :is(thead, tbody) th {
+  background: var(--ilw-color--table-head-background);
+  color: var(--ilw-color--table-head-color);
+}
+
+:where(.ilw-format table, ilw-content table, table.ilw-table) tbody th {
+  white-space: nowrap;
+}
+
+/* SortableTh's button on the head colour: the browser's focus ring can vanish
+   on Industrial or Blue, so draw one in the head's text colour. */
+:where(.ilw-format table, ilw-content table, table.ilw-table) th .th-sort:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+/* Striped rows: class on the table (or any ancestor). */
+:where(.ilw-table-stripe) tr:nth-child(2n) {
+  background: var(--ilw-color--table-row-stripe);
+}
+
+/* Responsive: a wrapper that scrolls a wide table sideways. Give it
+   tabindex="0", role="region" and a label so keyboard users can scroll it. */
+.ilw-table-responsive {
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+:where(.ilw-table-responsive) table {
+  width: 100%;
+}
+
+@media (width <= 599px) {
+  :where(.ilw-table-responsive) table {
+    width: auto;
+  }
+
+  :where(.ilw-table-responsive) thead th {
+    white-space: nowrap;
+  }
+}
+
+/* Table themes, as in toolkit.css. The first three are whole themes (the same
+   properties as .ilw-theme-blue-1, [theme=gray] and .ilw-theme-orange-1); the
+   last two only recolour the borders and head. */
+.ilw-theme-table-blue {
+  --ilw-color--background: var(--ilw-color--blue--background);
+  --ilw-color--text: var(--ilw-color--blue--text);
+  --ilw-color--border: var(--ilw-color--blue--border);
+  --ilw-color--border-light: var(--ilw-color--blue--border-light);
+  --ilw-color--link: var(--ilw-color--blue--link);
+  --ilw-color--link-hover: var(--ilw-color--blue--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--blue--link-visited);
+  --ilw-color--heading: var(--ilw-color--blue--heading);
+  --ilw-color--heading-link: var(--ilw-color--blue--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--blue--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--blue--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--blue--control);
+  --ilw-color--control-text: var(--ilw-color--blue--control-text);
+  --ilw-color--control-accent: var(--ilw-color--blue--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--blue--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--blue--table-border);
+  --ilw-color--table-background: var(--ilw-color--blue--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--blue--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--blue--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--blue--table-head-color);
+}
+
+.ilw-theme-table-gray {
+  --ilw-color--background: var(--ilw-color--gray--background);
+  --ilw-color--text: var(--ilw-color--gray--text);
+  --ilw-color--border: var(--ilw-color--gray--border);
+  --ilw-color--border-light: var(--ilw-color--gray--border-light);
+  --ilw-color--link: var(--ilw-color--gray--link);
+  --ilw-color--link-hover: var(--ilw-color--gray--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--gray--link-visited);
+  --ilw-color--heading: var(--ilw-color--gray--heading);
+  --ilw-color--heading-link: var(--ilw-color--gray--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--gray--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--gray--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--gray--control);
+  --ilw-color--control-text: var(--ilw-color--gray--control-text);
+  --ilw-color--control-accent: var(--ilw-color--gray--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--gray--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--gray--table-border);
+  --ilw-color--table-background: var(--ilw-color--gray--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--gray--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--gray--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--gray--table-head-color);
+}
+
+.ilw-theme-table-orange {
+  --ilw-color--background: var(--ilw-color--orange--background);
+  --ilw-color--text: var(--ilw-color--orange--text);
+  --ilw-color--border: var(--ilw-color--orange--border);
+  --ilw-color--border-light: var(--ilw-color--orange--border-light);
+  --ilw-color--link: var(--ilw-color--orange--link);
+  --ilw-color--link-hover: var(--ilw-color--orange--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--orange--link-visited);
+  --ilw-color--heading: var(--ilw-color--orange--heading);
+  --ilw-color--heading-link: var(--ilw-color--orange--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--orange--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--orange--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--orange--control);
+  --ilw-color--control-text: var(--ilw-color--orange--control-text);
+  --ilw-color--control-accent: var(--ilw-color--orange--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--orange--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--orange--table-border);
+  --ilw-color--table-background: var(--ilw-color--orange--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--orange--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--orange--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--orange--table-head-color);
+}
+
+table.ilw-theme-table-blue-light {
+  --ilw-color--table-border: var(--ilw-color--blue--table-border);
+  --ilw-color--table-head-background: var(--ilw-color--blue--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--blue--table-head-color);
+}
+
+/* White on Illinois Orange is 3.3:1: the head text is 1.2rem bold, which WCAG
+   counts as large text, so it passes AA there and only there. */
+table.ilw-theme-table-orange-white-background {
+  --ilw-color--table-border: var(--ilw-color--orange--table-border);
+  --ilw-color--table-head-background: var(--il-orange, #ff5f05);
+  --ilw-color--table-head-color: var(--ilw-color--orange--table-head-color);
+}

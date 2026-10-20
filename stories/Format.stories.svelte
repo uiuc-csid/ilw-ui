@@ -127,7 +127,7 @@
 
   **Why:** every `format.css` rule has zero specificity, so a component's own classed rules win: the combobox keeps its 16px field and options, the sort buttons and pager keep theirs. Prose around them is still formatted.
 
-  **Review:** the paragraphs are 18px Source Sans; the combobox field, its open list and the pager look exactly as in their own stories (16px). The table itself is unstyled until the table styles land.
+  **Review:** the paragraphs are 18px Source Sans; the combobox field, its open list and the pager look exactly as in their own stories (16px). The table has its own table styles.
 -->
 <Story
   name="Components inside"
@@ -149,7 +149,8 @@
 
     const sort = one(root, '.th-sort');
     await expect(css(sort, 'font-weight')).toBe('700');
-    await expect(px(sort, 'font-size')).toBeCloseTo(16, 1);
+    // The sort button inherits its heading cell's size from the table styles, not from .ilw-format.
+    await expect(css(sort, 'font-size')).toBe(css(sort.closest('th')!, 'font-size'));
     const page = one(root, '.ilw-pager-btn:not(:disabled)');
     await expect(px(page, 'font-size')).toBeCloseTo(16, 1);
     await expect(css(page, 'border-top-color')).toBe('rgb(19, 41, 75)');
