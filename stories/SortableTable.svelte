@@ -23,7 +23,7 @@
   );
 </script>
 
-<table>
+<table class="ilw-table">
   <caption>TA hours</caption>
   <thead>
     <tr>

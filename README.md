@@ -33,9 +33,8 @@ import 'ilw-ui/styles.css';
 Every page needs the brand stylesheet
 (`https://cdn.brand.illinois.edu/illinois.css`). **Until the replacements land,
 the host page still loads the toolkit** (`toolkit.js` as a module and
-`toolkit.css`): `Modal` wraps `<ilw-modal>`, and the table components rely on
-the table styles of `<ilw-page class="ilw-format">`, which the components are
-built to sit inside. This paragraph shrinks as each replacement lands.
+`toolkit.css`): `Modal` wraps `<ilw-modal>`. This paragraph shrinks as each
+replacement lands.
 
 **Tokens:** `styles.css` uses only the brand palette's `--il-*` custom
 properties, each with its brand value as a fallback in case the brand
@@ -49,6 +48,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | ---------------- | --------------------------------------------------------- |
 | `tokens.css`     | `--ilw-color--*` defaults, theme classes, dark mode       |
 | `button.css`     | `.ilw-button`, `ul.ilw-buttons`, `ul.ilw-buttons-left`    |
+| `table.css`      | `table.ilw-table`, tables in `.ilw-format`, stripes, `.ilw-table-responsive`, `.ilw-theme-table-*` |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Modal, Combobox, Autocomplete, Pager |
 
 ## Themes and dark mode
@@ -57,8 +57,8 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 themed the same way here. A page loads one of the two stylesheets, not both:
 they define the same classes and properties.
 
-**Theme classes** (as in `toolkit.css`; the `-table-*` themes come with the
-table styles):
+**Theme classes** (as in `toolkit.css`; the `-table-*` themes are under
+[Tables](#tables)):
 
 | Class or attribute                                                                         | Palette                                       |
 | ------------------------------------------------------------------------------------------ | --------------------------------------------- |
@@ -109,6 +109,44 @@ preference too**, since `tokens.css` overrides the toolkit's properties; set
 it runs under a same-origin-scripts, no-`eval` policy. Nothing sets inline
 `style` attributes either: `tests/e2e/combobox-csp.spec.ts` runs the open
 combobox under `style-src-attr 'none'`.
+
+## Tables
+
+`table.css` styles a native table the way `toolkit.css` does: `table.ilw-table`
+anywhere, and every table inside `.ilw-format` or `<ilw-content>` (the toolkit
+only styles bare tables inside `ilw-page.ilw-format main`). Its selectors have
+the specificity of a single element, so a class of yours wins.
+
+```html
+<div class="ilw-table-responsive" role="region" aria-label="TA hours" tabindex="0">
+  <table class="ilw-table ilw-table-stripe ilw-theme-table-blue">
+    <caption>TA hours</caption>
+    <thead><tr><th scope="col">Name</th><th scope="col">Hours</th></tr></thead>
+    <tbody><tr><th scope="row">Avery</th><td>20</td></tr></tbody>
+  </table>
+</div>
+```
+
+| Class                                     | On             | Effect                                                    |
+| ----------------------------------------- | -------------- | --------------------------------------------------------- |
+| `ilw-table`                               | `<table>`      | borders, head colours, fonts, padding                     |
+| `ilw-table-stripe`                        | `<table>`      | even body rows take `--ilw-color--table-row-stripe`       |
+| `ilw-table-responsive`                    | wrapper `<div>` | scrolls a wide table sideways                            |
+| `ilw-theme-table-blue`, `-gray`, `-orange` | `<table>`      | a whole theme (as `.ilw-theme-blue-1`, `[theme=gray]`, `.ilw-theme-orange-1`) |
+| `ilw-theme-table-blue-light`              | `<table>`      | Industrial head and blue borders on the page's colours    |
+| `ilw-theme-table-orange-white-background` | `<table>`      | Illinois Orange head on the page's colours                |
+
+- **Header cells** (`thead th` and row headers in `tbody`) take
+  `--ilw-color--table-head-background` and `-head-color`. Below 600px the
+  table drops its outer border, as in the toolkit.
+- **Responsive tables scroll; they don't stack.** The toolkit has no stacked
+  small-screen layout, and ilw-ui adds none: stacking needs `display: block` on
+  table parts, which drops the table semantics in some browsers. Give the
+  scrolling wrapper `tabindex="0"`, `role="region"` and a label, so keyboard
+  users can scroll it (axe's `scrollable-region-focusable`).
+- `ilw-theme-table-orange-white-background` puts white on Illinois Orange
+  (3.3:1). The head text is 1.2rem bold, which counts as large text, so it
+  passes AA there; don't put smaller text in that head.
 
 ## Components
 
@@ -221,7 +259,8 @@ direction, another key starts ascending.
 <SortableTh key="name" label="Name" {sort} onsort={(k) => (sort = nextSort(sort, k))} />
 ```
 
-DOM contract (consumers' tests select on it):
+DOM contract (consumers' tests select on it). The heading sits in a
+`<table class="ilw-table">` (or any table in `.ilw-format`), which colours it:
 
 ```html
 <th scope="col" aria-sort="ascending">
@@ -444,7 +483,7 @@ page, using the page's own comparators and predicates. Pages never import
 
 <input type="search" oninput={(e) => setTableFilter(table, 'code', e.currentTarget.value)} />
 <Pager {table} emptyLabel="No courses" />
-<DataTable {table} class="courses">
+<DataTable {table} class="ilw-table">
   {#snippet header()}<tr><TableSortTh {table} id="code" label="Course" /><TableSortTh {table} id="hours" label="Hours" /></tr>{/snippet}
   {#snippet row(course)}<tr><td>{course.code}</td><td>{course.hours}</td></tr>{/snippet}
   {#snippet empty()}<tr><td colspan="2">No courses.</td></tr>{/snippet}
@@ -467,7 +506,9 @@ page, using the page's own comparators and predicates. Pages never import
   `setFilterValue` yourself, call `table.setPageIndex(0)` too.
 - **`DataTable`** renders a native `<table>` (attributes pass through), a
   `<thead>` from `header`, and a `<tbody>` from `row` (keyed by `getRowId`) or
-  `empty`. It adds no classes or styles. **`DataRows`** is just the rows, for a
+  `empty`. It adds no classes or styles: give it `class="ilw-table"` for the
+  [table styles](#tables) (ta-manager's toolkit pages style the same markup
+  through `toolkit.css`). **`DataRows`** is just the rows, for a
   `<table>` already in the page's HTML: mount it into the `<tbody>`.
 - **`TableSortTh`** (`table`, `id`, `label`) renders a `SortableTh` with the
   same DOM contract, driven by the table's sort: the sorted column flips and
