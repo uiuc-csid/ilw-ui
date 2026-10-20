@@ -4,7 +4,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { type AutocompleteItem, filterItems } from '../core/index.ts';
-  import { keepCaret, keepLiveRegionIn } from './zag-input.ts';
+  import { focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
@@ -71,7 +71,7 @@
     onselect?.(item);
   }
 
-  const service = useMachine(combobox.machine, {
+  const service = useMachine(focusStaysPut(combobox.machine, () => input), {
     get id() {
       return id;
     },

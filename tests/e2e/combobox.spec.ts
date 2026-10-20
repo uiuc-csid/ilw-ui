@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { expectFocusNotOnBody, openStory, press } from './focus.ts';
+import { expectFocusNotOnBody, framesSettled, openStory, press, slowFrames } from './focus.ts';
 
 function parts(page: Page) {
   return {
@@ -80,6 +80,22 @@ test('Tab commits a unique match and moves on; Shift+Tab comes back', async ({ p
   await expect(input).toBeFocused();
   await press(page, 'Shift+Tab');
   await expect(before).toBeFocused();
+});
+
+test('Tab before Zag\'s deferred focus lands still moves on', async ({ page }) => {
+  // Opening the list queues a focus on the input for the next frame; a Tab
+  // inside that frame was pulled back (flaked in CI).
+  await slowFrames(page);
+  await openStory(page, 'combobox--fixture');
+  const { input, after, selected } = parts(page);
+
+  await input.focus();
+  await type(page, 'blake');
+  await press(page, 'Tab');
+  await expect(selected).toHaveText('bbrown');
+  await framesSettled(page);
+  await expectFocusNotOnBody(page);
+  await expect(after).toBeFocused();
 });
 
 test('unmatched text stays on Tab and commits nothing', async ({ page }) => {

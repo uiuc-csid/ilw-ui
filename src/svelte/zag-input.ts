@@ -42,3 +42,37 @@ export function keepLiveRegionIn(root: HTMLElement): () => void {
   observer.observe(document.body, { childList: true });
   return () => observer.disconnect();
 }
+
+/**
+ * Zag focuses the input a frame after the list opens or closes
+ * (`setInitialFocus`, `setFinalFocus`: a `raf` around `focusInputEl`). Typing
+ * opens the list, so a Tab within that frame moves focus on and Zag then pulls
+ * it back into the input. Run the same deferred focus, but only while focus is
+ * still where it was when Zag asked (or has fallen to `<body>`). Neither
+ * component has a trigger button, so the input is always the target. Zag's
+ * caret-to-end is left out: `keepCaret` drops it anyway.
+ */
+export function focusStaysPut<M extends { implementations?: { actions?: Record<string, unknown> } }>(
+  machine: M,
+  input: () => HTMLInputElement | undefined,
+): M {
+  function focusInput() {
+    const el = input();
+    if (!el) return;
+    const doc = el.ownerDocument;
+    const from = doc.activeElement;
+    requestAnimationFrame(() => {
+      const now = doc.activeElement;
+      if (!el.isConnected || now === el || (now && now !== from && now !== doc.body)) return;
+      el.focus({ preventScroll: true });
+    });
+  }
+  const implementations = machine.implementations ?? {};
+  return {
+    ...machine,
+    implementations: {
+      ...implementations,
+      actions: { ...implementations.actions, setInitialFocus: focusInput, setFinalFocus: focusInput },
+    },
+  };
+}

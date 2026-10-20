@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { expectFocusNotOnBody, openStory, press } from './focus.ts';
+import { expectFocusNotOnBody, framesSettled, openStory, press, slowFrames } from './focus.ts';
 
 function parts(page: Page) {
   return {
@@ -83,6 +83,21 @@ test('Tab takes the highlighted suggestion and moves on; Shift+Tab comes back', 
   await expect(input).toBeFocused();
   await press(page, 'Shift+Tab');
   await expect(before).toBeFocused();
+});
+
+test('Tab before Zag\'s deferred focus lands still moves on', async ({ page }) => {
+  // Opening the list queues a focus on the input for the next frame; a Tab
+  // inside that frame was pulled back.
+  await slowFrames(page);
+  await openStory(page, 'autocomplete--fixture');
+  const { input, after } = parts(page);
+
+  await input.focus();
+  await type(page, 'brown');
+  await press(page, 'Tab');
+  await framesSettled(page);
+  await expectFocusNotOnBody(page);
+  await expect(after).toBeFocused();
 });
 
 test('free text stays on Tab, and Enter with nothing highlighted submits the form', async ({ page }) => {
