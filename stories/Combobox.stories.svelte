@@ -193,6 +193,24 @@
   }}
 />
 
+<Story
+  name="Live region"
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('ad');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    // What @zag-js/live-region appends on Apple platforms; it must end up
+    // inside the component, not on <body>.
+    const region = document.createElement('span');
+    region.id = '__live-region__';
+    region.dataset.liveAnnouncer = 'true';
+    document.body.append(region);
+    await waitFor(() => expect(region.parentElement).toBe(canvasElement.querySelector('.combobox')));
+    region.remove();
+  }}
+/>
+
 <!-- Left open with a highlighted option so axe scans the open listbox. -->
 <Story
   name="Open"

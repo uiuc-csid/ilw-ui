@@ -106,3 +106,28 @@ focus back.
 **Workaround in ilw-ui:** on blur to outside the root, send
 `{ type: 'LAYER.INTERACT_OUTSIDE', src: 'interact-outside', restoreFocus: false }`
 when the list is open. The focus pull is not worked around.
+
+## 7. The live region can't be placed: it always goes on `document.body`
+
+**Status:** Not filed.
+
+On Apple platforms the combobox machine's `trackLiveRegion` effect calls
+`createLiveRegion({ level: 'assertive', document: scope.getDoc() })`, and
+`announceHighlightedItem` appends a `span[role=alert]` to `doc.body`.
+`@zag-js/live-region` accepts a `root`, but the machine never passes one. Apps
+whose content sits in a landmark wrapper (`<ilw-page>`), or that make the rest
+of the page `inert` while a modal is open, can't keep the region where it is
+heard and where their landmark checks expect it.
+
+**Repro:** in Safari, render a combobox inside a `<dialog>`-like container and
+set `inert` on the other `body` children; open the list and arrow through it.
+VoiceOver reads nothing from the live region: it is under `body`, which is not
+inert, but outside the container the user is in, and axe's `region` rule flags
+it outside the landmarks.
+
+**Proposal:** a `liveRegionRoot` (or `getLiveRegionRoot`) prop, passed to
+`createLiveRegion` as `root`, defaulting to `doc.body`.
+
+**Workaround in ilw-ui:** `keepLiveRegionIn` (`src/svelte/zag-input.ts`) moves
+each `[data-live-announcer]` appended to `body` into the component's root while
+focus is inside it.

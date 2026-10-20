@@ -3,8 +3,8 @@
 Accessible Svelte 5 components that look and behave like the
 [Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/). They cover what
 the toolkit lacks: so far, a sortable table heading, a modal with close
-events, focus return and a promise API, a filtering combobox, and a
-client-side sortable, filterable, paged table. Where the toolkit already has a
+events, focus return and a promise API, a filtering combobox, a free-text
+autocomplete, and a client-side sortable, filterable, paged table. Where the toolkit already has a
 component (page chrome, accordion, the modal dialog itself), `ilw-ui` uses it
 rather than replacing it.
 
@@ -19,7 +19,7 @@ and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
 `@tanstack/svelte-table` (9.3.1).
 
 ```js
-import { Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
+import { Autocomplete, Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
@@ -191,7 +191,68 @@ DOM contract (consumers' tests select on it):
 - `aria-activedescendant` is set only while the list is open and the highlighted option is rendered.
 - With no matches, the list shows a disabled `.combobox-empty` "No matches" row in place of the "more" row.
 - The popup is placed with CSS, with no inline `style`, so it runs under `style-src-attr 'none'`.
-- While the list is open on macOS and iOS, Zag adds a visually hidden `span[role=alert]` to `<body>`. It re-announces the highlight for VoiceOver.
+- While the list is open on macOS and iOS, Zag adds a visually hidden `span[role=alert][data-live-announcer]` that re-announces the highlight for VoiceOver. Zag appends it to `<body>`; the component moves it into its root `span`, so it stays inside the page's landmarks and outside `inert` (see Known issues).
+
+### `Autocomplete`
+
+A free-text input with suggestions, on the same Zag combobox machine: the text
+is the value, and choosing a suggestion writes its text into the input. Use it
+where any text is allowed (a professor's name, a course number) and the list
+only helps; use `Combobox` to pick one of a fixed set.
+
+```svelte
+<label id="prof-label" for="prof">Professor</label>
+<Autocomplete id="prof" labelId="prof-label" {items} bind:value onselect={(item) => (netid = item.value)} />
+```
+
+| Prop                              | Type                   | Default       |                                                                              |
+| --------------------------------- | ---------------------- | ------------- | ---------------------------------------------------------------------------- |
+| `id`                              | `string`               | required      | The input's id                                                               |
+| `popupId`                         | `string`               | `${id}-popup` | The listbox's id                                                             |
+| `items`                           | `AutocompleteItem[]`   | required      | `{ value, label, text?, search? }`: `label` is listed, `text` is written     |
+| `value`                           | `string`               | `''`          | The input's text (`bind:value`)                                              |
+| `oninput`                         | `(text) => void`       |               | On each keystroke                                                            |
+| `onselect`                        | `(item) => void`       |               | When a suggestion is chosen, after its `text` (or `label`) is written        |
+| `labelId`                         | `string`               |               | The `<label>`'s id; also labels the listbox                                  |
+| `placeholder`                     | `string`               | `''`          | Also the listbox's `aria-label` when there is no `labelId`                   |
+| `minChars`                        | `number`               | `1`           | Typing opens the list at this length                                         |
+| `max`                             | `number`               | `10`          | Suggestions shown at most                                                    |
+| `emptyText`                       | `string`               |               | Shown as a disabled option when nothing matches; without it the list closes  |
+| `block`                           | `boolean`              | `false`       | Adds `ac-block` (full-width)                                                 |
+| `disabled`, `invalid`, `required` | `boolean`              | `false`       |                                                                              |
+| `class`, other input attributes   |                        |               | Added to the input (`name`, `size`, `data-*`, `onchange`, …)                 |
+
+Matching is `filterItems`: a trimmed, case-insensitive substring search over
+each item's `search` text (or `label`), in item order.
+
+Keyboard:
+
+| Key                 | Action                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| Typing              | Filters; opens the list at `minChars` characters. Nothing is highlighted, so the text stays. |
+| ArrowDown / ArrowUp | Open the list on the current text, then move the highlight, wrapping.                     |
+| Enter               | Writes the highlighted suggestion and closes. With nothing highlighted, it is the input's own (submits a form). |
+| Escape              | Closes; focus and the text stay.                                                          |
+| Tab / blur          | Writes the highlighted suggestion, if any, and moves on. Otherwise the text stays.         |
+
+DOM contract:
+
+```html
+<span class="autocomplete" data-scope="combobox" data-part="root">
+  <input id="prof" class="autocomplete-input" role="combobox" aria-autocomplete="list"
+         aria-expanded="true" aria-controls="prof-popup"
+         aria-activedescendant="prof-popup-opt-aadams" autocomplete="off" />
+  <div id="prof-popup" class="autocomplete-popup" role="listbox" aria-labelledby="prof-label">
+    <div id="prof-popup-opt-aadams" role="option" data-value="aadams" data-highlighted>A. Adams — Avery Adams (aadams)</div>
+  </div>
+</span>
+```
+
+- With `block`, the root's class is `autocomplete ac-block`; `class` is added after `autocomplete-input`.
+- The listbox is `hidden` while closed. Option ids are `${popupId}-opt-${encodeURIComponent(value)}`.
+- No option is ever `aria-selected`: the text, not a selection, is the value.
+- With `emptyText` and no matches, the list shows one disabled `.autocomplete-empty` option.
+- `aria-activedescendant`, the caret and Zag's VoiceOver live region behave as in `Combobox`.
 
 ### `createDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`
 
@@ -372,7 +433,8 @@ where a workaround is possible. None is filed upstream yet. Draft issues are in
   as part of the description.
 
 Upstream Zag (`@zag-js/combobox` 1.44.0) gaps. Each is worked around once,
-inside `Combobox`. None is filed upstream yet. Draft issues are in
+inside `Combobox` (and `Autocomplete`, which shares the workarounds in
+`src/svelte/zag-input.ts`). None is filed upstream yet. Draft issues are in
 [docs/upstream-issues/zag.md](docs/upstream-issues/zag.md).
 
 - **`openOnChange` as a function sees the text from before the keystroke,** so
@@ -399,9 +461,12 @@ inside `Combobox`. None is filed upstream yet. Draft issues are in
   `restoreFocus: false`). The focus pull is a single-frame race and isn't worked
   around.
 - **On Apple platforms Zag adds an `aria-live` region to `document.body`** while
-  the list is open, outside `<ilw-page>`, to announce the highlighted option
-  (VoiceOver doesn't read `aria-activedescendant` reliably). It's visually hidden
-  and removed on close. `Combobox` keeps it.
+  the list is open, to announce the highlighted option (VoiceOver doesn't read
+  `aria-activedescendant` reliably). The machine passes `@zag-js/live-region` no
+  `root`, so it lands outside `<ilw-page>`, and is silenced by `inert` when the
+  component sits in a modal. While focus is in the component, `Combobox` and
+  `Autocomplete` move it into their root `span` (`keepLiveRegionIn`); Zag finds
+  it by id and still announces and removes it.
 
 ## License
 
