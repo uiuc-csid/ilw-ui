@@ -1,12 +1,17 @@
 # ilw-ui
 
-Accessible Svelte 5 components that look and behave like the
-[Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/). They cover what
-the toolkit lacks: so far, a sortable table heading, a modal with close
-events, focus return and a promise API, a filtering combobox, a free-text
-autocomplete, and a client-side sortable, filterable, paged table. Where the toolkit already has a
-component (page chrome, accordion, the modal dialog itself), `ilw-ui` uses it
-rather than replacing it.
+Accessible Svelte 5 components that look like the
+[Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/) and follow the
+WAI-ARIA Authoring Practices. The goal is a full replacement for the toolkit in
+Svelte apps: the same look without `toolkit.js` or `toolkit.css`, plus what the
+toolkit lacks. So far: a sortable table heading, a modal with close events,
+focus return and a promise API, a filtering combobox, a free-text autocomplete,
+and a client-side sortable, filterable, paged table. The roadmap is
+[docs/plans/2026-10-20-toolkit-replacement.md](docs/plans/2026-10-20-toolkit-replacement.md),
+tracked in [#9](https://github.com/uiuc-csid/ilw-ui/issues/9).
+
+Layering: native HTML first, `ilw-ui` second. The toolkit is the visual
+reference, not a runtime dependency of new components.
 
 Status: pre-release (`private: true`), first consumer
 [ta-manager](https://github.com/uiuc-csid/ta-manager).
@@ -21,14 +26,16 @@ and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
 ```js
 import { Autocomplete, Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
-import { nextSort, filterItems, blurMatch, rowColumn, pageWindow } from 'ilw-ui/core';
+import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
-**The host page must load the toolkit** (`toolkit.js` as a module and
-`toolkit.css`) and the brand stylesheet
-(`https://cdn.brand.illinois.edu/illinois.css`). The components are built to sit
-inside `<ilw-page class="ilw-format">`.
+Every page needs the brand stylesheet
+(`https://cdn.brand.illinois.edu/illinois.css`). **Until the replacements land,
+the host page still loads the toolkit** (`toolkit.js` as a module and
+`toolkit.css`): `Modal` wraps `<ilw-modal>`, and the table components rely on
+the table styles of `<ilw-page class="ilw-format">`, which the components are
+built to sit inside. This paragraph shrinks as each replacement lands.
 
 **Tokens:** `styles.css` uses only the brand palette's `--il-*` custom
 properties, each with its brand value as a fallback in case the brand
@@ -393,6 +400,41 @@ const unmount = mountIslands({ 'course-picker': CoursePicker }); // root default
   `data-ilw-mounted`. On `pagehide` it unmounts by itself, unless
   `event.persisted` is true: a page going into the bfcache comes back as it
   was, islands included.
+
+### `announce`
+
+Speaks a short message to screen-reader users without moving focus, through
+two shared live regions. Components use it to report changes (copied, row
+added, item moved); apps can call it too.
+
+```ts
+announce(message: string, opts?: { politeness?: 'polite' | 'assertive' }): void
+```
+
+```js
+import { announce } from 'ilw-ui/core';
+
+announce('3 results');                                    // waits for the reader to finish
+announce('Could not save', { politeness: 'assertive' }); // interrupts
+```
+
+- The first call appends two regions to `<body>` and later calls reuse them
+  (they are recreated if `<body>` is replaced). Importing the module touches
+  no DOM, so it is safe on the server and in islands.
+- The region is emptied at once and the text set on the next animation frame,
+  so repeating a message announces it again. A second call before that frame
+  replaces the first message; polite and assertive messages don't affect each
+  other.
+- Use `assertive` only for errors the user must hear now.
+- The regions are hidden with `.ilw-visually-hidden` from `styles.css`, which
+  must be loaded; the class is also available for any screen-reader-only text.
+
+DOM contract:
+
+```html
+<div role="status" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="polite">3 results</div>
+<div role="alert" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="assertive"></div>
+```
 
 ## Tests
 
