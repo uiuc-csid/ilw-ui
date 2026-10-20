@@ -57,6 +57,15 @@ Status: **pending human run.**
 - [ ] The current page's button is announced as the current page.
 - [ ] After pressing Next, focus stays on Next. On the last page, focus moves to the current page's button, and that is announced.
 
+## announce (story: announce → Buttons)
+
+Status: **pending human run.**
+
+- [ ] "Announce politely" is read ("3 results") after the button's own name, without cutting it off.
+- [ ] "Announce assertively" interrupts and reads "Could not save"; VoiceOver may prefix it with "alert".
+- [ ] Pressing the same button twice reads the message twice, not once.
+- [ ] Focus stays on the button. Nothing new appears on screen; reading to the end of the page with the browse/virtual cursor reaches the last message (the regions sit at the end of `<body>`).
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |

@@ -3,6 +3,20 @@
    that token's brand value, for pages where the brand stylesheet didn't load.
    No rules on bare th/td: <ilw-page class="ilw-format"> restyles those. */
 
+/* Hidden on screen, still read by screen readers: announce()'s live regions
+   and any text that exists only for assistive technology. */
+.ilw-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* SortableTh: a real button for keyboard access, reset to look like the
    heading text it sits in. */
 .th-sort {

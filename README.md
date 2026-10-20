@@ -26,7 +26,7 @@ and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
 ```js
 import { Autocomplete, Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
-import { nextSort, filterItems, blurMatch, rowColumn, pageWindow } from 'ilw-ui/core';
+import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
@@ -365,6 +365,41 @@ not change yet. Consumers should drop it and move to the default markup
 The count isn't a live region: with two pagers it would be announced twice.
 Focus staying on the pressed button is what tells a screen-reader user the page
 changed.
+
+### `announce`
+
+Speaks a short message to screen-reader users without moving focus, through
+two shared live regions. Components use it to report changes (copied, row
+added, item moved); apps can call it too.
+
+```ts
+announce(message: string, opts?: { politeness?: 'polite' | 'assertive' }): void
+```
+
+```js
+import { announce } from 'ilw-ui/core';
+
+announce('3 results');                                    // waits for the reader to finish
+announce('Could not save', { politeness: 'assertive' }); // interrupts
+```
+
+- The first call appends two regions to `<body>` and later calls reuse them
+  (they are recreated if `<body>` is replaced). Importing the module touches
+  no DOM, so it is safe on the server and in islands.
+- The region is emptied at once and the text set on the next animation frame,
+  so repeating a message announces it again. A second call before that frame
+  replaces the first message; polite and assertive messages don't affect each
+  other.
+- Use `assertive` only for errors the user must hear now.
+- The regions are hidden with `.ilw-visually-hidden` from `styles.css`, which
+  must be loaded; the class is also available for any screen-reader-only text.
+
+DOM contract:
+
+```html
+<div role="status" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="polite">3 results</div>
+<div role="alert" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="assertive"></div>
+```
 
 ## Tests
 
