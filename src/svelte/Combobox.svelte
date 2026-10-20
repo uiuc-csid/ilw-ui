@@ -4,7 +4,7 @@
   import { untrack } from 'svelte';
 
   import { blurMatch, type ComboboxItem, filterItems } from '../core/index.ts';
-  import { focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
+  import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
@@ -164,7 +164,7 @@
           query = text === labelOf(value) ? '' : text;
         },
         onfocusout(event: FocusEvent) {
-          if (root.contains(event.relatedTarget as Node | null)) return;
+          if (!focusLeft(root, event)) return;
           commit(blurMatch(items, text));
           // Close the way zag's own dismissal does. Its outside-click handling
           // otherwise races the blur and can leave the list open or pull focus

@@ -559,7 +559,8 @@ machine: a text input that filters a listbox of options, for picking one of many
 Matching (`filterItems` in `ilw-ui/core`) is a trimmed, case-insensitive
 substring search over each item's `search` text. Groups keep first-seen order.
 On blur (`blurMatch`), the combobox commits an exact label or value match, else
-the only match, else `null`.
+the only match, else `null`. Switching windows or tabs isn't a blur: the input
+keeps focus, so nothing is committed and the list stays as it was.
 
 There is no `name` or hidden form input: Zag would submit the label text. Keep
 the value in your own field (ta-manager keeps a hidden `<select>`).
@@ -649,6 +650,7 @@ Keyboard:
 | Enter               | Writes the highlighted suggestion and closes. With nothing highlighted, it is the input's own (submits a form). |
 | Escape              | Closes; focus and the text stay.                                                          |
 | Tab / blur          | Writes the highlighted suggestion, if any, and moves on. Otherwise the text stays.         |
+| Window switch       | Nothing: the input keeps focus, so the list, highlight and text stay as they were.        |
 
 DOM contract:
 
