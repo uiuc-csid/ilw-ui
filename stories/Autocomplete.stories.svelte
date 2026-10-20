@@ -20,9 +20,18 @@
     title: 'Autocomplete',
     component: AutocompleteDemo,
     args: { items: faculty, placeholder: 'Name or NetID' },
+    // The Docs page lists every story with its review notes (the comment above it).
+    tags: ['autodocs'],
   });
 </script>
 
+<!--
+  The DOM contract and the core flow: the markup ta-manager selects on, then type, arrow, Enter, Escape, clear.
+
+  **Why:** the README documents this markup as API, and this is the path most users take.
+
+  **Review:** type `a`. The list opens with nothing highlighted, and the text you typed stays. ArrowDown highlights an option, and Enter writes its short text (`D. Adams`, not the full label) and closes the list. Escape closes the list and leaves focus and text alone. Clearing the input closes the list. No option ever shows as selected.
+-->
 <Story
   name="Basic"
   play={async ({ canvas, canvasElement, userEvent }) => {
@@ -89,6 +98,13 @@
   }}
 />
 
+<!--
+  The text is the value: anything typed is kept, even when it matches no suggestion.
+
+  **Why:** unlike Combobox, Autocomplete must accept names that aren't in the list (a visiting professor).
+
+  **Review:** type text with no matches and Tab away. The text stays and `selects` stays at 0. Typing a match and tabbing out *without* arrowing also keeps your text, not the first suggestion.
+-->
 <Story
   name="Free text"
   play={async ({ canvas, userEvent }) => {
@@ -113,6 +129,13 @@
   }}
 />
 
+<!--
+  Tab with a highlighted suggestion takes it, as Enter does.
+
+  **Why:** a user who arrows to a suggestion and tabs on expects it to stick. Losing it on Tab is a common combobox bug.
+
+  **Review:** type `brown`, ArrowDown, Tab. The input reads `B. Brown` and the list is closed. Where focus lands is checked by the Playwright spec, not here (WebKit on macOS skips fields on Tab unless Option is held).
+-->
 <Story
   name="Tab takes the highlight"
   play={async ({ canvas, userEvent }) => {
@@ -131,6 +154,13 @@
   }}
 />
 
+<!--
+  With `emptyText`, a search with no matches shows a disabled "No matches" row instead of closing the list.
+
+  **Why:** a screen-reader user otherwise gets no feedback that the search came up empty.
+
+  **Review:** type `zz`. The row is visible, styled as muted rather than as a choice, and `aria-disabled`. Enter on it keeps `zz` and doesn't count as a select.
+-->
 <Story
   name="Empty text"
   args={{ emptyText: 'No matches' }}
@@ -148,6 +178,13 @@
   }}
 />
 
+<!--
+  A 50-item list capped by `max: 12`, with items that have only a `label`.
+
+  **Why:** checks the cap and the fallback where the label doubles as the text written to the input.
+
+  **Review:** type `cs`. Exactly 12 options show, and the popup scrolls once it reaches its 20rem height cap. ArrowUp wraps to the last one (`CS 112`), and Enter writes the label.
+-->
 <Story
   name="Many"
   args={{ items: many, max: 12 }}
@@ -165,6 +202,13 @@
   }}
 />
 
+<!--
+  Starts with text already in the input, as when editing a saved record.
+
+  **Why:** a prefilled value must not open the list on load, and the user needs a keyboard way to see suggestions for it.
+
+  **Review:** on load the list is closed. Focus the input and press ArrowDown: it opens, filtered by the current text (only Adams).
+-->
 <Story
   name="Prefilled"
   args={{ value: 'A. Adams' }}
@@ -180,6 +224,13 @@
   }}
 />
 
+<!--
+  Extra props (`class`, `name`, `size`, `data-*`) are passed through to the `<input>`.
+
+  **Why:** ta-manager posts the field in a plain form and selects rows by `data-*`.
+
+  **Review:** in the DOM, the input has the added class after `autocomplete-input` and carries the other attributes. Its width stays 200px, since the stylesheet sets it.
+-->
 <Story
   name="Input attributes"
   args={{ class: 'took-prof', name: 'prof', size: 12, 'data-row': '3' } as Record<string, unknown>}
@@ -192,6 +243,13 @@
   }}
 />
 
+<!--
+  Zag's VoiceOver live region is moved inside the component while the input has focus.
+
+  **Why:** on Apple platforms Zag appends the region to `<body>`, outside the page landmarks and outside any open modal (which makes the rest of the page inert), so its announcements are lost. See `docs/upstream-issues/zag.md` #7.
+
+  **Review:** nothing visible. This story only exists for its `play` test. To check by hand, type in Safari and inspect: any `[data-live-announcer]` sits under `.autocomplete`, not `<body>`. Real announcements are checked in `docs/at-smoke.md`.
+-->
 <Story
   name="Live region"
   play={async ({ canvas, canvasElement, userEvent }) => {
@@ -224,6 +282,13 @@
   }}
 />
 
+<!--
+  Disabled state, with text already filled in.
+
+  **Why:** a locked record still has to show its value.
+
+  **Review:** the field looks disabled but its text is still readable (check the contrast), it can't be focused, and nothing opens.
+-->
 <Story
   name="Disabled"
   args={{ value: 'A. Adams', disabled: true }}
@@ -234,6 +299,13 @@
   }}
 />
 
+<!--
+  `invalid` and `required` reach the input as `aria-invalid` and `required`.
+
+  **Why:** form validation in ta-manager depends on them, and screen readers announce both.
+
+  **Review:** the border is a 2px dark Altgeld (double width, so the state isn.t shown by color alone), and a screen reader says "invalid, required".
+-->
 <Story
   name="Invalid"
   args={{ invalid: true, required: true }}
@@ -244,6 +316,11 @@
   }}
 />
 
+<!--
+  `block` adds `ac-block`, so the field fills its container.
+
+  **Review:** the input and the popup both span the full width of the form row.
+-->
 <Story
   name="Block"
   args={{ block: true }}
@@ -252,7 +329,13 @@
   }}
 />
 
-<!-- Left open with a highlighted option so axe scans the open listbox. -->
+<!--
+  Left open with an option highlighted, so axe checks the open listbox and the `aria-activedescendant` reference.
+
+  **Why:** axe only checks what is rendered, and the other stories end with the list closed.
+
+  **Review:** the highlight (light Arches background) is easy to see, and the popup floats over the "After" field instead of pushing it down. The a11y panel should show no violations.
+-->
 <Story
   name="Open"
   play={async ({ canvas, userEvent }) => {
@@ -265,7 +348,11 @@
   }}
 />
 
-<!-- Left open on "No matches" so axe scans the disabled option. -->
+<!--
+  Left open on the "No matches" row, so axe checks the disabled option.
+
+  **Review:** the a11y panel is clean, and the row reads as a message, not as a choice you can pick.
+-->
 <Story
   name="Open empty"
   args={{ emptyText: 'No matches' }}
@@ -277,6 +364,15 @@
   }}
 />
 
-<!-- Fixtures for the Playwright keyboard spec: no play function. -->
+<!--
+  Has no `play` function: it is the starting page for `tests/e2e/autocomplete.spec.ts`, which drives it with a real keyboard.
+
+  **Review:** use it to try the component by hand. Expect Tab and Shift+Tab to move between Before, Professor and After, and focus never to drop to `<body>`.
+-->
 <Story name="Fixture" />
+<!--
+  `Fixture` with `emptyText`, for the Playwright "No matches is not selectable" test.
+
+  **Review:** like `Fixture`, but a search with no matches shows the "No matches" row.
+-->
 <Story name="Fixture empty text" args={{ emptyText: 'No matches' }} />

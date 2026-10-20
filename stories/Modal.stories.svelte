@@ -10,6 +10,8 @@
 
   const { Story } = defineMeta({
     title: 'Modal',
+    // The Docs page lists every story with its review notes (the comment above it).
+    tags: ['autodocs'],
     component: ModalDemo,
     // A story that leaves its modal open must not leak it (and the inert page) into the next.
     beforeEach: () => () => {
@@ -35,6 +37,13 @@
   const idNumber = (m: IlwModal) => Number(/^app-modal-(\d+)$/.exec(m.getAttribute('id')!)![1]);
 </script>
 
+<!--
+  `alert()`: one "Got it" button, `size="small"`, rendered into an `ilw-modal` on `<body>`.
+
+  **Why:** the toolkit's `ilw-modal` supplies the dialog itself; this wrapper adds a promise-based API, unique ids and focus return. Its slotted markup (`h2` title, `p`, `.modal-buttons`) is the documented DOM contract.
+
+  **Review:** click "Save preferences". The dialog's title is "Saved". "Got it" closes it, the result reads `dismissed`, and focus is back on the trigger.
+-->
 <Story
   name="Alert"
   args={{ kind: 'alert' }}
@@ -64,6 +73,13 @@
   }}
 />
 
+<!--
+  `confirm()`: Cancel and Delete, resolving `true` or `false`.
+
+  **Why:** a destructive action has to start on the safe choice, so Cancel gets `autofocus`. The page behind the dialog must be `inert` while it is open, and an element that was already inert must stay inert after it closes.
+
+  **Review:** focus starts on Cancel, not Delete. While it is open, you can't click or tab to the page behind it. Delete gives `true`; Cancel and Escape give `false`. Each opening gets a new `app-modal-N` id, and focus always comes back to the trigger.
+-->
 <Story
   name="Confirm"
   args={{ kind: 'confirm' }}
@@ -109,6 +125,13 @@
   }}
 />
 
+<!--
+  `openModal()` with three buttons, one of which has `autofocus`, plus every way of dismissing it.
+
+  **Why:** consumers choose the buttons and which one gets focus. Every dismissal (Escape, the × button, a backdrop click) must resolve `null`, so callers can tell it apart from any button.
+
+  **Review:** focus starts on "Keep editing". Save gives `save`. Escape, ×, and a click on the backdrop each give `null`, and each returns focus to the trigger.
+-->
 <Story
   name="Custom buttons"
   args={{ kind: 'custom' }}
@@ -149,6 +172,13 @@
   }}
 />
 
+<!--
+  `openModal()` with a Svelte snippet as the body and `size: 'medium'`.
+
+  **Why:** rich content is passed as a snippet, never as an HTML string (the project bans HTML sinks, and consumers run a strict CSP).
+
+  **Review:** the dialog is wider than the alert and shows a paragraph and a two-item list between the title and the button.
+-->
 <Story
   name="Rich body"
   args={{ kind: 'rich' }}
@@ -164,6 +194,13 @@
   }}
 />
 
+<!--
+  Mounts `Modal` directly and checks the `onclose` callback's reason: `button` with the button's value, or `dismiss` with `null`.
+
+  **Why:** ta-manager uses `Modal` as a component as well as through the promise helpers, and needs to know how it was closed.
+
+  **Review:** nothing to see on the canvas: the modals are opened and closed by the test. Check the Interactions panel.
+-->
 <Story
   name="Close reasons"
   args={{ kind: 'alert' }}
@@ -189,7 +226,13 @@
   }}
 />
 
-<!-- Left open so axe scans the open modal. -->
+<!--
+  The confirm dialog left open, so axe checks the open modal.
+
+  **Why:** axe only checks what is rendered, and every other story closes its modal.
+
+  **Review:** the a11y panel should show no violations. The title, message and buttons are readable against the backdrop.
+-->
 <Story
   name="Open"
   args={{ kind: 'confirm' }}
@@ -199,5 +242,9 @@
   }}
 />
 
-<!-- Fixture for the Playwright keyboard spec: no play function. -->
+<!--
+  Has no `play` function: it is the starting page for `tests/e2e/modal.spec.ts`.
+
+  **Review:** open the dialog by keyboard. Focus starts on Cancel, and Tab cycles Cancel → Delete → × and back to Cancel without leaving the dialog. Escape closes it, Enter on Delete confirms, and focus always returns to the trigger.
+-->
 <Story name="Trigger" args={{ kind: 'confirm' }} />
