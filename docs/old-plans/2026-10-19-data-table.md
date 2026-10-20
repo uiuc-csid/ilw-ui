@@ -13,8 +13,8 @@ ta-manager's tables sort with page-local comparators (`(a, b) => number`), filte
 - **Explicit page reset.** TanStack's `autoResetPageIndex` runs lazily, the next time the row model is read (during a render), so it's off. `TableSortTh` goes back to page 1 after a sort. For filters, `setTableFilter(table, id, value)` sets the filter and goes back to page 1.
 - **Filters are removed only for `undefined`.** `predicateFilterFn` sets `autoRemove` to `value === undefined`, so the predicate decides what `''`, `null` and `false` mean.
 - **Two table types.** `createDataTable` returns `PagedDataTable<T>` when `pageSize` is given and `DataTable<T>` otherwise. Only the paged type has the pagination APIs, and `Pager` accepts only it.
-- **`Pager` classes are props** (`classes`). Its defaults are ilw-ui's own (`ilw-pager`, …), styled with brand tokens. ta-manager passes its `picker-*` names.
-- **`Pager` accessibility beyond the legacy markup:** the root is `<nav aria-label>`, previous and next have `aria-label`s, the current page has `aria-current="page"`, and the count isn't live (two pagers would announce twice). Focus stays in the pager after paging by keyboard.
+- **`Pager` classes are props** (`classes`), merged over `ilwPagerClasses` (the `.ilw-pager*` styles), or over `legacyPagerClasses` (ta-manager's `picker-*`) with `legacy`.
+- **`Pager` renders accessible markup by default; the legacy markup is opt-in** (`legacy`). The default root is a `<nav aria-label>`, the buttons have `type="button"`, previous and next have `aria-label`s, and the current page has `aria-current="page"`. `legacy` renders ta-manager's unranked-courses pager byte for byte, so its 1:1 port keeps its aria snapshots until its Phase 13. In both modes the count isn't live (two pagers would announce twice) and focus stays in the pager after paging by keyboard.
 - **No `.svelte.ts` files** (a `.svelte.ts` broke Vite's dependency optimisation in ta-manager). Plain `.ts` plus `.svelte`.
 - **`DataTable` renders a native `<table>`** (attributes pass through) from `header`, `row` and `empty` snippets, with rows keyed by `getRowId`. **`DataRows`** is the same rows without the `<table>`, for a server-rendered `<tbody>`.
 
@@ -28,7 +28,7 @@ ta-manager's tables sort with page-local comparators (`(a, b) => number`), filte
 6. **Playwright.** Add `tests/e2e/data-table.spec.ts`. Enter and Space on a heading sort and keep focus on the button. Enter on next pages through to the last page, then focus moves to the current page's button. Focus never falls to `<body>`.
 7. **Docs.** Add README sections (API, DOM contracts, keyboard notes), an at-smoke checklist, and the `exports` list.
 
-**Status (2026-10-19):** steps 1–7 done on branch `data-table`. `pnpm check`, `pnpm test` (80) and `pnpm test:e2e` (24, and 72/72 with `--repeat-each 3`) pass locally. Still open: CI, and the human at-smoke run.
+**Done (2026-10-19).** Steps 1–7 merged in #6. CI passed on main at `9e85265`. A follow-up (branch `pager-legacy-default`) added the `legacy` opt-in. Still open: the human at-smoke run.
 
 ## Done when
 

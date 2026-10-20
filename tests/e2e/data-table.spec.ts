@@ -61,3 +61,18 @@ test('a sort goes back to page 1 and keeps focus on the heading', async ({ page 
   await expect(pager.locator('[aria-current="page"]')).toHaveText('1');
   await expect(group).toBeFocused();
 });
+
+test('the legacy pager keeps focus too', async ({ page }) => {
+  await openStory(page, 'datatable--fixture-paged-legacy');
+  const pager = page.locator('.picker-ctrl-row').last();
+  const next = pager.locator('button').last();
+  const currentPage = pager.locator('.picker-tog-on');
+
+  await next.focus();
+  for (let n = 2; n <= 6; n++) {
+    await press(page, 'Enter');
+    await expect(currentPage).toHaveText(String(n));
+  }
+  await expect(next).toBeDisabled();
+  await expect(currentPage).toBeFocused();
+});

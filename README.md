@@ -250,18 +250,22 @@ page, using the page's own comparators and predicates. Pages never import
   same DOM contract, driven by the table's sort: the sorted column flips and
   another column starts ascending. Focus stays on the button, even if the page
   re-renders the header.
-- **`Pager`** (`table`, `emptyLabel`, `label?`, `classes?`, `onpage?`) takes a
-  paged table only. A page may render two pagers over one table; they stay in
-  step. After paging by keyboard, focus stays on the pressed button, or on the
-  current page's button when the pressed one becomes disabled. `classes`
-  replaces the default class names, e.g. ta-manager's `picker-*` ones: `root`,
-  `label`, `button`, `current` (added to the current page's button),
-  `ellipsis`, `count`. Give each pager a distinct `label` when a page has two.
+- **`Pager`** (`table`, `emptyLabel`, `label?`, `legacy?`, `classes?`,
+  `onpage?`) takes a paged table only. A page may render two pagers over one
+  table; they stay in step. After paging by keyboard, focus stays on the pressed
+  button, or on the current page's button when the pressed one becomes
+  disabled. `classes` overrides the class names part by part (`root`, `label`,
+  `button`, `current` (added to the current page's button), `ellipsis`,
+  `count`) over `ilwPagerClasses`, the `.ilw-pager*` styles in
+  `ilw-ui/styles.css`, or over `legacyPagerClasses` with `legacy`.
 
 `pageWindow(page, totalPages)` (`ilw-ui/core`) is the pager's page list: the
 first, the last, and two either side of `page`, with `null` for each gap.
 
-`Pager` DOM contract (default classes; page 1 of 6):
+**`Pager` DOM contract** (page 1 of 6). The root is a `<nav>` labelled by
+`label` (default `"Pages"`; give two pagers distinct labels), the buttons have
+`type="button"`, previous and next are named, and the current page has
+`aria-current="page"`:
 
 ```html
 <nav class="ilw-pager" aria-label="Pages">
@@ -275,6 +279,19 @@ first, the last, and two either side of `page`, with `null` for each gap.
   <button type="button" class="ilw-pager-btn" data-page="2" aria-label="Next page">›</button>
   <span class="ilw-pager-count">1–25 of 131</span>
 </nav>
+```
+
+(The real output has no whitespace between elements; it's added here to make
+the example readable.)
+
+**`legacy` renders ta-manager's legacy unranked-courses pager instead**, byte
+for byte: a `div`, `picker-*` classes, no `type` on the buttons, no ARIA and no
+whitespace between elements. It exists for 1:1 ports whose aria snapshots must
+not change yet. Consumers should drop it and move to the default markup
+(ta-manager: in its Phase 13).
+
+```html
+<div class="picker-ctrl-row"><span class="picker-sort-lbl">Page:</span><button class="picker-tog picker-pg-btn" data-page="0" disabled>‹</button><button class="picker-tog picker-pg-btn picker-tog-on" data-page="1">1</button><button class="picker-tog picker-pg-btn" data-page="2">2</button><button class="picker-tog picker-pg-btn" data-page="3">3</button><span class="picker-pg-ellipsis">…</span><button class="picker-tog picker-pg-btn" data-page="6">6</button><button class="picker-tog picker-pg-btn" data-page="2">›</button><span class="picker-count">1–25 of 131</span></div>
 ```
 
 The count isn't a live region: with two pagers it would be announced twice.

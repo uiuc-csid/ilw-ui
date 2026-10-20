@@ -66,6 +66,26 @@ export interface PagerClasses {
   count: string;
 }
 
+/** `Pager`'s class names with `legacy`: ta-manager's legacy unranked-courses pager. */
+export const legacyPagerClasses: PagerClasses = {
+  root: 'picker-ctrl-row',
+  label: 'picker-sort-lbl',
+  button: 'picker-tog picker-pg-btn',
+  current: 'picker-tog-on',
+  ellipsis: 'picker-pg-ellipsis',
+  count: 'picker-count',
+};
+
+/** `Pager`'s default class names, styled by `ilw-ui/styles.css` (`.ilw-pager*`). */
+export const ilwPagerClasses: PagerClasses = {
+  root: 'ilw-pager',
+  label: 'ilw-pager-label',
+  button: 'ilw-pager-btn',
+  current: 'on',
+  ellipsis: 'ilw-pager-ellipsis',
+  count: 'ilw-pager-count',
+};
+
 /**
  * A client-side table: filter, then sort, then (with `pageSize`) paginate, all
  * with the page's own comparators and predicates. Call it while a component
