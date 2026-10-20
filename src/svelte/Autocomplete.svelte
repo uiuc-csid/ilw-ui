@@ -4,7 +4,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { type AutocompleteItem, filterItems } from '../core/index.ts';
-  import { focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
+  import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
@@ -134,7 +134,7 @@
         if (!api.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) query = value;
       },
       onfocusout(event: FocusEvent) {
-        if (root.contains(event.relatedTarget as Node | null)) return;
+        if (!focusLeft(root, event)) return;
         // Tab and blur take the highlighted suggestion, as Enter does.
         const highlighted = api.open ? shown.find((i) => i.value === api.highlightedValue) : undefined;
         if (highlighted) choose(highlighted);

@@ -203,6 +203,32 @@
 />
 
 <!--
+  Switching windows mid-word leaves the text and the list alone.
+
+  **Why:** when the window loses focus the input gets `blur`/`focusout` but stays the focused element. Treating that as leaving the field committed `Blake Brown` after `bla`, and the rest of the word landed after it (`Blake Brownke`). Headless WebKit on Linux does this on its own now and then, which made `Grouped` flaky in CI.
+
+  **Review:** type `bla`, switch to another window and back, then type `ke`. The field reads `blake`, the list is still open with Blake Brown highlighted, and nothing is selected until you press Enter or Tab.
+-->
+<Story
+  name="Window switch"
+  play={async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('bla');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown'));
+    // What the browser fires when the window loses focus: focus stays on the input.
+    input.dispatchEvent(new FocusEvent('blur'));
+    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    await expect(document.activeElement).toBe(input);
+    await userEvent.keyboard('ke');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown'));
+    await expect(input).toHaveValue('blake');
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
+  }}
+/>
+
+<!--
   Disabled state, with a value already selected.
 
   **Why:** a locked record still has to show who is assigned.

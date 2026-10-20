@@ -76,3 +76,18 @@ export function focusStaysPut<M extends { implementations?: { actions?: Record<s
     },
   };
 }
+
+/**
+ * Whether a `focusout` inside `root` means focus has left it. When the window
+ * loses focus (switching windows or tabs, or a headless browser's window
+ * deactivating), the input gets `focusout` with no `relatedTarget` but stays
+ * the document's `activeElement`, and gets focus back on return. Committing
+ * then would rewrite the text mid-word: typing `bla`, switching away and back,
+ * then `ke` gave `Blake Brownke`. A real blur (Tab, a click elsewhere) has
+ * already moved `activeElement` by the time `focusout` fires.
+ */
+export function focusLeft(root: HTMLElement, event: FocusEvent): boolean {
+  const to = event.relatedTarget as Node | null;
+  if (root.contains(to)) return false;
+  return !(to == null && root.contains(root.ownerDocument.activeElement));
+}

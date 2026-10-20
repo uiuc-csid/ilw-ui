@@ -155,6 +155,33 @@
 />
 
 <!--
+  Switching windows leaves the highlight and the text alone.
+
+  **Why:** when the window loses focus the input gets `blur`/`focusout` but stays the focused element. Treating that like Tab took the highlighted suggestion while the user was away.
+
+  **Review:** type `brown`, ArrowDown, switch to another window and back. The field still reads `brown`, the list is open with B. Brown highlighted, and `chosen` is empty.
+-->
+<Story
+  name="Window switch"
+  play={async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: 'Professor' });
+    await userEvent.click(input);
+    await userEvent.keyboard('brown');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-bbrown'));
+    // What the browser fires when the window loses focus: focus stays on the input.
+    input.dispatchEvent(new FocusEvent('blur'));
+    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    await expect(document.activeElement).toBe(input);
+    await expect(input).toHaveValue('brown');
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-bbrown');
+    await expect(canvas.getByTestId('chosen')).toHaveTextContent('');
+  }}
+/>
+
+<!--
   With `emptyText`, a search with no matches shows a disabled "No matches" row instead of closing the list.
 
   **Why:** a screen-reader user otherwise gets no feedback that the search came up empty.
