@@ -63,3 +63,5 @@ export {
   rowColumn,
   type RowColumnOptions,
 } from './table.ts';
+
+export { announce, type AnnounceOptions, type Politeness } from './announce.ts';
