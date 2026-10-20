@@ -35,7 +35,9 @@
 <Story
   name="IlwUi"
   parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas, canvasElement }) => {
+  play={async ({ args, canvas, canvasElement }) => {
+    // Side By Side loads this story once per variant; the checks need them all.
+    if (args.variant !== 'all') return;
     const css = (el: Element, p: string) => getComputedStyle(el).getPropertyValue(p);
     const tables = canvasElement.querySelectorAll('table');
     await expect(tables).toHaveLength(TABLE_VARIANTS.length);
