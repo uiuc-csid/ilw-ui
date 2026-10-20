@@ -66,6 +66,16 @@ Status: **pending human run.**
 - [ ] Pressing the same button twice reads the message twice, not once.
 - [ ] Focus stays on the button. Nothing new appears on screen; reading to the end of the page with the browse/virtual cursor reaches the last message (the regions sit at the end of `<body>`).
 
+## Page chrome (story: Page Chrome → Page → Fixture)
+
+Status: **pending human run.**
+
+- [ ] The first Tab reaches "Skip to main content, link", and it appears on screen. Enter moves to the content: the next Tab reaches the breadcrumbs' "Home", not the header.
+- [ ] The landmarks list (NVDA: D / Insert+F7; VoiceOver rotor) has one banner, one main, one content info, and the "Breadcrumbs" and "Social media" navigations.
+- [ ] Breadcrumbs: the list is announced with its item count; the separators (`>`) are not read; the last item is announced as the current page and is not a link.
+- [ ] Page title: the heading is read as heading level 1; the background image is not announced.
+- [ ] Footer: the wordmark link reads "University of Illinois Urbana-Champaign, link" once, not twice (no extra "Illinois" image); the campus sections are level-3 headings under it; the legal links are a list.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |

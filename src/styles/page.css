@@ -1,0 +1,87 @@
+/* Page shell (B1), the CSS form of <ilw-page>: header, main and footer in one
+   column, a skip link first, and the theme's page colours. Markup:
+
+     <div class="ilw-page" id="top">
+       <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+       <header class="ilw-header">…</header>
+       <main id="main-content" tabindex="-1">…</main>
+       <footer class="ilw-footer">…</footer>
+     </div>
+
+   Modifiers, as the toolkit's classes and attribute: .ilw-margin (side margins
+   on main), .ilw-page--expanded (`expanded`: top and bottom margin on main).
+   .ilw-format and .ilw-font come from the prose styles. */
+
+.ilw-page {
+  /* The toolkit's grid; the 1fr row lets a min-height on the page push the footer down. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  /* The toolkit leaves the page colours to the host; set them so dark mode shows. */
+  background-color: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}
+
+/* The header row sits above main, so its menus overlay the content (upstream: z-index 300). */
+.ilw-page > header {
+  position: relative;
+  z-index: 300;
+}
+
+.ilw-page > main {
+  min-width: 0;
+  margin-inline: var(--ilw-page--margin, 0);
+}
+
+/* Only the skip link focuses main (tabindex="-1"); don't ring the whole content area. */
+.ilw-page > main:focus {
+  outline: none;
+}
+
+/* Links in main take the theme's link colours, as <ilw-page> styles them
+   (with or without .ilw-format). :where() keeps this at a bare `a`'s
+   specificity, so any component's own link styles win. */
+:where(.ilw-page > main) a {
+  color: var(--ilw-color--link);
+  text-decoration: underline;
+}
+
+:where(.ilw-page > main) a:where(:hover, :focus) {
+  color: var(--ilw-color--link-hover);
+}
+
+:where(.ilw-page > main) a:where(:focus) {
+  color: var(--ilw-color--focus--text);
+  background-color: var(--ilw-color--focus--background);
+  outline: 2px solid var(--ilw-color--focus--outline);
+}
+
+.ilw-page.ilw-margin {
+  --ilw-page--margin: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 37.5rem)));
+  overflow-y: hidden;
+}
+
+.ilw-page.ilw-page--expanded > main {
+  margin-block: var(--ilw-page--main-margin-top, 30px) var(--ilw-page--main-margin-bottom, 30px);
+}
+
+/* Skip link: hidden until focused, then at the top left in the focus colours.
+   The toolkit has none (WCAG 2.4.1). */
+.ilw-skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+  font: 700 1.125rem/1.5 var(--il-font-sans, 'Source Sans 3', sans-serif);
+  color: var(--ilw-color--focus--text);
+  background-color: var(--ilw-color--focus--background);
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: -2px;
+  text-decoration: underline;
+  transform: translateY(-120%);
+}
+
+.ilw-skip-link:focus {
+  transform: none;
+}

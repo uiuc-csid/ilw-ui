@@ -1,0 +1,120 @@
+/* Page title (B5), the CSS form of <ilw-page-title>, its shadow parts in light
+   DOM. Markup:
+
+     <div class="ilw-page-title">
+       <img class="ilw-page-title-background" src="…" alt="">
+       <div class="ilw-page-title-inner">
+         <div class="ilw-page-title-text"><h1>Graduate Programs</h1></div>
+       </div>
+     </div>
+
+   Modifiers, as the toolkit's attributes: .ilw-page-title--blue, --orange,
+   --white (`theme`), .ilw-page-title--fade (`fade`). */
+
+.ilw-page-title {
+  --ilw-page-title--text-color: var(--ilw-color--background);
+  --ilw-page-title--background-color: var(--ilw-color--heading);
+  --ilw-page-title--main-margin: 0 max(1.875rem, calc(50cqw - 35.625rem)) 0;
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+/* The themes read the palettes directly, as upstream's [theme=…] rules do. */
+.ilw-page-title--blue {
+  --ilw-page-title--text-color: var(--ilw-color--blue--text);
+  --ilw-page-title--background-color: var(--ilw-color--blue--background);
+}
+
+.ilw-page-title--orange {
+  --ilw-page-title--text-color: var(--ilw-color--orange--heading);
+  --ilw-page-title--background-color: var(--ilw-color--orange--background);
+}
+
+.ilw-page-title--white {
+  --ilw-page-title--text-color: var(--ilw-color--white--heading);
+  --ilw-page-title--background-color: var(--ilw-color--white--background);
+}
+
+.ilw-page-title-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.ilw-page-title--fade .ilw-page-title-background {
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0));
+}
+
+.ilw-page-title-inner {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 12.5rem;
+  margin: 0 auto;
+  padding-top: 16px;
+}
+
+.ilw-page-title-text {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 16px 14px 20px;
+  color: var(--ilw-page-title--text-color);
+  text-align: left;
+  font: 700 2.5em var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* The colour plate behind the text: 85 % over the image, solid with fade. */
+.ilw-page-title-text::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--ilw-page-title--background-color);
+  opacity: 0.85;
+}
+
+.ilw-page-title--fade .ilw-page-title-text::after {
+  opacity: 1;
+}
+
+.ilw-page-title-text h1 {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 1em;
+  /* The toolkit's title inherits .ilw-format's h1 line height (2.875rem at 2.5rem). */
+  line-height: 1.15;
+  text-align: left;
+}
+
+@media (max-width: 1200px) {
+  .ilw-page-title-text {
+    margin: var(--ilw-page-title--main-margin);
+  }
+}
+
+@media (max-width: 800px) {
+  .ilw-page-title-text {
+    font-size: 2em;
+  }
+}
+
+@media (max-width: 600px) {
+  .ilw-page-title-text {
+    font-size: 1.5em;
+  }
+}

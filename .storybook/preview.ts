@@ -1,16 +1,18 @@
 import type { Preview } from '@storybook/svelte-vite';
 
 import IlwPage from './IlwPage.svelte';
-import PlainMain from './PlainMain.svelte';
+import IlwUiPage from './IlwUiPage.svelte';
 import { applyStyles, applyTheme, type StylesMode, type ThemeGlobal } from './styles.ts';
 
 const preview: Preview = {
   // Stylesheets go in before the story renders, so play functions and specs see it styled.
   loaders: [({ parameters }) => applyStyles(parameters.styles as StylesMode | undefined)],
   decorators: [
-    (_, { parameters, globals }) => {
+    (Story, { parameters, globals }) => {
       applyTheme(globals.theme as ThemeGlobal | undefined);
-      return { Component: parameters.styles === 'ilw-ui' ? PlainMain : IlwPage };
+      // `shell: false`: the story renders a whole page (its own shell and landmarks).
+      if (parameters.shell === false) return Story();
+      return { Component: parameters.styles === 'ilw-ui' ? IlwUiPage : IlwPage };
     },
   ],
   globalTypes: {

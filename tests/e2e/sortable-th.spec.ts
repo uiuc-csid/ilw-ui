@@ -9,6 +9,9 @@ test('Enter and Space toggle the sort and keep focus on the heading button', asy
   const hoursTh = page.getByRole('columnheader', { name: 'Hours' });
   const hoursBtn = page.getByRole('button', { name: 'Hours' });
 
+  // The story sits in the Page shell: its skip link comes first.
+  await press(page, 'Tab');
+  await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused();
   await press(page, 'Tab');
   await expect(nameBtn).toBeFocused();
 

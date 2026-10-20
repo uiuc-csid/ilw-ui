@@ -5,4 +5,8 @@
 
 @import './styles/tokens.css';
 @import './styles/table.css';
+@import './styles/page.css';
+@import './styles/page-title.css';
+@import './styles/breadcrumbs.css';
+@import './styles/footer.css';
 @import './styles/components.css';
