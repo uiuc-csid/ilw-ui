@@ -42,7 +42,7 @@
     // Opens at two characters.
     await userEvent.click(input);
     await userEvent.keyboard('a');
-    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
     await userEvent.keyboard('d');
     await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
     const groups = canvas.getAllByRole('group');
@@ -58,28 +58,28 @@
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-aadams'));
     await userEvent.keyboard('{ArrowDown}');
-    await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-dadams');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-dadams'));
     await userEvent.keyboard('{Enter}');
-    await expect(selected).toHaveTextContent('dadams');
-    await expect(input).toHaveValue('Drew Adams');
-    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(selected).toHaveTextContent('dadams'));
+    await waitFor(() => expect(input).toHaveValue('Drew Adams'));
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
 
     // Escape closes and keeps focus.
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
     await expect(canvas.getAllByRole('option')).toHaveLength(4);
     await userEvent.keyboard('{Escape}');
-    await expect(input).toHaveAttribute('aria-expanded', 'false');
-    await expect(input).not.toHaveAttribute('aria-activedescendant');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
+    await waitFor(() => expect(input).not.toHaveAttribute('aria-activedescendant'));
     await expect(document.activeElement).toBe(input);
 
     // A unique match commits on blur.
     await userEvent.clear(input);
     await userEvent.keyboard('blake');
-    await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown'));
     await userEvent.tab();
-    await expect(selected).toHaveTextContent('bbrown');
-    await expect(input).toHaveValue('Blake Brown');
+    await waitFor(() => expect(selected).toHaveTextContent('bbrown'));
+    await waitFor(() => expect(input).toHaveValue('Blake Brown'));
 
     // Unmatched free text stays and clears the selection.
     await userEvent.click(input);
@@ -87,9 +87,9 @@
     await userEvent.keyboard('zz9');
     await expect(canvas.getByRole('option', { name: 'No matches' })).toHaveAttribute('aria-disabled', 'true');
     await userEvent.tab();
-    await expect(input).toHaveValue('zz9');
-    await expect(input).not.toHaveAttribute('aria-activedescendant');
-    await expect(selected).toHaveTextContent('');
+    await waitFor(() => expect(input).toHaveValue('zz9'));
+    await waitFor(() => expect(input).not.toHaveAttribute('aria-activedescendant'));
+    await waitFor(() => expect(selected).toHaveTextContent(''));
     await expect(canvas.getByTestId('changes')).toHaveTextContent('3');
   }}
 />
@@ -147,7 +147,7 @@
     await userEvent.keyboard('{ArrowUp}');
     await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-s200'));
     await userEvent.keyboard('{ArrowDown}');
-    await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-s001');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-s001'));
   }}
 />
 
@@ -159,7 +159,7 @@
     await userEvent.keyboard('newperson');
     await waitFor(() => expect(canvas.getByRole('option', { name: 'No matches' })).toBeVisible());
     await userEvent.tab();
-    await expect(input).toHaveValue('newperson');
+    await waitFor(() => expect(input).toHaveValue('newperson'));
     await expect(canvas.getByTestId('selected')).toHaveTextContent('');
     await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
   }}

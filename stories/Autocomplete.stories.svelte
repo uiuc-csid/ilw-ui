@@ -61,16 +61,16 @@
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-aadams'));
     await userEvent.keyboard('{ArrowDown}');
-    await expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-dadams');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-dadams'));
     const option = canvas.getByRole('option', { name: 'D. Adams — Drew Adams (dadams)' });
     await expect(option.id).toBe('prof-popup-opt-dadams');
     await expect(option).toHaveAttribute('data-highlighted');
     await userEvent.keyboard('{Enter}');
-    await expect(input).toHaveValue('D. Adams');
-    await expect(text).toHaveTextContent('D. Adams');
-    await expect(chosen).toHaveTextContent('dadams');
-    await expect(input).toHaveAttribute('aria-expanded', 'false');
-    await expect(input).not.toHaveAttribute('aria-activedescendant');
+    await waitFor(() => expect(input).toHaveValue('D. Adams'));
+    await waitFor(() => expect(text).toHaveTextContent('D. Adams'));
+    await waitFor(() => expect(chosen).toHaveTextContent('dadams'));
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
+    await waitFor(() => expect(input).not.toHaveAttribute('aria-activedescendant'));
     // Zag's selection is never kept: no option is ever aria-selected.
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
@@ -78,14 +78,14 @@
 
     // Escape closes and keeps focus and the text.
     await userEvent.keyboard('{Escape}');
-    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
     await expect(document.activeElement).toBe(input);
     await expect(input).toHaveValue('D. Adams');
 
     // Clearing the text closes the list.
     await userEvent.clear(input);
-    await expect(input).toHaveAttribute('aria-expanded', 'false');
-    await expect(text).toHaveTextContent('');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
+    await waitFor(() => expect(text).toHaveTextContent(''));
   }}
 />
 
@@ -98,7 +98,7 @@
     // No matches and no emptyText: the list stays closed.
     await expect(input).toHaveAttribute('aria-expanded', 'false');
     await userEvent.tab();
-    await expect(input).toHaveValue('Visiting Prof');
+    await waitFor(() => expect(input).toHaveValue('Visiting Prof'));
     await expect(canvas.getByTestId('text')).toHaveTextContent('Visiting Prof');
     await expect(canvas.getByTestId('selects')).toHaveTextContent('0');
 
@@ -108,7 +108,7 @@
     await userEvent.keyboard('clark');
     await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
     await userEvent.tab();
-    await expect(input).toHaveValue('clark');
+    await waitFor(() => expect(input).toHaveValue('clark'));
     await expect(canvas.getByTestId('selects')).toHaveTextContent('0');
   }}
 />
@@ -123,7 +123,7 @@
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-bbrown'));
     await userEvent.tab();
-    await expect(input).toHaveValue('B. Brown');
+    await waitFor(() => expect(input).toHaveValue('B. Brown'));
     await expect(canvas.getByTestId('chosen')).toHaveTextContent('bbrown');
     // Where focus goes is the keyboard spec's (tests/e2e): macOS WebKit's Tab
     // skips fields unless Option is held.
@@ -143,7 +143,7 @@
     await expect(empty.className).toBe('autocomplete-empty');
     await expect(empty).toHaveAttribute('aria-disabled', 'true');
     await userEvent.keyboard('{Enter}');
-    await expect(input).toHaveValue('zz');
+    await waitFor(() => expect(input).toHaveValue('zz'));
     await expect(canvas.getByTestId('selects')).toHaveTextContent('0');
   }}
 />
@@ -161,7 +161,7 @@
     await userEvent.keyboard('{ArrowUp}');
     await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-cs112'));
     await userEvent.keyboard('{Enter}');
-    await expect(input).toHaveValue('CS 112');
+    await waitFor(() => expect(input).toHaveValue('CS 112'));
   }}
 />
 
