@@ -35,6 +35,13 @@ in new tab"), then add a row to the log below.
 - [ ] In Free text, unmatched text is read back as typed after Tab, and "No matches" is announced while the list is open.
 - [ ] Disabled and invalid stories announce "dimmed/unavailable" and "invalid entry" respectively.
 
+## enhanceSelect (story: EnhanceSelect → Fixture)
+
+Status: **pending human run.** The Combobox checklist covers the widget itself; this covers the enhanced page.
+
+- [ ] The hidden select is not announced or reachable (browse mode skips it); the combobox is announced with the select's label ("Person").
+- [ ] After a choice, reading on finds the page's reaction to the select's change (here the "Changes" output), and focus stays in the input.
+
 ## Autocomplete (stories: Autocomplete → Fixture, Fixture empty text, Prefilled)
 
 Status: **pending human run.**

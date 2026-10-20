@@ -24,7 +24,7 @@ and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
 `@tanstack/svelte-table` (9.3.1).
 
 ```js
-import { Autocomplete, Combobox, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
+import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
@@ -405,8 +405,56 @@ DOM contract:
 - With `block`, the root's class is `autocomplete ac-block`; `class` is added after `autocomplete-input`.
 - The listbox is `hidden` while closed. Option ids are `${popupId}-opt-${encodeURIComponent(value)}`.
 - No option is ever `aria-selected`: the text, not a selection, is the value.
+- Choosing a suggestion fires a bubbling `change` on the input, after its text is written, as a native input would on a new value. (Blurring after typing fires the input's own `change` as usual.)
 - With `emptyText` and no matches, the list shows one disabled `.autocomplete-empty` option.
 - `aria-activedescendant`, the caret and Zag's VoiceOver live region behave as in `Combobox`.
+
+### `enhanceSelect`, `enhanceSelects`
+
+Progressive enhancement for a server-rendered `<select>`: a `Combobox` is
+inserted right after it, and the select stays in the DOM, hidden, as the value
+source. Forms submit it, and page code and tests keep reading and setting
+`select.value`. Options come from the select's `<option>`s (`data-search` adds
+search text; `<optgroup>`s become groups), and are re-read when page code
+changes them.
+
+```js
+import { enhanceSelect, enhanceSelects } from 'ilw-ui/svelte';
+import 'ilw-ui/styles.css';
+
+enhanceSelects(); // every select[data-combobox] in the document not yet enhanced
+enhanceSelects(tbody, 'select.pick'); // under a root, with another selector
+```
+
+```svelte
+<!-- One select a Svelte component renders; the cleanup removes the combobox. -->
+<select data-combobox {@attach enhanceSelect}>…</select>
+```
+
+`enhanceSelects` also removes the comboboxes of selects that have left the
+document, so it is safe to call after every re-render.
+
+Behavior:
+
+- Choosing an option sets `select.value` and fires one bubbling `change` on the select (only when the value changed).
+- Text that matches nothing stays in the input; on blur the select's value becomes `''`, without an event.
+- When page code sets `select.value` and fires `change`, the input shows the new option at once (unless the input has focus).
+- Matching, keyboard and the "…N more" row are `Combobox`'s, with `minChars` 2 and `max` 200.
+
+DOM contract:
+
+```html
+<label id="person-label" for="person-cb">Person</label>          <!-- re-pointed; given an id if it has none -->
+<select id="person" data-combobox data-comboboxed="1" style="display: none">…</select>
+<span class="combobox cb-block" data-scope="combobox" data-part="root">
+  <input id="person-cb" class="combobox-input" role="combobox" placeholder="(the empty option's text)" … />
+  <div id="person-popup" class="combobox-popup" role="listbox" aria-labelledby="person-label">…</div>
+</span>
+```
+
+- The input's id is `<select id>-cb` and the listbox's `<select id>-popup`; a select without an id gets `combobox-N`.
+- The placeholder is the text of the select's empty-value option (default "Type to search...").
+- `data-comboboxed="1"` marks an enhanced select; enhancing it again is a no-op.
 
 ### `createDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`
 

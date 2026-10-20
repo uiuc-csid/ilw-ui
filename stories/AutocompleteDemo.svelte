@@ -27,12 +27,18 @@
   let chosen = $state('');
   let selects = $state(0);
   let submits = $state(0);
+  // The input's change events while focus is still in it (a choice), as "text".
+  let picks = $state<string[]>([]);
   $effect.pre(() => {
     text = value;
   });
 </script>
 
 <form
+  onchange={(event) => {
+    const el = event.target as HTMLInputElement;
+    if (el.id === 'prof' && document.activeElement === el) picks = [...picks, el.value];
+  }}
   onsubmit={(event) => {
     event.preventDefault();
     submits++;
@@ -59,5 +65,6 @@
 </form>
 <p>
   Text: <output data-testid="text">{text}</output>; chosen: <output data-testid="chosen">{chosen}</output>
-  (<span data-testid="selects">{selects}</span> selects, <span data-testid="submits">{submits}</span> submits)
+  (<span data-testid="selects">{selects}</span> selects, <span data-testid="submits">{submits}</span> submits; change on pick:
+  <output data-testid="picks">{picks.join(' | ')}</output>)
 </p>

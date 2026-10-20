@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as combobox from '@zag-js/combobox';
   import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
+  import { flushSync } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { type AutocompleteItem, filterItems } from '../core/index.ts';
@@ -69,6 +70,10 @@
   function choose(item: AutocompleteItem) {
     value = item.text ?? item.label;
     onselect?.(item);
+    // A choice changes the input's value as typing and blurring would, so it
+    // fires the bubbling `change` a native input fires, after the text is in.
+    flushSync();
+    input.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   const service = useMachine(focusStaysPut(combobox.machine, () => input), {

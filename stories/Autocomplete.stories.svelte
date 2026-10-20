@@ -78,6 +78,8 @@
     await waitFor(() => expect(input).toHaveValue('D. Adams'));
     await waitFor(() => expect(text).toHaveTextContent('D. Adams'));
     await waitFor(() => expect(chosen).toHaveTextContent('dadams'));
+    // The choice fires one bubbling change, with the new text already in.
+    await expect(canvas.getByTestId('picks')).toHaveTextContent(/^D\. Adams$/);
     await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
     await waitFor(() => expect(input).not.toHaveAttribute('aria-activedescendant'));
     // Zag's selection is never kept: no option is ever aria-selected.
