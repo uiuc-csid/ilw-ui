@@ -10,6 +10,8 @@
     // The Docs page lists every story with its review notes (the comment above it).
     tags: ['autodocs'],
     component: DataTableDemo,
+    // ilw-ui's table.css only, no toolkit: the table carries class="ilw-table".
+    parameters: { styles: 'ilw-ui' },
   });
 
   const NBSP = '\u00a0';
@@ -57,7 +59,7 @@
   args={{ count: 30 }}
   play={async ({ canvas, canvasElement, userEvent }) => {
     const table = canvas.getByRole('table', { name: 'People' });
-    await expect(table.className).toBe('people');
+    await expect(table.className).toBe('ilw-table');
     const [nameTh, groupTh] = canvas.getAllByRole('columnheader');
     const name = canvas.getByRole('button', { name: 'Name' });
     const group = canvas.getByRole('button', { name: 'Group' });
