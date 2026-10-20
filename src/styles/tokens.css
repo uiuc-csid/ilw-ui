@@ -1,0 +1,426 @@
+/* Theme tokens: the toolkit's --ilw-color--* custom properties and its theme
+   classes, under the same names, so markup written for toolkit.css themes the
+   same way here. Values match the vendored toolkit.css (its `@layer base`
+   :root block and the .ilw-theme-* / [theme=…] rules), with brand --il-*
+   tokens in place of its hard-coded hex. The -table-* theme classes belong to
+   the table styles.
+
+   Components read only the theme-neutral properties (--ilw-color--background,
+   --ilw-color--text, …, --ilw-color--focus--*); the palette properties
+   (--ilw-color--<palette>--*) exist to define themes. A component never names
+   a theme. */
+
+/* Palettes. */
+:root {
+  --ilw-color--white--background: var(--il-white, #ffffff);
+  --ilw-color--white--text: var(--il-storm-10, #252525);
+  --ilw-color--white--border: var(--il-storm, #707372);
+  --ilw-color--white--border-light: var(--il-storm-80, #c6c7c6);
+  --ilw-color--white--link: var(--il-industrial, #1d58a7);
+  --ilw-color--white--link-hover: var(--il-altgeld, #c84113);
+  --ilw-color--white--link-visited: var(--il-industrial-darker-1, #2f568c);
+  --ilw-color--white--heading: var(--il-blue, #13294b);
+  --ilw-color--white--heading-link: var(--il-blue, #13294b);
+  --ilw-color--white--heading-link-hover: var(--il-altgeld, #c84113);
+  --ilw-color--white--heading-link-visited: var(--il-industrial-darker-1, #2f568c);
+  --ilw-color--white--control: var(--il-white, #ffffff);
+  --ilw-color--white--control-text: var(--il-blue, #13294b);
+  --ilw-color--white--control-accent: var(--il-orange, #ff5f05);
+  --ilw-color--white--control-accent-text: var(--il-white, #ffffff);
+  --ilw-color--white--table-border: var(--il-storm-60, #8e9090);
+  --ilw-color--white--table-background: var(--il-white, #ffffff);
+  --ilw-color--white--table-row-stripe: var(--il-storm-95, #f4f4f4);
+  --ilw-color--white--table-head-background: var(--il-blue, #13294b);
+  --ilw-color--white--table-head-color: var(--il-white, #ffffff);
+
+  --ilw-color--blue--background: var(--il-blue, #13294b);
+  --ilw-color--blue--text: var(--il-white, #ffffff);
+  --ilw-color--blue--border: var(--il-storm, #707372);
+  --ilw-color--blue--border-light: var(--il-storm-80, #c6c7c6);
+  --ilw-color--blue--link: var(--il-white, #ffffff);
+  --ilw-color--blue--link-hover: var(--il-orange, #ff5f05);
+  --ilw-color--blue--link-visited: var(--il-white, #ffffff);
+  --ilw-color--blue--heading: var(--il-white, #ffffff);
+  --ilw-color--blue--heading-link: var(--il-white, #ffffff);
+  --ilw-color--blue--heading-link-hover: var(--il-orange, #ff5f05);
+  --ilw-color--blue--heading-link-visited: var(--il-white, #ffffff);
+  --ilw-color--blue--control: var(--il-blue, #13294b);
+  --ilw-color--blue--control-text: var(--il-white, #ffffff);
+  --ilw-color--blue--control-accent: var(--il-orange, #ff5f05);
+  --ilw-color--blue--control-accent-text: var(--il-white, #ffffff);
+  --ilw-color--blue--table-border: var(--il-blue-70, #98afd2);
+  --ilw-color--blue--table-background: var(--il-blue, #13294b);
+  --ilw-color--blue--table-row-stripe: var(--il-blue-30, #2f4668);
+  --ilw-color--blue--table-head-background: var(--il-industrial, #1d58a7);
+  --ilw-color--blue--table-head-color: var(--il-white, #ffffff);
+
+  --ilw-color--orange--background: var(--il-orange, #ff5f05);
+  --ilw-color--orange--text: var(--il-blue, #13294b);
+  --ilw-color--orange--border: var(--il-storm, #707372);
+  --ilw-color--orange--border-light: var(--il-storm-80, #c6c7c6);
+  --ilw-color--orange--link: var(--il-blue, #13294b);
+  --ilw-color--orange--link-hover: var(--il-black, #000000);
+  --ilw-color--orange--link-visited: var(--il-storm-10, #252525);
+  --ilw-color--orange--heading: var(--il-white, #ffffff);
+  --ilw-color--orange--heading-link: var(--il-white, #ffffff);
+  --ilw-color--orange--heading-link-hover: var(--il-blue, #13294b);
+  --ilw-color--orange--heading-link-visited: var(--il-storm-10, #252525);
+  --ilw-color--orange--control: var(--il-orange, #ff5f05);
+  --ilw-color--orange--control-text: var(--il-white, #ffffff);
+  --ilw-color--orange--control-accent: var(--il-blue, #13294b);
+  --ilw-color--orange--control-accent-text: var(--il-white, #ffffff);
+  --ilw-color--orange--table-border: var(--il-storm-60, #8e9090);
+  --ilw-color--orange--table-background: var(--il-white, #ffffff);
+  --ilw-color--orange--table-row-stripe: var(--il-storm-95, #f4f4f4);
+  --ilw-color--orange--table-head-background: var(--il-orange-40, #a72f10);
+  --ilw-color--orange--table-head-color: var(--il-white, #ffffff);
+
+  --ilw-color--gray--background: var(--il-storm-95, #f4f4f4);
+  --ilw-color--gray--text: var(--il-storm-10, #252525);
+  --ilw-color--gray--border: var(--il-storm, #707372);
+  --ilw-color--gray--border-light: var(--il-storm-80, #c6c7c6);
+  --ilw-color--gray--link: var(--il-industrial, #1d58a7);
+  --ilw-color--gray--link-hover: var(--il-altgeld, #c84113);
+  --ilw-color--gray--link-visited: var(--il-black, #000000);
+  --ilw-color--gray--heading: var(--il-blue, #13294b);
+  --ilw-color--gray--heading-link: var(--il-blue, #13294b);
+  --ilw-color--gray--heading-link-hover: var(--il-altgeld, #c84113);
+  --ilw-color--gray--heading-link-visited: var(--il-black, #000000);
+  --ilw-color--gray--control: var(--il-white, #ffffff);
+  --ilw-color--gray--control-text: var(--il-blue, #13294b);
+  --ilw-color--gray--control-accent: var(--il-orange, #ff5f05);
+  --ilw-color--gray--control-accent-text: var(--il-white, #ffffff);
+  --ilw-color--gray--table-border: var(--il-storm-60, #8e9090);
+  --ilw-color--gray--table-background: var(--il-storm-95, #f4f4f4);
+  --ilw-color--gray--table-row-stripe: var(--il-storm-80, #c6c7c6);
+  --ilw-color--gray--table-head-background: var(--il-blue, #13294b);
+  --ilw-color--gray--table-head-color: var(--il-white, #ffffff);
+
+  /* The toolkit's gradient stops are #1d58a7 (Industrial) to #13294b (Blue). */
+  --ilw-color--bluegrad--background: linear-gradient(135deg, var(--il-industrial, #1d58a7), var(--il-blue, #13294b));
+  --ilw-color--bluegrad--text: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--border: var(--il-storm, #707372);
+  --ilw-color--bluegrad--border-light: var(--il-storm-80, #c6c7c6);
+  --ilw-color--bluegrad--link: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--link-hover: var(--il-arches-90, #c7edf8);
+  --ilw-color--bluegrad--link-visited: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--heading: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--heading-link: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--heading-link-hover: var(--il-arches-90, #c7edf8);
+  --ilw-color--bluegrad--heading-link-visited: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--control: var(--il-blue, #13294b);
+  --ilw-color--bluegrad--control-text: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--control-accent: var(--il-orange, #ff5f05);
+  --ilw-color--bluegrad--control-accent-text: var(--il-white, #ffffff);
+  --ilw-color--bluegrad--table-border: var(--il-blue-70, #98afd2);
+  --ilw-color--bluegrad--table-background: var(--il-blue, #13294b);
+  --ilw-color--bluegrad--table-row-stripe: var(--il-blue-30, #2f4668);
+  --ilw-color--bluegrad--table-head-background: var(--il-industrial, #1d58a7);
+  --ilw-color--bluegrad--table-head-color: var(--il-white, #ffffff);
+
+  /* The toolkit's stops are #fcb316 (Harvest), #fd890e and #ff5f05 (Orange);
+     #fd890e is the even mix of the other two. */
+  --ilw-color--orangegrad--background: linear-gradient(
+    135deg,
+    var(--il-harvest, #fcb316),
+    color-mix(in srgb, var(--il-harvest, #fcb316) 50%, var(--il-orange, #ff5f05)) 18.89%,
+    var(--il-orange, #ff5f05) 80.81%
+  );
+  --ilw-color--orangegrad--text: var(--il-blue, #13294b);
+  --ilw-color--orangegrad--border: var(--il-storm, #707372);
+  --ilw-color--orangegrad--border-light: var(--il-storm-80, #c6c7c6);
+  --ilw-color--orangegrad--link: var(--il-blue, #13294b);
+  --ilw-color--orangegrad--link-hover: var(--il-black, #000000);
+  --ilw-color--orangegrad--link-visited: var(--il-black, #000000);
+  --ilw-color--orangegrad--heading: var(--il-blue, #13294b);
+  --ilw-color--orangegrad--heading-link: var(--il-blue, #13294b);
+  --ilw-color--orangegrad--heading-link-hover: var(--il-black, #000000);
+  --ilw-color--orangegrad--heading-link-visited: var(--il-black, #000000);
+  --ilw-color--orangegrad--control: var(--il-orange, #ff5f05);
+  --ilw-color--orangegrad--control-text: var(--il-white, #ffffff);
+  --ilw-color--orangegrad--control-accent: var(--il-blue, #13294b);
+  --ilw-color--orangegrad--control-accent-text: var(--il-white, #ffffff);
+  --ilw-color--orangegrad--table-border: var(--il-storm-60, #8e9090);
+  --ilw-color--orangegrad--table-background: var(--il-white, #ffffff);
+  --ilw-color--orangegrad--table-row-stripe: var(--il-storm-95, #f4f4f4);
+  --ilw-color--orangegrad--table-head-background: var(--il-orange-40, #a72f10);
+  --ilw-color--orangegrad--table-head-color: var(--il-white, #ffffff);
+
+  --ilw-color--focus--background: var(--il-arches-90, #c7edf8);
+  --ilw-color--focus--text: var(--il-blue, #13294b);
+  --ilw-color--focus--outline: var(--il-blue, #13294b);
+}
+
+/* The theme-neutral properties components read. The page default is the white
+   palette; --ilw-color--border is Storm 60 as in the toolkit's own :root override. */
+:root {
+  --ilw-color--background: var(--ilw-color--white--background);
+  --ilw-color--text: var(--ilw-color--white--text);
+  --ilw-color--border: var(--il-storm-60, #8e9090);
+  --ilw-color--border-light: var(--ilw-color--white--border-light);
+  --ilw-color--link: var(--ilw-color--white--link);
+  --ilw-color--link-hover: var(--ilw-color--white--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--white--link-visited);
+  --ilw-color--heading: var(--ilw-color--white--heading);
+  --ilw-color--heading-link: var(--ilw-color--white--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--white--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--white--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--white--control);
+  --ilw-color--control-text: var(--ilw-color--white--control-text);
+  --ilw-color--control-accent: var(--ilw-color--white--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--white--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--white--table-border);
+  --ilw-color--table-background: var(--ilw-color--white--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--white--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--white--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--white--table-head-color);
+}
+
+/* Theme classes and [theme=…] attributes, grouped as in toolkit.css. Note the
+   toolkit's naming: .ilw-theme-blue and -blue-outline are the white palette
+   (a blue outline control on white); the filled forms are -1, -2, -solid and
+   -inverse. .ilw-theme-orange and -orange-outline only swap the control colours. */
+.ilw-theme-blue,
+.ilw-theme-blue-outline,
+[theme='white'] {
+  --ilw-color--background: var(--ilw-color--white--background);
+  --ilw-color--text: var(--ilw-color--white--text);
+  --ilw-color--border: var(--ilw-color--white--border);
+  --ilw-color--border-light: var(--ilw-color--white--border-light);
+  --ilw-color--link: var(--ilw-color--white--link);
+  --ilw-color--link-hover: var(--ilw-color--white--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--white--link-visited);
+  --ilw-color--heading: var(--ilw-color--white--heading);
+  --ilw-color--heading-link: var(--ilw-color--white--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--white--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--white--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--white--control);
+  --ilw-color--control-text: var(--ilw-color--white--control-text);
+  --ilw-color--control-accent: var(--ilw-color--white--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--white--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--white--table-border);
+  --ilw-color--table-background: var(--ilw-color--white--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--white--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--white--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--white--table-head-color);
+}
+
+.ilw-theme-blue-1,
+.ilw-theme-blue-2,
+.ilw-theme-blue-inverse,
+.ilw-theme-blue-solid,
+[theme='blue'] {
+  --ilw-color--background: var(--ilw-color--blue--background);
+  --ilw-color--text: var(--ilw-color--blue--text);
+  --ilw-color--border: var(--ilw-color--blue--border);
+  --ilw-color--border-light: var(--ilw-color--blue--border-light);
+  --ilw-color--link: var(--ilw-color--blue--link);
+  --ilw-color--link-hover: var(--ilw-color--blue--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--blue--link-visited);
+  --ilw-color--heading: var(--ilw-color--blue--heading);
+  --ilw-color--heading-link: var(--ilw-color--blue--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--blue--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--blue--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--blue--control);
+  --ilw-color--control-text: var(--ilw-color--blue--control-text);
+  --ilw-color--control-accent: var(--ilw-color--blue--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--blue--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--blue--table-border);
+  --ilw-color--table-background: var(--ilw-color--blue--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--blue--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--blue--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--blue--table-head-color);
+}
+
+[theme='gray'] {
+  --ilw-color--background: var(--ilw-color--gray--background);
+  --ilw-color--text: var(--ilw-color--gray--text);
+  --ilw-color--border: var(--ilw-color--gray--border);
+  --ilw-color--border-light: var(--ilw-color--gray--border-light);
+  --ilw-color--link: var(--ilw-color--gray--link);
+  --ilw-color--link-hover: var(--ilw-color--gray--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--gray--link-visited);
+  --ilw-color--heading: var(--ilw-color--gray--heading);
+  --ilw-color--heading-link: var(--ilw-color--gray--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--gray--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--gray--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--gray--control);
+  --ilw-color--control-text: var(--ilw-color--gray--control-text);
+  --ilw-color--control-accent: var(--ilw-color--gray--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--gray--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--gray--table-border);
+  --ilw-color--table-background: var(--ilw-color--gray--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--gray--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--gray--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--gray--table-head-color);
+}
+
+[theme='blue-gradient'] {
+  --ilw-color--background: var(--ilw-color--bluegrad--background);
+  --ilw-color--text: var(--ilw-color--bluegrad--text);
+  --ilw-color--border: var(--ilw-color--bluegrad--border);
+  --ilw-color--border-light: var(--ilw-color--bluegrad--border-light);
+  --ilw-color--link: var(--ilw-color--bluegrad--link);
+  --ilw-color--link-hover: var(--ilw-color--bluegrad--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--bluegrad--link-visited);
+  --ilw-color--heading: var(--ilw-color--bluegrad--heading);
+  --ilw-color--heading-link: var(--ilw-color--bluegrad--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--bluegrad--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--bluegrad--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--bluegrad--control);
+  --ilw-color--control-text: var(--ilw-color--bluegrad--control-text);
+  --ilw-color--control-accent: var(--ilw-color--bluegrad--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--bluegrad--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--bluegrad--table-border);
+  --ilw-color--table-background: var(--ilw-color--bluegrad--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--bluegrad--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--bluegrad--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--bluegrad--table-head-color);
+}
+
+.ilw-theme-orange-1,
+.ilw-theme-orange-2,
+.ilw-theme-orange-inverse,
+.ilw-theme-orange-solid,
+[theme='orange'] {
+  --ilw-color--background: var(--ilw-color--orange--background);
+  --ilw-color--text: var(--ilw-color--orange--text);
+  --ilw-color--border: var(--ilw-color--orange--border);
+  --ilw-color--border-light: var(--ilw-color--orange--border-light);
+  --ilw-color--link: var(--ilw-color--orange--link);
+  --ilw-color--link-hover: var(--ilw-color--orange--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--orange--link-visited);
+  --ilw-color--heading: var(--ilw-color--orange--heading);
+  --ilw-color--heading-link: var(--ilw-color--orange--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--orange--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--orange--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--orange--control);
+  --ilw-color--control-text: var(--ilw-color--orange--control-text);
+  --ilw-color--control-accent: var(--ilw-color--orange--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--orange--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--orange--table-border);
+  --ilw-color--table-background: var(--ilw-color--orange--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--orange--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--orange--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--orange--table-head-color);
+}
+
+.ilw-theme-orange,
+.ilw-theme-orange-outline {
+  --ilw-color--control: var(--ilw-color--orange--control-text);
+  --ilw-color--control-text: var(--ilw-color--orange--control);
+}
+
+[theme='orange-gradient'] {
+  --ilw-color--background: var(--ilw-color--orangegrad--background);
+  --ilw-color--text: var(--ilw-color--orangegrad--text);
+  --ilw-color--border: var(--ilw-color--orangegrad--border);
+  --ilw-color--border-light: var(--ilw-color--orangegrad--border-light);
+  --ilw-color--link: var(--ilw-color--orangegrad--link);
+  --ilw-color--link-hover: var(--ilw-color--orangegrad--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--orangegrad--link-visited);
+  --ilw-color--heading: var(--ilw-color--orangegrad--heading);
+  --ilw-color--heading-link: var(--ilw-color--orangegrad--heading-link);
+  --ilw-color--heading-link-hover: var(--ilw-color--orangegrad--heading-link-hover);
+  --ilw-color--heading-link-visited: var(--ilw-color--orangegrad--heading-link-visited);
+  --ilw-color--control: var(--ilw-color--orangegrad--control);
+  --ilw-color--control-text: var(--ilw-color--orangegrad--control-text);
+  --ilw-color--control-accent: var(--ilw-color--orangegrad--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--orangegrad--control-accent-text);
+  --ilw-color--table-border: var(--ilw-color--orangegrad--table-border);
+  --ilw-color--table-background: var(--ilw-color--orangegrad--table-background);
+  --ilw-color--table-row-stripe: var(--ilw-color--orangegrad--table-row-stripe);
+  --ilw-color--table-head-background: var(--ilw-color--orangegrad--table-head-background);
+  --ilw-color--table-head-color: var(--ilw-color--orangegrad--table-head-color);
+}
+
+/* Dark mode. The toolkit header's toggle sets html[data-theme] to "dark" or
+   "light"; with neither, the OS preference decides. The vendored toolkit has no
+   dark rules, and web-illinois/ilw-page's unreleased dark-mode.css keeps the
+   light Storm 95 background, so these values are ours, from the brand palette:
+   the light surfaces (white and gray palettes, focus) turn dark; the blue,
+   orange and gradient palettes are already strong colours and stay as they are.
+   The two blocks below must stay identical (tests/unit/tokens.test.ts). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ilw-color--white--background: var(--il-blue-10, #11181d);
+    --ilw-color--white--text: var(--il-storm-95, #f4f4f4);
+    --ilw-color--white--border: var(--il-storm-60, #8e9090);
+    --ilw-color--white--border-light: var(--il-storm-30, #474948);
+    --ilw-color--white--link: var(--il-industrial-lighter-4, #cad9ef);
+    --ilw-color--white--link-hover: var(--il-orange, #ff5f05);
+    --ilw-color--white--link-visited: var(--il-arches-90, #c7edf8);
+    --ilw-color--white--heading: var(--il-blue-90, #e1e7f1);
+    --ilw-color--white--heading-link: var(--il-blue-90, #e1e7f1);
+    --ilw-color--white--heading-link-hover: var(--il-orange, #ff5f05);
+    --ilw-color--white--heading-link-visited: var(--il-arches-90, #c7edf8);
+    --ilw-color--white--control: var(--il-blue-10, #11181d);
+    --ilw-color--white--control-text: var(--il-industrial-lighter-4, #cad9ef);
+    --ilw-color--white--table-border: var(--il-storm-60, #8e9090);
+    --ilw-color--white--table-background: var(--il-blue-10, #11181d);
+    --ilw-color--white--table-row-stripe: var(--il-storm-10, #252525);
+    --ilw-color--white--table-head-background: var(--il-blue-30, #2f4668);
+
+    --ilw-color--gray--background: var(--il-storm-10, #252525);
+    --ilw-color--gray--text: var(--il-storm-95, #f4f4f4);
+    --ilw-color--gray--border: var(--il-storm-60, #8e9090);
+    --ilw-color--gray--border-light: var(--il-storm-30, #474948);
+    --ilw-color--gray--link: var(--il-industrial-lighter-4, #cad9ef);
+    --ilw-color--gray--link-hover: var(--il-orange, #ff5f05);
+    --ilw-color--gray--link-visited: var(--il-arches-90, #c7edf8);
+    --ilw-color--gray--heading: var(--il-blue-90, #e1e7f1);
+    --ilw-color--gray--heading-link: var(--il-blue-90, #e1e7f1);
+    --ilw-color--gray--heading-link-hover: var(--il-orange, #ff5f05);
+    --ilw-color--gray--heading-link-visited: var(--il-arches-90, #c7edf8);
+    --ilw-color--gray--control: var(--il-storm-10, #252525);
+    --ilw-color--gray--control-text: var(--il-industrial-lighter-4, #cad9ef);
+    --ilw-color--gray--table-background: var(--il-storm-10, #252525);
+    --ilw-color--gray--table-row-stripe: var(--il-storm-30, #474948);
+    --ilw-color--gray--table-head-background: var(--il-blue-30, #2f4668);
+
+    --ilw-color--focus--background: var(--il-blue-30, #2f4668);
+    --ilw-color--focus--text: var(--il-white, #ffffff);
+    --ilw-color--focus--outline: var(--il-industrial-lighter-2, #759bd1);
+  }
+}
+
+:root[data-theme='dark'] {
+  --ilw-color--white--background: var(--il-blue-10, #11181d);
+  --ilw-color--white--text: var(--il-storm-95, #f4f4f4);
+  --ilw-color--white--border: var(--il-storm-60, #8e9090);
+  --ilw-color--white--border-light: var(--il-storm-30, #474948);
+  --ilw-color--white--link: var(--il-industrial-lighter-4, #cad9ef);
+  --ilw-color--white--link-hover: var(--il-orange, #ff5f05);
+  --ilw-color--white--link-visited: var(--il-arches-90, #c7edf8);
+  --ilw-color--white--heading: var(--il-blue-90, #e1e7f1);
+  --ilw-color--white--heading-link: var(--il-blue-90, #e1e7f1);
+  --ilw-color--white--heading-link-hover: var(--il-orange, #ff5f05);
+  --ilw-color--white--heading-link-visited: var(--il-arches-90, #c7edf8);
+  --ilw-color--white--control: var(--il-blue-10, #11181d);
+  --ilw-color--white--control-text: var(--il-industrial-lighter-4, #cad9ef);
+  --ilw-color--white--table-border: var(--il-storm-60, #8e9090);
+  --ilw-color--white--table-background: var(--il-blue-10, #11181d);
+  --ilw-color--white--table-row-stripe: var(--il-storm-10, #252525);
+  --ilw-color--white--table-head-background: var(--il-blue-30, #2f4668);
+
+  --ilw-color--gray--background: var(--il-storm-10, #252525);
+  --ilw-color--gray--text: var(--il-storm-95, #f4f4f4);
+  --ilw-color--gray--border: var(--il-storm-60, #8e9090);
+  --ilw-color--gray--border-light: var(--il-storm-30, #474948);
+  --ilw-color--gray--link: var(--il-industrial-lighter-4, #cad9ef);
+  --ilw-color--gray--link-hover: var(--il-orange, #ff5f05);
+  --ilw-color--gray--link-visited: var(--il-arches-90, #c7edf8);
+  --ilw-color--gray--heading: var(--il-blue-90, #e1e7f1);
+  --ilw-color--gray--heading-link: var(--il-blue-90, #e1e7f1);
+  --ilw-color--gray--heading-link-hover: var(--il-orange, #ff5f05);
+  --ilw-color--gray--heading-link-visited: var(--il-arches-90, #c7edf8);
+  --ilw-color--gray--control: var(--il-storm-10, #252525);
+  --ilw-color--gray--control-text: var(--il-industrial-lighter-4, #cad9ef);
+  --ilw-color--gray--table-background: var(--il-storm-10, #252525);
+  --ilw-color--gray--table-row-stripe: var(--il-storm-30, #474948);
+  --ilw-color--gray--table-head-background: var(--il-blue-30, #2f4668);
+
+  --ilw-color--focus--background: var(--il-blue-30, #2f4668);
+  --ilw-color--focus--text: var(--il-white, #ffffff);
+  --ilw-color--focus--outline: var(--il-industrial-lighter-2, #759bd1);
+}
