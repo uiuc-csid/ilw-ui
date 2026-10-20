@@ -7,6 +7,8 @@
 
   const { Story } = defineMeta({
     title: 'DataTable',
+    // The Docs page lists every story with its review notes (the comment above it).
+    tags: ['autodocs'],
     component: DataTableDemo,
   });
 
@@ -43,6 +45,13 @@
     '<span class="picker-count">1–25 of 131</span></div>';
 </script>
 
+<!--
+  30 rows with two sortable headings (`TableSortTh`), sorted by Name to start.
+
+  **Why:** `TableSortTh` must render exactly the same markup as `SortableTh`, and the sort must be stable: the data has many ties, and the legacy pages kept tied rows in input order.
+
+  **Review:** the Name heading shows ↑, and only that column has `aria-sort`. Clicking it flips to ↓, and focus stays on the button. Clicking Group moves the arrow there, starting ascending. Rows with the same name or group keep their order relative to each other in both directions.
+-->
 <Story
   name="Sortable"
   args={{ count: 30 }}
@@ -86,6 +95,13 @@
   }}
 />
 
+<!--
+  Row identity survives a data update: `getRowId` keys the rows.
+
+  **Why:** if rows were recreated on each update, focus, selection and inputs inside them would be lost whenever ta-manager refreshes its data.
+
+  **Review:** press "Rename r1". The row becomes "Person zz" and moves to the bottom (the list is re-sorted). The test checks that it is the same `<tr>` element, not a new one.
+-->
 <Story
   name="Keyed rows"
   args={{ count: 4 }}
@@ -100,6 +116,13 @@
   }}
 />
 
+<!--
+  A column filter, driven by the search box, and the empty snippet.
+
+  **Why:** filtering and the "no rows" state are the most common table interactions in ta-manager.
+
+  **Review:** type `person 0` and only matching rows remain. Type `nobody` and the body shows a single "None." cell spanning both columns. Clearing the box brings all 20 rows back.
+-->
 <Story
   name="Filtered"
   args={{ count: 20 }}
@@ -119,6 +142,13 @@
   }}
 />
 
+<!--
+  `Pager` with `legacy`: the markup ta-manager's `unranked-courses-module.js` builds today, byte for byte.
+
+  **Why:** ta-manager's existing tests and CSS select on that markup, so this lets them switch to `Pager` without rewriting either. It has no `nav` landmark and no `aria-current`, so it is less accessible; that's the trade-off `legacy` opts into.
+
+  **Review:** the top and bottom pagers look like the legacy page and stay in step: going to page 3 moves both and the count reads `51–75 of 131`. Sorting goes back to page 1.
+-->
 <Story
   name="Paged legacy"
   args={{ count: 131, pageSize: 25, legacy: true }}
@@ -138,6 +168,13 @@
   }}
 />
 
+<!--
+  `Pager`'s default, accessible markup: a labelled `nav` with Previous/Next buttons, `aria-current` on the current page, and an ellipsis.
+
+  **Why:** this is the markup new pages should use. The default is fixed by the README contract.
+
+  **Review:** the current page is filled dark blue, and Previous is disabled on page 1. Each pager is announced as "Pages, top" or "Pages, bottom". Both pagers and the rows stay in step. A sort or a filter goes back to page 1. Filtering to nothing shows "No people" and disables Next.
+-->
 <Story
   name="Paged"
   args={{ count: 131, pageSize: 25 }}
@@ -197,6 +234,13 @@
   }}
 />
 
+<!--
+  `classes` replaces individual default class names (`root`, `current`) and keeps the rest.
+
+  **Why:** consumers with their own pager CSS can restyle parts of it without forking the markup.
+
+  **Review:** with the replaced classes the pager loses its default layout and the current-page fill, because `styles.css` no longer matches it. That is expected. `aria-current` is still on page 1.
+-->
 <Story
   name="Pager classes"
   args={{ count: 60, pageSize: 25, classes: { root: 'pages', current: 'is-current' } }}
@@ -211,7 +255,21 @@
   }}
 />
 
-<!-- Fixtures for the Playwright keyboard spec: no play function. -->
+<!--
+  Has no `play` function: it is the starting page for the Playwright test "Enter and Space on a TableSortTh sort and keep focus on its button".
+
+  **Review:** tab to a heading and press Enter or Space. The sort changes and focus stays on the button.
+-->
 <Story name="Fixture" args={{ count: 30 }} />
+<!--
+  `Fixture` with paging, for the Playwright tests on paging by keyboard and on sorting back to page 1.
+
+  **Review:** tab into a pager and press Next repeatedly. Both pagers advance, and on the last page, where Next is disabled, focus moves to the current page button instead of dropping to `<body>`.
+-->
 <Story name="Fixture paged" args={{ count: 131, pageSize: 25 }} />
+<!--
+  `Fixture paged` with `legacy`, for the Playwright test "the legacy pager keeps focus too".
+
+  **Review:** same as `Fixture paged`, with the legacy markup.
+-->
 <Story name="Fixture paged legacy" args={{ count: 131, pageSize: 25, legacy: true }} />

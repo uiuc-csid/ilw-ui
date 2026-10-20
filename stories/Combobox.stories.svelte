@@ -20,11 +20,20 @@
 
   const { Story } = defineMeta({
     title: 'Combobox',
+    // The Docs page lists every story with its review notes (the comment above it).
+    tags: ['autodocs'],
     component: ComboboxDemo,
     args: { items: people, placeholder: 'Select faculty or type NetID' },
   });
 </script>
 
+<!--
+  The DOM contract and the full flow with grouped items: open at two characters, arrow, Enter, Escape, commit on blur, free text.
+
+  **Why:** the README documents this markup as API (ta-manager's tests select on it), and grouped faculty/staff is the shape ta-manager uses.
+
+  **Review:** typing one character does nothing, and the list opens at two. Group headings (FACULTY, STAFF) are visually distinct from options and aren't reachable with the arrows. With two matches nothing is highlighted until you press ArrowDown. Enter commits and shows the label. Typing `blake` and tabbing away commits Blake Brown, because it is the only match. Text that matches nothing stays in the field and clears the selection.
+-->
 <Story
   name="Grouped"
   play={async ({ canvas, canvasElement, userEvent }) => {
@@ -94,6 +103,13 @@
   }}
 />
 
+<!--
+  Starts with a value, as when editing a saved record.
+
+  **Why:** the input must show the item's label, not its value (`Casey Clark`, not `cclark`), and must not open on load.
+
+  **Review:** the field reads `Casey Clark` and the list is closed. The Playwright spec checks that ArrowDown then opens the whole list at the selection (`Fixture preselected`).
+-->
 <Story
   name="Preselected"
   args={{ value: 'cclark' }}
@@ -105,6 +121,13 @@
 />
 
 
+<!--
+  Items with no groups, and the input attributes every combobox gets.
+
+  **Why:** the ungrouped list renders no `group` roles, and only the selected option carries `aria-selected` (a Zag behaviour this story pins down).
+
+  **Review:** type `brown` and press Enter. ArrowDown reopens the list, and Blake Brown is bold (selected) while the others are not.
+-->
 <Story
   name="Basic"
   args={{ items: plain }}
@@ -130,6 +153,13 @@
   }}
 />
 
+<!--
+  500 items, capped at 200 options plus a disabled "…300 more — keep typing to narrow" row.
+
+  **Why:** ta-manager's student lists are this long, and rendering every option would be slow and swamp a screen reader.
+
+  **Review:** type `student`. The list scrolls inside its 20rem cap, and the last row is muted italic text you can't pick. ArrowUp highlights Student 200, the last real option, skipping the "more" row. ArrowDown from there wraps to Student 001.
+-->
 <Story
   name="Many"
   args={{ items: many }}
@@ -151,6 +181,13 @@
   }}
 />
 
+<!--
+  Text that matches nothing is kept on blur and commits nothing.
+
+  **Why:** the user may be about to type a NetID the list doesn't know yet. Silently wiping what they typed loses work.
+
+  **Review:** type `newperson`. A disabled "No matches" row shows. Tab away: the text stays, and `changes` stays at 0.
+-->
 <Story
   name="Free text"
   play={async ({ canvas, userEvent }) => {
@@ -165,6 +202,13 @@
   }}
 />
 
+<!--
+  Disabled state, with a value already selected.
+
+  **Why:** a locked record still has to show who is assigned.
+
+  **Review:** the field looks disabled but `Avery Adams` is still readable (check the contrast), it can't be focused, and nothing opens.
+-->
 <Story
   name="Disabled"
   args={{ value: 'aadams', disabled: true }}
@@ -175,6 +219,13 @@
   }}
 />
 
+<!--
+  `invalid` and `required` reach the input as `aria-invalid` and `required`.
+
+  **Why:** ta-manager's form validation depends on them, and screen readers announce both.
+
+  **Review:** the border is a 2px dark Altgeld (double width, so the state isn't shown by color alone), and a screen reader says "invalid, required".
+-->
 <Story
   name="Invalid"
   args={{ invalid: true, required: true }}
@@ -185,6 +236,11 @@
   }}
 />
 
+<!--
+  `block` adds `cb-block`, so the field fills its container.
+
+  **Review:** the input and the popup both span the full width of the form row.
+-->
 <Story
   name="Block"
   args={{ block: true }}
@@ -193,6 +249,13 @@
   }}
 />
 
+<!--
+  Zag's VoiceOver live region is moved inside the component while the input has focus.
+
+  **Why:** on Apple platforms Zag appends the region to `<body>`, outside the page landmarks and outside any open modal (which makes the rest of the page inert), so its announcements are lost. See `docs/upstream-issues/zag.md` #7.
+
+  **Review:** nothing visible. This story only exists for its `play` test. To check by hand, type in Safari and inspect: any `[data-live-announcer]` sits under `.combobox`, not `<body>`. Real announcements are checked in `docs/at-smoke.md`.
+-->
 <Story
   name="Live region"
   play={async ({ canvas, canvasElement, userEvent }) => {
@@ -211,7 +274,13 @@
   }}
 />
 
-<!-- Left open with a highlighted option so axe scans the open listbox. -->
+<!--
+  Left open with an option highlighted, so axe checks the open listbox, its groups and the `aria-activedescendant` reference.
+
+  **Why:** axe only checks what is rendered, and the other stories end with the list closed.
+
+  **Review:** the highlight (light Arches background) is easy to see, and the popup floats over the "After" field instead of pushing it down. The a11y panel should show no violations.
+-->
 <Story
   name="Open"
   play={async ({ canvas, userEvent }) => {
@@ -224,6 +293,15 @@
   }}
 />
 
-<!-- Fixtures for the Playwright keyboard spec: no play function. -->
+<!--
+  Has no `play` function: it is the starting page for `tests/e2e/combobox.spec.ts` and `combobox-csp.spec.ts`, which drive it with a real keyboard.
+
+  **Review:** use it to try the component by hand. Try Alt+ArrowDown, Enter with nothing highlighted (it must not submit the form), and Tab and Shift+Tab between Before, Person and After. Focus should never drop to `<body>`.
+-->
 <Story name="Fixture" />
+<!--
+  `Fixture` with `cclark` selected, for the Playwright test "ArrowDown on a selected value opens the whole list at the selection".
+
+  **Review:** focus the field and press ArrowDown. Every option shows, and Casey Clark is highlighted.
+-->
 <Story name="Fixture preselected" args={{ value: 'cclark' }} />
