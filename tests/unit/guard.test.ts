@@ -48,3 +48,16 @@ it('flags what it should', () => {
   expect(violations('x.ts', "import type { SortFn } from '@tanstack/table-core';")).toEqual([]);
   expect(violations('x.ts', "import { Store } from '@tanstack/store';")).toHaveLength(1);
 });
+
+// The ta-manager spikes kept components in a top-level svelte/ folder, and
+// Vite (root = the package) resolved the bare `svelte` import to it. They
+// patched it twice (an exact alias; optimizeDeps.exclude). Keeping sources
+// under src/ settles it: no top-level entry may share a bare import's name.
+it('no top-level file or folder shadows a dependency', () => {
+  const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as Record<string, Record<string, string>>;
+  const deps = new Set(
+    ['dependencies', 'devDependencies', 'peerDependencies'].flatMap((k) => Object.keys(pkg[k] ?? {})).map((d) => d.split('/')[0]),
+  );
+  const clashes = readdirSync(root).filter((name) => deps.has(name));
+  expect(clashes).toEqual([]);
+});

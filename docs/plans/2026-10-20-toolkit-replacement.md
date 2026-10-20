@@ -89,13 +89,13 @@ All are **CSS + Svelte**. The Svelte component renders exactly the documented ma
 
 ### E. Gaps the toolkit doesn't fill
 
-Some of these are done: `SortableTh`, `Combobox`, `DataTable`/`DataRows`/`TableSortTh`, and `Pager`. "Seen in" lists real uses found in our apps.
+Some of these are done: `SortableTh`, `Combobox`, `Autocomplete` (E2, #8), `DataTable`/`DataRows`/`TableSortTh`, and `Pager`. "Seen in" lists real uses found in our apps.
 
 | # | Item | What | Seen in |
 | - | ---- | ---- | ------- |
 | E1 | `Alert` / messages | Dismissible notices. `role="status"` for info and success, `role="alert"` only for errors. Optional actions (retry, log in again). | Django `messages` partials; ta-manager save-error banner |
-| E2 | `Autocomplete` | Free text with local or async (debounced, abortable) suggestions. Uses Zag with `allowCustomValue`. | ta-manager professor, course and thesis pickers; opportunities Select2 |
-| E3 | `Combobox` async + multi | An async source, multi-select tokens, and hidden inputs for a multi-select form field. | opportunities `ModelSelect2Multiple` |
+| E2 | `Autocomplete` (done, #8) | Free text with suggestions from a local list. Uses Zag with `allowCustomValue`. Async suggestions are part of E3. | ta-manager professor, course and thesis pickers; opportunities Select2 |
+| E3 | Async sources + `Combobox` multi | An async (debounced, abortable) source for both `Combobox` and `Autocomplete`, multi-select tokens, and hidden inputs for a multi-select form field. | opportunities `ModelSelect2Multiple` |
 | E4 | `ToggleGroup` | Filter buttons with `aria-pressed`, single- or multi-select, in a labelled group. | ta-manager (about 60 instances) |
 | E5 | Choice chips | Native radios or checkboxes in a `fieldset` with a `legend`, styled as chips. | ngpa country/schema |
 | E6 | `CopyButton` | Copies a value or an element's text and announces it through A9. | ta-manager (5+ modules) |
@@ -117,7 +117,7 @@ Each phase is a set of independent PRs that can run in parallel unless noted.
 
 1. **Foundations.** A1–A4, A8, A9, the parity-story harness, and the README layering change (AGENTS.md is updated with this plan). Everything else depends on these.
 2. **Remove today's toolkit dependency.** C1 `Modal` (with the coordinated ta-manager PR), C5 alongside `Pager`, and the remaining foundations A5–A7. After this phase, nothing ilw-ui already ships needs `toolkit.js`.
-3. **The most-used interactive pieces.** C2 Accordion, C3 Tabs, C4 Tooltip, E1 Alert, E2 Autocomplete then E3, E4 ToggleGroup, E5 chips, E6 CopyButton.
+3. **The most-used interactive pieces.** C2 Accordion, C3 Tabs, C4 Tooltip, E1 Alert, E3 (`Autocomplete`, E2, is done), E4 ToggleGroup, E5 chips, E6 CopyButton.
 4. **Page chrome.** B1–B7. After this phase, a page can drop the toolkit entirely.
 5. **Forms and data.** C6 Filter, E7 Repeater, E8, E9, E12, E13, E15.
 6. **Content components.** D1–D9. Each is small and they can be done in bulk.
