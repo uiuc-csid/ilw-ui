@@ -21,8 +21,11 @@ test('an enhanced select: keyboard commit writes the select; Escape keeps focus'
   await expect(input).toHaveAttribute('aria-expanded', 'false');
   await expect(input).toBeFocused();
 
+  // Wait for each step: WebKit can take the second ArrowDown before the list reopens.
   await press(page, 'ArrowDown');
+  await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-aadams');
   await press(page, 'ArrowDown');
+  await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-dadams');
   await press(page, 'Enter');
   await expect(select).toHaveValue('dadams');
   await expect(page.getByTestId('changes')).toHaveText('person=dadams');
