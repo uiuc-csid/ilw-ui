@@ -48,6 +48,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | ---------------- | --------------------------------------------------------- |
 | `tokens.css`     | `--ilw-color--*` defaults, theme classes, dark mode       |
 | `format.css`     | `.ilw-format`, `.ilw-font`, `.ilw-heading` prose          |
+| `button.css`     | `.ilw-button`, `ul.ilw-buttons`, `ul.ilw-buttons-left`    |
 | `table.css`      | `table.ilw-table`, tables in `.ilw-format`, stripes, `.ilw-table-responsive`, `.ilw-theme-table-*` |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Modal, Combobox, Autocomplete, Pager |
 
@@ -193,6 +194,97 @@ the specificity of a single element, so a class of yours wins.
   passes AA there; don't put smaller text in that head.
 
 ## Components
+
+### `Button` and `.ilw-button`
+
+The toolkit's buttons, from `button.css`: the same classes, so toolkit markup
+looks the same with no `toolkit.css`. Server templates use the classes;
+Svelte code can use `Button`, which renders that markup.
+
+```html
+<a class="ilw-button" href="/apply">Apply now</a>
+<button type="button" class="ilw-button ilw-button-large ilw-theme-blue-solid">Save</button>
+
+<!-- disabled -->
+<button type="button" class="ilw-button" disabled>Save</button>
+<a class="ilw-button" role="link" aria-disabled="true">Apply now</a>
+
+<!-- a row of buttons: ul.ilw-buttons styles its links and buttons and centres
+     them; ul.ilw-buttons-left only lays them out, so its items need .ilw-button -->
+<ul class="ilw-buttons">
+  <li><a href="/apply">Apply</a></li>
+  <li><a href="/visit">Visit</a></li>
+</ul>
+```
+
+| Class                                                                      | Effect                                                  |
+| -------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `.ilw-button` on `<a>` or `<button>`                                       | outline button in `--ilw-color--control*`               |
+| `.ilw-button-small`, `.ilw-button-large` (on the button or the `ul`)       | sizes; none is medium                                   |
+| none, `.ilw-theme-blue`, `.ilw-theme-blue-outline`                         | blue outline                                            |
+| `.ilw-theme-blue-1`, `.ilw-theme-blue-solid`                               | solid blue                                              |
+| `.ilw-theme-orange`, `.ilw-theme-orange-outline`                           | orange outline                                          |
+| `.ilw-theme-orange-1`, `.ilw-theme-orange-solid`                           | solid orange (white on orange: large text only, 3:1)    |
+| `.ilw-width-full`                                                          | full width (on a button; on the `ul`, its items grow to fill the row) |
+
+A theme class on an ancestor recolours the outline button too: inside
+`[theme=blue]` it is white on blue. Every rule weighs one class, so a page's own
+single-class rule overrides it, and prose link styles never do.
+
+```svelte
+<script>
+  import { Button } from 'ilw-ui/svelte';
+</script>
+
+<Button href="/apply">Apply now</Button>
+<Button theme="blue-solid" size="large" onclick={save}>Save</Button>
+<Button disabled>Save</Button>
+```
+
+| Prop       | Type                                                          |                                                          |
+| ---------- | ------------------------------------------------------------- | -------------------------------------------------------- |
+| `href`     | `string`                                                      | given: renders `<a>`; omitted: `<button type="button">`  |
+| `size`     | `'small' \| 'medium' \| 'large'`                              | default `'medium'`                                       |
+| `theme`    | `ButtonTheme`: one of the theme names above, without `ilw-theme-` | default none (blue outline)                          |
+| `disabled` | `boolean`                                                     | see below                                                |
+| `children` | snippet                                                       | the label                                                |
+
+Other attributes and handlers (`onclick`, `type="submit"`, `target`, `class`, …)
+pass through to the element.
+
+DOM contract (consumers' tests select on it): exactly the markup above. A
+disabled `<button>` gets `disabled`, never `aria-disabled`. A disabled link
+loses its `href` (so Tab skips it and clicking does nothing), gets
+`role="link"` and `aria-disabled="true"`, and drops `onclick` and `tabindex`.
+
+**Behaviour:** native. Enter activates both forms; Space presses a button and
+scrolls the page on a link, as links do. Disabled controls are out of the Tab
+order.
+
+**Differs from the toolkit:**
+
+- **Focus** shows on `:focus-visible` (the toolkit uses `:focus`, so a mouse
+  click shows it too), and adds a two-tone ring: a 2px band of
+  `--ilw-color--focus--background` around the border, then a 2px
+  `--ilw-color--focus--text` outline. One of the two reaches 3:1 against every
+  theme surface (WCAG 1.4.11), checked by the Focus Rings stories:
+
+  | Surface                    | Light: Blue line / Arches 90 band | Dark: white line / Blue 30 band |
+  | -------------------------- | --------------------------------- | ------------------------------- |
+  | white palette              | 14.5 / 1.2                        | 17.9 / 1.9                      |
+  | gray                       | 13.2 / 1.1                        | 15.3 / 1.6                      |
+  | blue                       | 1.0 / 11.7                        | 14.5 / 1.5                      |
+  | orange                     | 4.8 / 2.5                         | 3.1 / 3.1                       |
+  | Industrial (blue gradient) | 2.1 / 5.6                         | 7.0 / 1.4                       |
+  | Harvest (orange gradient)  | 8.0 / 1.5                         | 1.8 / 5.3                       |
+
+- **Disabled links** are styled like disabled buttons; the toolkit has no rule
+  for them.
+- **The disabled surface** is the white palette's background, so it turns
+  dark in dark mode; the toolkit's is always white.
+- **Size classes need `.ilw-button`** on a lone button (the toolkit also sizes a
+  bare `button.ilw-button-large`).
+- **No new-window icon** on `a.ilw-button[target=_blank]` yet.
 
 ### `SortableTh`
 
