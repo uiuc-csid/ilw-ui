@@ -41,6 +41,69 @@ built to sit inside. This paragraph shrinks as each replacement lands.
 properties, each with its brand value as a fallback in case the brand
 stylesheet fails to load. It has no rules on bare `th`/`td`.
 
+**Partials:** `styles.css` is an index that `@import`s `src/styles/*.css`.
+Each partial is exported too, so a page can take only what it needs, e.g.
+`import 'ilw-ui/styles/tokens.css'` for the theme properties alone.
+
+| Partial          | Holds                                                     |
+| ---------------- | --------------------------------------------------------- |
+| `tokens.css`     | `--ilw-color--*` defaults, theme classes, dark mode       |
+| `components.css` | `.ilw-visually-hidden`, SortableTh, Modal, Combobox, Autocomplete, Pager |
+
+## Themes and dark mode
+
+`tokens.css` uses the toolkit's names, so markup themed for `toolkit.css` is
+themed the same way here. A page loads one of the two stylesheets, not both:
+they define the same classes and properties.
+
+**Theme classes** (as in `toolkit.css`; the `-table-*` themes come with the
+table styles):
+
+| Class or attribute                                                                         | Palette                                       |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| none                                                                                       | white (the page default)                      |
+| `.ilw-theme-blue`, `.ilw-theme-blue-outline`, `[theme=white]`                              | white: blue outline controls on white         |
+| `.ilw-theme-blue-1`, `-blue-2`, `-blue-solid`, `-blue-inverse`, `[theme=blue]`               | Illinois Blue, white text                     |
+| `.ilw-theme-orange-1`, `-orange-2`, `-orange-solid`, `-orange-inverse`, `[theme=orange]`    | Illinois Orange, blue text, white headings    |
+| `.ilw-theme-orange`, `.ilw-theme-orange-outline`                                            | controls only: white with orange text         |
+| `[theme=gray]`                                                                              | Storm 95                                      |
+| `[theme=blue-gradient]`, `[theme=orange-gradient]`                                          | Industrial to Blue; Harvest to Orange         |
+
+A theme only sets properties; it paints nothing by itself. Whatever reads the
+properties (a component, `.ilw-button`, your own rule) takes the theme's colours.
+
+**Properties a component may read** (it never names a theme or a palette):
+
+| Property                                                                                     | Use                            |
+| -------------------------------------------------------------------------------------------- | ------------------------------ |
+| `--ilw-color--background`, `--ilw-color--text`                                               | surface and body text          |
+| `--ilw-color--border`, `--ilw-color--border-light`                                           | borders, rules                 |
+| `--ilw-color--link`, `-link-hover`, `-link-visited`                                          | links                          |
+| `--ilw-color--heading`, `-heading-link`, `-heading-link-hover`, `-heading-link-visited`      | headings and links in them     |
+| `--ilw-color--control`, `-control-text`, `-control-accent`, `-control-accent-text`          | buttons and other controls     |
+| `--ilw-color--focus--background`, `--ilw-color--focus--text`, `--ilw-color--focus--outline` | focus state                    |
+| `--ilw-color--table-border`, `-table-background`, `-table-row-stripe`, `-table-head-background`, `-table-head-color` | tables |
+
+The palette properties (`--ilw-color--white--*`, `--ilw-color--blue--*`,
+`--orange--`, `--gray--`, `--bluegrad--`, `--orangegrad--`) define the themes.
+Override one on `:root` to restyle every place that palette is used.
+
+The toolkit's orange theme puts white on Illinois Orange (3.3:1) in headings
+and controls, and every palette's `--control-accent` does the same. That
+passes WCAG only for large text (24px, or 18.66px bold); use it accordingly.
+
+**Dark mode:** the page is dark when `<html data-theme="dark">`, or when the OS
+prefers dark and `<html>` doesn't have `data-theme="light"`. That's the
+attribute the toolkit header's dark-mode toggle sets, so the header drives it.
+Dark mode changes the white and gray palettes and the focus colours (near-black
+Blue 10 or Storm 10 surfaces, Storm 95 text, Industrial-lighter links, a light
+blue focus outline); the blue, orange and gradient themes keep their colours.
+The vendored toolkit has no dark rules, and upstream's unreleased
+`dark-mode.css` keeps a light background, so these values are ilw-ui's own.
+**A page that loads `styles.css` next to `toolkit.css` follows the OS
+preference too**, since `tokens.css` overrides the toolkit's properties; set
+`data-theme="light"` on `<html>` to keep it light until the page migrates.
+
 **CSP:** nothing here uses `eval`, `new Function`, `{@html}` or `innerHTML`, so
 it runs under a same-origin-scripts, no-`eval` policy. Nothing sets inline
 `style` attributes either: `tests/e2e/combobox-csp.spec.ts` runs the open
@@ -416,7 +479,18 @@ its Storybook stories, on Chromium and WebKit:
    scans every story, including an "Open" story per component so the open
    popup or modal is scanned.
 
-A node Vitest project also covers `core/` and the guard below.
+A node Vitest project also covers `core/` and the guard below, and
+`tests/unit/tokens.test.ts` checks `tokens.css` against the vendored
+`toolkit.css`: every palette colour and every theme rule.
+
+**Parity stories.** Each story picks its stylesheets with `parameters.styles`:
+`'toolkit'` (`toolkit.css` only, inside `<ilw-page class="ilw-format">`),
+`'ilw-ui'` (`styles.css` only, inside a plain `<main>`) or `'both'` (the
+default). A replacement gets `stories/parity/<Name>.parity.stories.svelte` with
+a `Toolkit` story (axe off: it documents upstream), an `IlwUi` story, and a
+`Side By Side` story that shows each in its own iframe, one row per variant.
+The **Theme** toolbar sets `html[data-theme]` (Light by default, Dark, or
+System, which removes it).
 
 ```bash
 pnpm install

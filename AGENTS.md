@@ -16,16 +16,20 @@ Accessible Svelte 5 components that look and behave like the **Illinois Web Tool
 src/
   core/        framework-agnostic helpers (nextSort, nextId)
   svelte/      Svelte components + index.ts exports (zag-input.ts: Zag workarounds shared by Combobox and Autocomplete)
-  styles.css   component styles (brand tokens only)
+  styles.css   index: @imports src/styles/*.css (brand tokens only)
+  styles/      tokens.css (--ilw-color--*, theme classes, dark mode), components.css
 stories/       *.stories.svelte (Svelte CSF) + story-only helper components
+  parity/      <Name>.parity.stories.svelte: Toolkit / IlwUi / Side By Side pairs
 tests/
-  unit/        node Vitest: core helpers + import/sink guard
+  unit/        node Vitest: core helpers, import/sink guard, tokens.css vs the vendored toolkit.css
   e2e/         Playwright keyboard/focus specs against the static Storybook build
 vendor/illinois-toolkit/   pinned toolkit.js/.css, served by Storybook at /toolkit
-.storybook/    Storybook config; IlwPage.svelte wraps every story in <ilw-page class="ilw-format"><main>
+.storybook/    Storybook config; styles.ts adds toolkit.css and/or styles.css per story from parameters.styles
+               ('toolkit' | 'ilw-ui' | 'both', default 'both'); IlwPage.svelte wraps 'toolkit'/'both' stories in
+               <ilw-page class="ilw-format"><main>, PlainMain.svelte wraps 'ilw-ui' ones in <main>
 ```
 
-The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `exports`: `./core`, `./svelte`, `./styles.css`.
+The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `exports`: `./core`, `./svelte`, `./styles.css`, `./styles/*`.
 
 ## Rules
 
@@ -48,6 +52,7 @@ Accessibility is proven by tests. Every component gets three layers, all driven 
 2. **APG keyboard + focus** — `tests/e2e/*.spec.ts`, real `page.keyboard` against `storybook-static/`; every step asserts focus never falls to `<body>` (`tests/e2e/focus.ts`). Needs `pnpm build-storybook` first, then `pnpm test:e2e`.
 3. **axe** — `@storybook/addon-a11y` with `a11y.test = 'error'` (WCAG 2.0/2.1 A/AA) on every story. Every component has an "open" story so its open state is scanned. Disabling a rule on a story needs a comment with the reason and an issue link.
 
+- **Parity pairs:** the `Toolkit` story of a pair sets `a11y: { test: 'off' }` with a comment: it documents upstream, it isn't our code. `Side By Side` stories are tagged `!test` (iframes of other stories, for people).
 - Storybook runs a story's `play` function whenever the story loads, including in the static build. Playwright specs therefore use stories **without** a `play` function (the "fixture" stories), so their state is untouched when the spec starts.
 - Run one Playwright spec: `pnpm exec playwright test tests/e2e/modal.spec.ts --project chromium`.
 - `mise run test` runs everything: `pnpm test && pnpm build-storybook && pnpm test:e2e`. Also run `pnpm check` (svelte-check, fails on warnings).
