@@ -32,6 +32,9 @@
   async function checkRings(canvasElement: HTMLElement, outline: string) {
     const buttons = [...canvasElement.querySelectorAll<HTMLButtonElement>('section button')];
     await expect(buttons).toHaveLength(4);
+    // The story's Page shell puts its skip link first in the tab order.
+    await userEvent.tab();
+    await expect(canvasElement.ownerDocument.querySelector('.ilw-skip-link')).toHaveFocus();
     for (const button of buttons) {
       await userEvent.tab();
       await expect(button).toHaveFocus();
