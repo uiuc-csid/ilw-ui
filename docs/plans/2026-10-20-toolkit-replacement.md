@@ -20,6 +20,7 @@ The inventory below is the toolkit's full component list (the active `web-illino
 - **Two delivery forms.**
   - _Presentational components_ (card, hero, quote, footer, and so on) ship as documented markup and classes in `styles.css`, so a server template can use them without JavaScript. They also ship as a Svelte component that renders exactly that markup.
   - _Interactive components_ are islands. Where possible they start from server markup that works without JavaScript (accordion from `<details>`, tabs that fall back to headed sections, filters that fall back to a GET form) and improve it once mounted.
+- **CSS before JS for page chrome.** Page chrome that needs no script to work ships as markup and classes only. Disclosure uses `<details>` (with `name` for one open at a time) or `popover` with `popovertarget`. Reveal-on-scroll uses scroll-driven animations, with an always-visible fallback. Script is added only where HTML can't do the job (today: the dark-mode toggle). Svelte pages still get a component that renders the same markup.
 - **Island-safe.** No SvelteKit imports, and no DOM access at module top level, so components also work when prerendered. Props come from `data-*` attributes or `json_script`, through a shared `mountIslands` helper.
 - **Native first.** Native `<dialog>`, `<details>`, `popover`, form controls and `<table>` come before custom widgets. Zag or TanStack are used only where native elements fall short, and only inside ilw-ui.
 - **The layering rule changes.** AGENTS.md's "Illinois toolkit first, native HTML second, ilw-ui third" becomes "native HTML first, ilw-ui second; the toolkit is the visual reference". The README's "host page must load the toolkit" goes away step by step, as each component stops needing it. The first PR under this plan updates both files.
@@ -48,13 +49,13 @@ Delivery is one of: **CSS** (markup and classes), **Svelte** (component), or **I
 
 | # | Item | Replaces | Delivery | Notes |
 | - | ---- | -------- | -------- | ----- |
-| B1 | Page shell | `ilw-page` | CSS + Svelte | Skip link, landmark layout, and the dark-mode hook. Replaces `IlwPage.svelte` in Storybook. |
-| B2 | Header | `ilw-header`, `ilw-header-menu`, `ilw-header-megamenu` | CSS + Island (menus) | Wordmark, site name, utility links and search. The menus are disclosure navigation (not `role="menu"`) and include the mobile toggle. |
+| B1 | Page shell | `ilw-page` | CSS + Svelte | Skip link (a plain `<a>` to a `tabindex="-1"` `<main>`), landmark layout, and the A1 dark-mode hook. Without script it follows `prefers-color-scheme`. The toggle that sets `html[data-theme]` and the `ilw-dark-mode` cookie is the only script: a small, optional island. Replaces `IlwPage.svelte` in Storybook. |
+| B2 | Header | `ilw-header`, `ilw-header-menu`, `ilw-header-megamenu` | CSS + Svelte | Wordmark, site name, utility links and a GET search form. Menus are disclosure navigation (not `role="menu"`) with no script: `<details name="…">` for in-flow submenus (the shared `name` keeps one open at a time), and a `popovertarget` button with a `popover` panel for the megamenu and the mobile toggle (Escape and light dismiss come free). |
 | B3 | Footer | `ilw-footer`, `.ilw-footer-menu` | CSS + Svelte | The campus footer content must match the toolkit's exactly. |
 | B4 | Breadcrumbs | `ilw-breadcrumbs` | CSS + Svelte | `<nav aria-label>` with `aria-current="page"`. |
 | B5 | Page title | `ilw-page-title` | CSS + Svelte | |
-| B6 | Section nav | `ilw-section-nav` | CSS + Island | A collapsible tree, with `aria-current` and disclosure buttons. |
-| B7 | Back to top | `ilw-back-to-top` | Island | Appears after scrolling and moves focus to the top of the page. |
+| B6 | Section nav | `ilw-section-nav` | CSS + Svelte | Nested `<details>`: the server sets `open` on the current branch and `aria-current="page"` on the current link. The link and the toggle stay separate (no link inside `<summary>`): the summary holds only the toggle, named "Subpages of …", laid out beside the link. |
+| B7 | Back to top | `ilw-back-to-top` | CSS + Svelte | `<a href="#top">` to the skip-link target. A scroll-driven animation (`animation-timeline: scroll()`) reveals it after scrolling; where that isn't supported, it is always visible. |
 
 ### C. Interactive toolkit components
 
@@ -118,7 +119,7 @@ Each phase is a set of independent PRs that can run in parallel unless noted.
 1. **Foundations.** A1–A4, A8, A9, the parity-story harness, and the README layering change (AGENTS.md is updated with this plan). Everything else depends on these.
 2. **Remove today's toolkit dependency.** C1 `Modal` (with the coordinated ta-manager PR), C5 alongside `Pager`, and the remaining foundations A5–A7. After this phase, nothing ilw-ui already ships needs `toolkit.js`.
 3. **The most-used interactive pieces.** C2 Accordion, C3 Tabs, C4 Tooltip, E1 Alert, E3 (`Autocomplete`, E2, is done), E4 ToggleGroup, E5 chips, E6 CopyButton.
-4. **Page chrome.** B1–B7. After this phase, a page can drop the toolkit entirely.
+4. **Page chrome.** B1–B7, all CSS: only B1's dark-mode toggle is an island. They need only A1 and A2, so they can run alongside phases 2 and 3. After this phase, a page can drop the toolkit entirely.
 5. **Forms and data.** C6 Filter, E7 Repeater, E8, E9, E12, E13, E15.
 6. **Content components.** D1–D9. Each is small and they can be done in bulk.
 7. **Media and the rest of the gaps.** C7–C9, E10, E11, E14, E17.
