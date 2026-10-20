@@ -19,3 +19,4 @@ export { alert, type CloseReason, confirm, type ModalButton, type ModalOptions, 
 export { default as Pager } from './Pager.svelte';
 export { default as SortableTh } from './SortableTh.svelte';
 export { default as TableSortTh } from './TableSortTh.svelte';
+export { type IslandRegistry, mountIslands } from './islands.ts';

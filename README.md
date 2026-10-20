@@ -366,6 +366,41 @@ The count isn't a live region: with two pagers it would be announced twice.
 Focus staying on the pressed button is what tells a screen-reader user the page
 changed.
 
+### `mountIslands`
+
+Mounts Svelte components on a server-rendered page (Django and similar), one
+island per host element.
+
+```html
+<div data-ilw-island="course-picker" data-props='{"term": "fa26"}'></div>
+
+<!-- or Django's json_script: -->
+{{ picker_props|json_script:"picker-props" }}
+<div data-ilw-island="course-picker" data-props-id="picker-props"></div>
+```
+
+```js
+import { mountIslands } from 'ilw-ui/svelte';
+import CoursePicker from './CoursePicker.svelte';
+
+const unmount = mountIslands({ 'course-picker': CoursePicker }); // root defaults to document
+```
+
+- `mountIslands(registry, root?)` finds every `[data-ilw-island]` under `root`
+  and calls `mount(registry[name], { target, props })`.
+- Props come from `data-props` (a JSON string) or from `data-props-id`, the id
+  of a `<script type="application/json">`. Both are parsed with `JSON.parse`
+  only and must be a JSON object; no attribute means no props.
+- A host with bad JSON, an unknown name or a component that throws while
+  mounting is logged with `console.error` (once per element) and skipped. The
+  call never throws.
+- Mounted hosts get `data-ilw-mounted`. Calling `mountIslands` again (after a
+  fragment swap) mounts only hosts without it.
+- It returns a function that unmounts what that call mounted and removes
+  `data-ilw-mounted`. On `pagehide` it unmounts by itself, unless
+  `event.persisted` is true: a page going into the bfcache comes back as it
+  was, islands included.
+
 ### `announce`
 
 Speaks a short message to screen-reader users without moving focus, through
