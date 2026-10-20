@@ -208,7 +208,10 @@
     const root = canvasElement.querySelector('.autocomplete')!;
     await waitFor(() => expect(region.parentElement).toBe(root));
     region.remove();
-    // With focus elsewhere it is left alone.
+    // With focus elsewhere it is left alone. Opening focuses the input a
+    // frame later (docs/upstream-issues/zag.md #6); blurring before that frame
+    // has focus pulled back, so the final state races.
+    await new Promise(requestAnimationFrame);
     input.blur();
     const other = document.createElement('span');
     other.dataset.liveAnnouncer = 'true';
@@ -216,6 +219,8 @@
     await new Promise((r) => setTimeout(r));
     await expect(other.parentElement).toBe(document.body);
     other.remove();
+    await new Promise(requestAnimationFrame);
+    await expect(document.activeElement).not.toBe(input);
   }}
 />
 
