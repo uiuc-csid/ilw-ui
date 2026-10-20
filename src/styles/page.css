@@ -38,19 +38,20 @@
   outline: none;
 }
 
-/* Links in main take the theme's link colours, as <ilw-page> styles them
-   (with or without .ilw-format). :where() keeps this at a bare `a`'s
-   specificity, so any component's own link styles win. */
-:where(.ilw-page > main) a {
+/* Links in main take the theme's link colours, as <ilw-page> styles them even
+   without .ilw-format. Links inside .ilw-format (on the shell or any element in
+   main) are format.css's, heading links included, so these stand aside. Zero specificity: any component's own link
+   styles win. */
+:where(.ilw-page > main) :where(a):not(:where(.ilw-format a)) {
   color: var(--ilw-color--link);
   text-decoration: underline;
 }
 
-:where(.ilw-page > main) a:where(:hover, :focus) {
+:where(.ilw-page > main) :where(a:hover, a:focus):not(:where(.ilw-format a)) {
   color: var(--ilw-color--link-hover);
 }
 
-:where(.ilw-page > main) a:where(:focus) {
+:where(.ilw-page > main) :where(a:focus):not(:where(.ilw-format a)) {
   color: var(--ilw-color--focus--text);
   background-color: var(--ilw-color--focus--background);
   outline: 2px solid var(--ilw-color--focus--outline);

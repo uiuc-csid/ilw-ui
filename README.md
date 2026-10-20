@@ -234,8 +234,9 @@ come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrom
 - The header and footer are direct children of the shell, outside `main`, so
   they are the page's banner and content-info landmarks.
 - The shell sets the page background and text from `--ilw-color--background`
-  and `--ilw-color--text`, so it follows the theme and dark mode, and colours
-  links in `main` from `--ilw-color--link*` at a bare `a`'s specificity.
+  and `--ilw-color--text`, so it follows the theme and dark mode. Links in
+  `main` outside `.ilw-format` get `--ilw-color--link*` at zero specificity;
+  inside `.ilw-format`, the prose styles colour them.
 - Modifiers (props in Svelte): `ilw-format` (`format`), `ilw-margin` (`margin`:
   side margins on `main`), `ilw-page--expanded` (`expanded`, the toolkit's
   `expanded` attribute: top and bottom margin on `main`).
