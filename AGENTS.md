@@ -1,6 +1,6 @@
 # ilw-ui
 
-Accessible Svelte 5 components that look and behave like the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>), filling gaps the toolkit leaves (sortable headings, modal with events/focus restore; later combobox, autocomplete, data table, pager). First consumer: ta-manager (`uiuc-csid/ta-manager`). [docs/old-plans/2026-10-16-ilw-ui-scaffold.md](docs/old-plans/2026-10-16-ilw-ui-scaffold.md) holds the design and the contracts that consumer depends on.
+Accessible Svelte 5 components that look and behave like the **Illinois Web Toolkit** (`ilw-*` Lit web components, <https://builder3.toolkit.illinois.edu/>), filling gaps the toolkit leaves (sortable headings, modal with events/focus restore, combobox, autocomplete, data table, pager). First consumer: ta-manager (`uiuc-csid/ta-manager`). [docs/old-plans/2026-10-16-ilw-ui-scaffold.md](docs/old-plans/2026-10-16-ilw-ui-scaffold.md) holds the design and the contracts that consumer depends on.
 
 ## Tech Stack
 
@@ -15,7 +15,7 @@ Accessible Svelte 5 components that look and behave like the **Illinois Web Tool
 ```text
 src/
   core/        framework-agnostic helpers (nextSort, nextId)
-  svelte/      Svelte components + index.ts exports
+  svelte/      Svelte components + index.ts exports (zag-input.ts: Zag workarounds shared by Combobox and Autocomplete)
   styles.css   component styles (brand tokens only)
 stories/       *.stories.svelte (Svelte CSF) + story-only helper components
 tests/
@@ -36,6 +36,7 @@ The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `export
 - **Read the toolkit component's docs and source before wrapping it:** `https://builder3.toolkit.illinois.edu/component/<name>/index.html` and `https://github.com/web-illinois/<name>`. The prose docs lag the code; follow the code. Upstream gaps go under **Known issues** in the README with an issue link, not patched around in markup.
 - **DOM contracts are API.** ta-manager's tests select on the exact markup documented in the README; change it only deliberately.
 - Pin every `storybook`/`@storybook/*` package to one exact version.
+- **Sources stay under `src/`.** No top-level file or folder may share a dependency's name: Vite (root = this repo) resolved the bare `svelte` import to a top-level `svelte/` folder in the ta-manager spikes. `tests/unit/guard.test.ts` checks it; don't add an alias or `optimizeDeps.exclude` instead.
 
 ## Tests
 

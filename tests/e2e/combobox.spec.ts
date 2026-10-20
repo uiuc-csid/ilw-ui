@@ -186,3 +186,15 @@ test('typing mid-text keeps the caret in place', async ({ page }) => {
   await expect(input).toHaveAttribute('aria-expanded', 'true');
   await expect.poll(caret).toBe(2);
 });
+
+test('no live region is left on <body> while the list is in use', async ({ page }) => {
+  await openStory(page, 'combobox--fixture');
+  const { input } = parts(page);
+
+  await input.focus();
+  await type(page, 'ad');
+  await press(page, 'ArrowDown');
+  await press(page, 'ArrowDown');
+  // Zag announces through it on macOS/iOS only; elsewhere there is none at all.
+  await expect(page.locator('body > [data-live-announcer]')).toHaveCount(0);
+});

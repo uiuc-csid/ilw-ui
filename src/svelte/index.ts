@@ -1,3 +1,4 @@
+export { default as Autocomplete } from './Autocomplete.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export {
   type AnyDataTable,

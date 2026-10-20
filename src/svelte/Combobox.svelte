@@ -4,6 +4,7 @@
   import { untrack } from 'svelte';
 
   import { blurMatch, type ComboboxItem, filterItems } from '../core/index.ts';
+  import { keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
@@ -140,21 +141,8 @@
     },
   });
 
-  // Zag moves the caret to the end (dom-query's setCaretToEnd) after nearly
-  // every state change: opening, closing, even a keystroke that opens the list
-  // or moves the highlight. Typing mid-text then jumps to the end. A real text
-  // change already puts the caret at the end, so drop those calls.
-  $effect(() => {
-    const own = input.setSelectionRange;
-    input.setSelectionRange = function (start, end, direction) {
-      const len = this.value.length;
-      if (start === len && end === len && direction === undefined) return;
-      own.call(this, start, end, direction);
-    };
-    return () => {
-      input.setSelectionRange = own;
-    };
-  });
+  $effect(() => keepCaret(input));
+  $effect(() => keepLiveRegionIn(root));
 
   const api = $derived(combobox.connect(service, normalizeProps));
 

@@ -27,10 +27,20 @@ export interface ComboboxItem {
 }
 
 /** Case-insensitive substring match of the trimmed query over each item's search text (or label), capped at `max`. */
-export function filterItems(items: ComboboxItem[], query: string, max: number): { shown: ComboboxItem[]; more: number } {
+export function filterItems<T extends ComboboxItem>(items: T[], query: string, max: number): { shown: T[]; more: number } {
   const needle = query.trim().toLowerCase();
   const matches = items.filter((i) => (i.search ?? i.label).toLowerCase().includes(needle));
   return { shown: matches.slice(0, max), more: Math.max(0, matches.length - max) };
+}
+
+export interface AutocompleteItem {
+  value: string;
+  /** The suggestion's text in the list. */
+  label: string;
+  /** What choosing it writes into the input; defaults to the label. */
+  text?: string;
+  /** Text matched by filterItems; defaults to the label. */
+  search?: string;
 }
 
 /** The item typed text commits to on blur: an exact label or value match, else the only substring match, else null. */

@@ -28,18 +28,21 @@
   margin-top: 1rem;
 }
 
-/* Combobox: the field mirrors the toolkit's ilw-input (which styles inputs
+/* Combobox and Autocomplete: the field mirrors the toolkit's ilw-input (which styles inputs
    only inside <ilw-content>); the popup is placed by CSS, not Floating UI. */
-.combobox {
+.combobox,
+.autocomplete {
   position: relative;
   display: inline-block;
 }
 
-.combobox.cb-block {
+.combobox.cb-block,
+.autocomplete.ac-block {
   display: block;
 }
 
-.combobox-input {
+.combobox-input,
+.autocomplete-input {
   box-sizing: border-box;
   width: 200px;
   margin: 0;
@@ -51,32 +54,39 @@
   font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
 }
 
-.cb-block .combobox-input {
+.cb-block .combobox-input,
+.ac-block .autocomplete-input {
   width: 100%;
 }
 
 .combobox-input:hover,
-.combobox-input:focus {
+.combobox-input:focus,
+.autocomplete-input:hover,
+.autocomplete-input:focus {
   background-color: var(--il-arches-90, #c7edf8);
 }
 
-.combobox-input:focus-visible {
+.combobox-input:focus-visible,
+.autocomplete-input:focus-visible {
   outline: 3px solid var(--il-altgeld, #c84113);
 }
 
 /* No brand red: the darker Altgeld, at double width so it isn't colour alone. */
-.combobox-input[aria-invalid='true'] {
+.combobox-input[aria-invalid='true'],
+.autocomplete-input[aria-invalid='true'] {
   border: 2px solid var(--il-altgeld-darker-1, #983220);
 }
 
-.combobox-input:disabled {
+.combobox-input:disabled,
+.autocomplete-input:disabled {
   background-color: var(--il-storm-95, #f4f4f4);
   border-color: var(--il-storm-60, #8e9090);
   color: var(--il-storm-30, #474948);
   cursor: not-allowed;
 }
 
-.combobox-popup {
+.combobox-popup,
+.autocomplete-popup {
   position: absolute;
   top: calc(100% + 2px);
   inset-inline: 0;
@@ -93,17 +103,20 @@
   font: 1rem/1.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
 }
 
-.combobox-popup[hidden] {
+.combobox-popup[hidden],
+.autocomplete-popup[hidden] {
   display: none;
 }
 
-.combobox-popup [role='option'] {
+.combobox-popup [role='option'],
+.autocomplete-popup [role='option'] {
   padding: 6px 10px;
   color: var(--il-storm-10, #252525);
   cursor: pointer;
 }
 
-.combobox-popup [role='option'][data-highlighted] {
+.combobox-popup [role='option'][data-highlighted],
+.autocomplete-popup [role='option'][data-highlighted] {
   background-color: var(--il-arches-90, #c7edf8);
 }
 
@@ -121,7 +134,8 @@
 }
 
 .combobox-popup .combobox-more,
-.combobox-popup .combobox-empty {
+.combobox-popup .combobox-empty,
+.autocomplete-popup .autocomplete-empty {
   color: var(--il-storm-30, #474948);
   font-style: italic;
   cursor: default;

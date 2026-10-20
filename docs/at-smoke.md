@@ -27,13 +27,26 @@ in new tab"), then add a row to the log below.
 
 - [ ] Tabbing in announces "Person, combobox" (or "edit text, has autocomplete") with its current value, and that it is collapsed.
 - [ ] Typing two characters announces that the list expanded. The number of results is announced or easy to find.
-- [ ] ArrowDown and ArrowUp announce each option's name. On macOS, VoiceOver reads it once, not twice (Zag adds its own live region there).
+- [ ] ArrowDown and ArrowUp announce each option's name. On macOS, VoiceOver reads it once, not twice (Zag adds its own live region there; the component moves it into itself, so check it is still heard, including inside a Modal).
 - [ ] Options in a group announce the group ("Faculty") when entering it.
 - [ ] Enter announces the chosen value, the list collapses, and the input reads back the label.
 - [ ] Escape collapses the list and focus stays in the input (not on the page).
 - [ ] In Many, the "…N more — keep typing to narrow" row is announced as unavailable or dimmed and can't be chosen. Decide whether a disabled option reads well or whether a status message would be better (open question 1 in the Combobox plan).
 - [ ] In Free text, unmatched text is read back as typed after Tab, and "No matches" is announced while the list is open.
 - [ ] Disabled and invalid stories announce "dimmed/unavailable" and "invalid entry" respectively.
+
+## Autocomplete (stories: Autocomplete → Fixture, Fixture empty text, Prefilled)
+
+Status: **pending human run.**
+
+- [ ] Tabbing in announces "Professor, combobox" (or "edit text, has autocomplete") with its current text, and that it is collapsed.
+- [ ] Typing one character announces that the list expanded; the number of suggestions is announced or easy to find.
+- [ ] ArrowDown and ArrowUp announce each suggestion's full text. On macOS, VoiceOver reads it once, not twice (the component moves Zag's live region into itself; it must still be heard).
+- [ ] Enter writes the suggestion's short text (e.g. "D. Adams"); the list collapses and the input reads back the new text.
+- [ ] Escape collapses the list; focus and the typed text stay.
+- [ ] Tab with a suggestion highlighted writes it and moves to the next field; with none highlighted, the typed text is kept as is.
+- [ ] In Fixture empty text, "No matches" is announced as unavailable or dimmed and can't be chosen.
+- [ ] Prefilled: the existing text is read on focus, and ArrowDown lists only the suggestions matching it.
 
 ## DataTable and Pager (stories: DataTable → Fixture, Fixture paged)
 
