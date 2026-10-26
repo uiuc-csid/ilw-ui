@@ -1,0 +1,25 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: ['config:recommended'],
+  packageRules: [
+    {
+      // The CI image's browsers only work with the same Playwright version
+      // pnpm installs (tests/unit/playwright-container.test.ts), so the image
+      // and the npm packages move in one PR.
+      groupName: 'Playwright',
+      matchPackageNames: ['playwright', '@playwright/test', 'mcr.microsoft.com/playwright'],
+      separateMajorMinor: false,
+    },
+    {
+      // Tags look like v1.64.1-noble; keep the Ubuntu suffix fixed.
+      matchDatasources: ['docker'],
+      matchPackageNames: ['mcr.microsoft.com/playwright'],
+      versioning: 'regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>[a-z]+)$',
+    },
+    // Library families are pinned exactly and move in lockstep (AGENTS.md).
+    { groupName: 'Storybook', matchPackageNames: ['storybook', '@storybook/*'], separateMajorMinor: false },
+    { groupName: 'Vitest', matchPackageNames: ['vitest', '@vitest/*'], separateMajorMinor: false },
+    { groupName: 'Zag', matchPackageNames: ['@zag-js/*'], separateMajorMinor: false },
+    { groupName: 'TanStack Table', matchPackageNames: ['@tanstack/*'], separateMajorMinor: false },
+  ],
+}
