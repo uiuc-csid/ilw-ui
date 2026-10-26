@@ -3,7 +3,7 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Footer, Icon, PageTitle } from '../src/svelte/index.ts';
+  import { Breadcrumbs, Button, Footer, Header, Icon, PageTitle } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
 
@@ -58,6 +58,35 @@
     <Icon icon={Envelope} />
     <p>Email the department office.</p>
   </div>
+</Story>
+
+<!--
+  `Header` outside `.ilw-format`, with every part.
+
+  **Why:** the play function checks the site name, links, search and nav items are in Source Sans without the prose styles.
+
+  **Review:** matches **Parity/Header → IlwUi**.
+-->
+<Story
+  name="Header"
+  play={({ canvasElement }) =>
+    brandSans(
+      canvasElement.querySelectorAll(
+        '.ilw-header :is(.ilw-header-parent-unit, .ilw-header-site-name, .ilw-header-toggle, .ilw-header-links a, .ilw-header-search input, .ilw-header-search button, .ilw-header-nav a, .ilw-header-nav summary)',
+      ),
+    )}
+>
+  <Header
+    siteName="Sample Site"
+    siteHref="#home"
+    parentUnit={{ label: 'Parent Unit', href: '#parent' }}
+    links={[{ label: 'Apply', href: '#apply' }]}
+    search={{ action: '#search' }}
+    nav={[
+      { label: 'About', href: '#about' },
+      { label: 'Programs', children: [{ label: 'Majors', href: '#majors' }] },
+    ]}
+  />
 </Story>
 
 <!--

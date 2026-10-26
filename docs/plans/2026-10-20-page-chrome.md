@@ -149,6 +149,23 @@ DOM order is reading order is focus order, at every width:
 
 `Header`: props `siteName`, `siteHref`, `parentUnit` (`{ label, href }`), `source` (UTM, default `Illinois_App`), `search` (`{ action, name, method }` or false), `links` and `nav` (a tree of `{ label, href?, current?, children? }`; an item with both `href` and `children` renders as a linked section), `megamenu` (boolean: render top-level sections as popovers), `darkModeToggle` (boolean: render the island host). Snippets for `siteName` when it needs to be an `<h1>`.
 
+### As built (PR 3)
+
+Ambiguities resolved while building B2, against the toolkit's code (`ilw-header.ts` and both CSS files, `HeaderMenu*.ts/css`, `MegaMenu*.ts/css`) and its rendering in the vendored build:
+
+- **Megamenu inside the narrow menu.** A popover restores focus on Escape only if no other auto popover was open when it was shown (HTML "show popover": `shouldRestoreFocus`), so a megamenu panel inside the open `auto` menu dropped focus to `<body>` in Chromium and WebKit. With `megamenu`, the menu is `popover="manual"`: Escape closes the panel and focus returns to its button; the menu closes from "Menu" only (no Escape or light dismiss for it). Without a megamenu the menu stays `auto`. Recorded in the README's gaps.
+- **Anchoring.** `position-anchor`'s initial value is now `normal`, which doesn't use the implicit (invoker) anchor, so panels set `position-anchor: auto`. The menu anchors to `.ilw-header-main` by name (`--ilw-header-main`, `anchor-scope`d to the header). Both are `position: absolute` so they scroll with the page. A wide panel starts 39 px left of the page margin and is at most 1270 px wide, as upstream, but clamped to the viewport (upstream overflows it).
+- **Breakpoints** are viewport media queries (990 px; 600 px for the wordmark text and the "Menu" label; 1200 px for the full side margin). Upstream measures the header's own width; the header is full width, so they agree.
+- **Wordmark name:** visually hidden text inside the link, as B3's footer does, rather than `aria-label` (one convention for both wordmarks; it survives page translation).
+- **`details` names:** top-level sections share `ilw-header-nav`; a nested group is its parent group's name plus the parent's 1-based position (`ilw-header-nav-3`, `ilw-header-nav-3-4`). The `id` prop (default `ilw-header`) prefixes every id and name.
+- **`current`** marks only the item it's on (`aria-current="page"` on a link, `"true"` on a section toggle); it isn't propagated to ancestors.
+- **Search:** GET only (no `method` prop: a search is a safe query, and POST would need CSRF); `search` defaults to `false`; the field name defaults to `q`. The magnifier is inline SVG (upstream: a CDN background image, which our CSP-bound consumers may not load). The button's end padding is 1em, where upstream's 2em is squeezed by its 290 px form; same width.
+- **Dark-mode toggle:** in Svelte, `Header` mounts `DarkModeToggle` in the host itself and marks it `data-ilw-mounted`, so `mountIslands` skips it. Wide, the switch sits at the right end of the nav bar, after the last item (upstream puts its checkbox between the identity row and the nav).
+- **Colours:** upstream's `#e8e9eb` bar and `#f4f4f4` submenu have no brand token; they are `color-mix()` of the theme text into the theme background (10 % and 5 %), which matches in light and turns dark with the page.
+- **Megamenu content:** a panel is a list of columns built from the item's children (a link plus its own links), or a flat list in upstream's 4 × 5 grid. Upstream's `action-left`/`action-right` slots (image cards) aren't supported.
+- **Focus styles** use `:focus-visible` (upstream: `:focus`), as `Button` does, so clicking a toggle doesn't paint it.
+- **Tests:** the header's keyboard specs are in `tests/e2e/header.spec.ts` rather than `page-chrome.spec.ts`, so B6/B7 can extend that file without conflicts.
+
 ## B3: footer
 
 ### Markup contract

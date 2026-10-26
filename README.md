@@ -204,13 +204,15 @@ the specificity of a single element, so a class of yours wins.
 
 ## Page chrome
 
-The page shell, footer, breadcrumbs and page title replace `<ilw-page>`,
-`<ilw-footer>`, `<ilw-breadcrumbs>` and `<ilw-page-title>` with plain HTML and
-classes: no script, so a server template renders them as they are. Each also
-ships as a Svelte component that renders exactly this markup. The classes are
-named after the toolkit elements; their shadow-DOM parts are light-DOM
-children. The plan, including the header, section nav and back-to-top still to
-come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrome.md).
+The page shell, header, footer, breadcrumbs and page title replace
+`<ilw-page>`, `<ilw-header>` (with `<ilw-header-menu>` and
+`<ilw-header-megamenu>`), `<ilw-footer>`, `<ilw-breadcrumbs>` and
+`<ilw-page-title>` with plain HTML and classes: no script, so a server template
+renders them as they are. Each also ships as a Svelte component that renders
+exactly this markup. The classes are named after the toolkit elements; their
+shadow-DOM parts are light-DOM children. The plan, including the section nav
+and back-to-top still to come, is
+[docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrome.md).
 
 ### Page shell (`Page`)
 
@@ -247,6 +249,140 @@ come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrom
   `expanded` attribute: top and bottom margin on `main`).
 - Differs from `<ilw-page>`: the skip link (the toolkit has none) and the page
   colours (the toolkit leaves them to the host).
+
+### Header (`Header`)
+
+```html
+<header class="ilw-header">
+  <div class="ilw-header-main">
+    <a class="ilw-header-wordmark" href="https://illinois.edu/?utm_source=…&utm_medium=web&utm_campaign=Header">
+      <span class="ilw-visually-hidden">University of Illinois Urbana-Champaign</span>
+      <span class="ilw-header-block-i"><svg aria-hidden="true">…</svg></span>
+      <svg class="ilw-header-wordmark-text" aria-hidden="true">…</svg>
+    </a>
+    <div class="ilw-header-identity">
+      <a class="ilw-header-parent-unit" href="…">Parent Unit</a>         <!-- optional -->
+      <a class="ilw-header-site-name" href="/">Site Name</a>             <!-- or <h1 class="ilw-header-site-name"><a>, or a <div> -->
+    </div>
+    <button class="ilw-header-toggle" type="button" popovertarget="ilw-header-menu">
+      <svg class="ilw-header-toggle-open" aria-hidden="true">…</svg><svg class="ilw-header-toggle-close" aria-hidden="true">…</svg>
+      <span class="ilw-header-toggle-label">Menu</span>
+    </button>
+  </div>
+  <div class="ilw-header-menu" id="ilw-header-menu" popover>            <!-- popover="manual" with a megamenu -->
+    <nav class="ilw-header-links" aria-label="Utility"><ul><li><a href="…">…</a></li></ul></nav>
+    <form class="ilw-header-search" role="search" method="get" action="/search">
+      <input type="search" name="q" aria-labelledby="ilw-header-search-button">
+      <button type="submit" id="ilw-header-search-button"><svg aria-hidden="true">…</svg> Search</button>
+    </form>
+    <nav class="ilw-header-nav" aria-label="Main">
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><details name="ilw-header-nav">                                   <!-- a section -->
+          <summary>Start Here<svg class="ilw-header-chevron" aria-hidden="true">…</svg></summary>
+          <ul><li><a href="…">…</a></li></ul>
+        </details></li>
+        <li class="ilw-header-nav-linked">                                    <!-- a linked section -->
+          <a href="/info">Information</a>
+          <details name="ilw-header-nav">
+            <summary><span class="ilw-visually-hidden">Subpages of Information</span><svg class="ilw-header-chevron" aria-hidden="true">…</svg></summary>
+            <ul>…<li><details name="ilw-header-nav-3">…</details></li></ul>  <!-- nested: its own name -->
+          </details>
+        </li>
+      </ul>
+    </nav>
+    <span class="ilw-header-dark-mode" data-ilw-island="dark-mode-toggle"></span>  <!-- optional -->
+  </div>
+</header>
+```
+
+A megamenu (`megamenu` in Svelte) swaps each top-level section's `details` for
+a button and a popover panel of columns:
+
+```html
+<nav class="ilw-header-nav ilw-header-nav--mega" aria-label="Main">
+  <ul>
+    <li>
+      <button type="button" class="ilw-header-megamenu-toggle" popovertarget="ilw-header-mega-1">Admissions<svg class="ilw-header-chevron" aria-hidden="true">…</svg></button>
+      <div class="ilw-header-megamenu-panel" id="ilw-header-mega-1" popover>
+        <ul class="ilw-header-megamenu-list ilw-header-megamenu-list--columns">  <!-- --columns when items have children -->
+          <li><a href="…">Undergraduate</a><ul><li><a href="…">Apply</a></li></ul></li>
+        </ul>
+      </div>
+    </li>
+    <li class="ilw-header-nav-linked">                                        <!-- a linked section -->
+      <a href="/research">Research</a>
+      <button type="button" class="ilw-header-megamenu-toggle" popovertarget="ilw-header-mega-2"><span class="ilw-visually-hidden">Subpages of Research</span><svg class="ilw-header-chevron" aria-hidden="true">…</svg></button>
+      <div class="ilw-header-megamenu-panel" id="ilw-header-mega-2" popover>…</div>
+    </li>
+  </ul>
+</nav>
+```
+
+```svelte
+<Header
+  siteName="My Site"
+  parentUnit={{ label: 'Parent Unit', href: '…' }}
+  links={[{ label: 'Apply', href: '/apply' }]}
+  search={{ action: '/search' }}
+  nav={[
+    { label: 'About', href: '/about' },
+    { label: 'Start Here', children: [{ label: 'Getting Started', href: '/start', current: true }] },
+    { label: 'Information', href: '/info', children: [/* … */] },
+  ]}
+  darkModeToggle
+/>
+```
+
+- **No script.** Under 990 px (the toolkit's breakpoint) the "Menu" button
+  opens the menu as a popover under the header (anchor positioning; without
+  it, the browser's centred popover). From 990 px the button is hidden and the
+  menu is `display: contents`, so the links, search and nav take the toolkit's
+  places in the header. Sections are `<details>` sharing one `name`, so one is
+  open at a time; a nested section's `name` adds its position
+  (`ilw-header-nav-3`), so opening it keeps its parent open. Megamenu panels
+  are `popover` (one at a time, Escape, light dismiss).
+- **Focus order is reading order** at every width: skip link, wordmark, parent
+  unit, site name, "Menu" (narrow), utility links, search field and button, the
+  nav items (a linked section's link, then its toggle), the dark-mode switch,
+  then `main`. An open section's links follow its toggle; a panel follows its
+  button.
+- **Current page:** `current` on a nav item puts `aria-current="page"` on its
+  link, or `aria-current="true"` on a section's toggle (the toolkit's
+  `current` attribute); both get the toolkit's blue rule.
+- **Search** is a GET form labelled by its submit button (the toolkit's
+  contract). `search={{ action, name = 'q', label = 'Search' }}`, or `false`
+  (the default) for none.
+- **Dark-mode toggle:** `darkModeToggle` renders the
+  [`DarkModeToggle`](#dark-mode-toggle-darkmodetoggle) island host at the end
+  of the menu (at the right of the nav bar from 990 px). In Svelte the
+  component mounts it itself and marks the host mounted, so `mountIslands`
+  skips it; a server template renders the empty host and calls `mountIslands`.
+- Props: `siteName` (text or a snippet), `siteHref` (default `/`; `null` for
+  no link), `heading` (the site name is the page's `<h1>`), `parentUnit`,
+  `source` (the wordmark's UTM source, default `Illinois_App`), `links`,
+  `linksLabel` (default "Utility"), `search`, `nav`, `navLabel` (default
+  "Main"), `megamenu`, `darkModeToggle`, `menuLabel` (default "Menu"), `id`
+  (default `ilw-header`: the prefix of every id and `details` name; set it if
+  a page has two headers), `class`. With no links, search, nav or toggle there
+  is no menu and no "Menu" button (the toolkit's `menu="none"`).
+- Colours come from the theme (`--ilw-color--heading`, `--ilw-color--background`,
+  …), so the header turns dark with the page; the block I keeps its brand blue
+  and the top rule stays orange.
+- **Gaps against the APG disclosure navigation pattern** (they need script):
+  no arrow keys between top-level items (optional in the APG); an open
+  `details` dropdown doesn't close on Escape or when focus leaves it (it closes
+  when another opens or its toggle is pressed). With a megamenu, the narrow
+  menu is a manual popover (Escape and an outside click leave it open; "Menu"
+  closes it): a popover restores focus on Escape only when no other auto
+  popover is open, so the panels inside the menu must be the only auto ones.
+- Differs from `<ilw-header>`: no script; the menu sections are `details`
+  rather than buttons with `aria-expanded`; the linked section's toggle is
+  named "Subpages of …" (upstream: "… submenu"); a megamenu panel holds a list
+  of columns (upstream: slotted lists and `action-left`/`action-right` slots,
+  not supported); the dark-mode switch is the B1 island; the wordmark's name is
+  visually hidden text in the link, as in the footer; the "Menu" button doesn't
+  trap focus in the open menu (upstream loops Tab inside it).
 
 ### Footer (`Footer`)
 
@@ -370,7 +506,7 @@ come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrom
 
 The one piece of page chrome that needs script: an optional island that lets
 the user override the OS colour scheme. Put the host where the toggle goes
-(the header, once B2 lands) and mount it with `mountIslands`:
+(the header renders it with `darkModeToggle`) and mount it with `mountIslands`:
 
 ```html
 <span data-ilw-island="dark-mode-toggle"></span>

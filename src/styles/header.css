@@ -1,0 +1,795 @@
+/* Header and menus (B2), the CSS form of <ilw-header>, <ilw-header-menu> and
+   <ilw-header-megamenu>, with no script. Markup in the README ("Header"):
+
+     <header class="ilw-header">
+       <div class="ilw-header-main">wordmark, identity, <button popovertarget> "Menu"</div>
+       <div class="ilw-header-menu" popover>utility links, search, nav, dark-mode host</div>
+     </header>
+
+   Under 990 px (the toolkit's breakpoint) the menu is a popover the "Menu"
+   button opens under the header. From 990 px the button is hidden and the
+   menu is display: contents, so its parts join the header's grid. Menu
+   sections are <details name> (one open at a time); megamenu sections are
+   popovers. Colours come from the theme properties, so dark mode follows; the
+   block I keeps its brand colours, as the footer's wordmark does. */
+
+.ilw-header {
+  --ilw-header--side: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
+  /* The toolkit's margins: 8 px inside the page margin, the full margin from 1200 px. */
+  --ilw-header--margin: calc(var(--ilw-header--side) - 8px);
+  --ilw-header--text: var(--ilw-color--heading);
+  --ilw-header--hover: var(--ilw-color--heading-link-hover);
+  --ilw-header--background: var(--ilw-color--background);
+  --ilw-header--accent: var(--il-orange, #ff5f05);
+  /* The toolkit's #e8e9eb bar and #f4f4f4 submenu, mixed from the theme so they turn dark too. */
+  --ilw-header--bar: color-mix(in srgb, var(--ilw-color--text) 10%, var(--ilw-color--background));
+  --ilw-header--sub: color-mix(in srgb, var(--ilw-color--text) 5%, var(--ilw-color--background));
+  --ilw-header--rule: var(--ilw-color--border-light);
+  --ilw-header--field-border: var(--il-storm, #707372);
+  --ilw-header--shadow: 0 0 4px color-mix(in srgb, var(--il-black, #000000) 25%, transparent);
+
+  box-sizing: border-box;
+  position: relative;
+  border-top: 8px solid var(--ilw-header--accent);
+  border-bottom: 2px solid var(--ilw-header--bar);
+  background-color: var(--ilw-header--background);
+  color: var(--ilw-header--text);
+  font: 400 1rem/1 var(--il-font-sans, 'Source Sans 3', sans-serif);
+  anchor-scope: --ilw-header-main;
+}
+
+.ilw-header *,
+.ilw-header *::before,
+.ilw-header *::after {
+  box-sizing: border-box;
+}
+
+.ilw-header :where(ul) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-header :where(a) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ilw-header :where(a:hover) {
+  color: var(--ilw-header--hover);
+  text-decoration: underline;
+}
+
+.ilw-header :where(a, summary, button):focus-visible {
+  color: var(--ilw-color--focus--text);
+  background-color: var(--ilw-color--focus--background);
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: -2px;
+}
+
+.ilw-header-main {
+  display: grid;
+  /* The toolkit's toggle column: 60 px, 120 px from 600 px. */
+  grid-template-columns: minmax(0, 1fr) var(--ilw-header--toggle-column, 60px);
+  grid-template-rows: 63px auto;
+  grid-template-areas: 'wordmark wordmark' 'identity toggle';
+  margin-inline: var(--ilw-header--margin);
+  anchor-name: --ilw-header-main;
+}
+
+@media (width >= 1200px) {
+  .ilw-header {
+    --ilw-header--margin: var(--ilw-header--side);
+  }
+}
+
+/* Wordmark: the block I in its blue box, overlapping the orange rule, and the
+   name beside it. The box only under 600 px, as upstream. */
+
+.ilw-header-wordmark {
+  grid-area: wordmark;
+  position: relative;
+  top: -8px;
+  display: block;
+  width: 44px;
+  height: 51px;
+  overflow: hidden;
+}
+
+.ilw-header-block-i {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 44px;
+  height: 51px;
+  background-color: var(--il-blue, #13294b);
+}
+
+.ilw-header-block-i svg {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 22px;
+  height: 31px;
+}
+
+.ilw-header-block-i .outline {
+  fill: var(--il-white, #ffffff);
+}
+
+.ilw-header-block-i .fill {
+  fill: var(--ilw-header--accent);
+}
+
+.ilw-header-wordmark-text {
+  position: absolute;
+  top: 21px;
+  left: 55px;
+  width: 379px;
+  height: 11px;
+  fill: currentColor;
+}
+
+.ilw-header-wordmark:hover {
+  text-decoration: none;
+}
+
+.ilw-header-wordmark:hover .ilw-header-wordmark-text {
+  border-bottom: 1px solid;
+  height: 14px;
+  padding-bottom: 2px;
+}
+
+.ilw-header .ilw-header-wordmark:focus-visible {
+  background: none;
+  outline: none;
+}
+
+.ilw-header-wordmark:focus-visible .ilw-header-block-i {
+  outline: 2px solid var(--ilw-color--focus--outline);
+}
+
+.ilw-header-wordmark:focus-visible .ilw-header-wordmark-text {
+  background-color: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  outline: 2px solid var(--ilw-color--focus--outline);
+}
+
+@media (width >= 600px) {
+  .ilw-header-main {
+    --ilw-header--toggle-column: 120px;
+  }
+
+  .ilw-header-wordmark {
+    width: 445px;
+  }
+}
+
+/* Identity: parent unit over site name. */
+
+.ilw-header-identity {
+  grid-area: identity;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 0 20px 9px;
+}
+
+.ilw-header-parent-unit {
+  font: 400 18px/24px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-header-site-name {
+  margin: 0;
+  font: 700 24px/30px var(--il-font-sans, 'Source Sans 3', sans-serif);
+  color: var(--ilw-header--text);
+}
+
+/* The "Menu" button (narrow only): a blue tab with the icon; the text shows from 600 px. */
+
+.ilw-header-toggle {
+  grid-area: toggle;
+  justify-self: end;
+  align-self: center;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 2.25rem;
+  height: calc(2.25rem + 2px);
+  margin: 0 0 20px;
+  padding: 0;
+  border: 1px solid var(--ilw-header--text);
+  border-radius: 0.25rem;
+  background-color: var(--ilw-header--text);
+  color: var(--ilw-header--background);
+  font: 600 1.25rem/2.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ilw-header-toggle:hover {
+  background-color: var(--ilw-header--background);
+  color: var(--ilw-header--text);
+}
+
+.ilw-header-toggle svg {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  fill: currentColor;
+}
+
+.ilw-header-toggle-close,
+.ilw-header:has(.ilw-header-menu:popover-open) .ilw-header-toggle-open {
+  display: none;
+}
+
+.ilw-header:has(.ilw-header-menu:popover-open) .ilw-header-toggle-close {
+  display: block;
+}
+
+.ilw-header-toggle-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (width >= 600px) {
+  .ilw-header-toggle-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    padding: 0 0.75rem 0 2.25rem;
+  }
+}
+
+/* The menu: a popover under the header on narrow screens. */
+
+.ilw-header-menu {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--ilw-header--bar);
+  color: var(--ilw-header--text);
+}
+
+@supports (top: anchor(bottom)) {
+  .ilw-header-menu {
+    position: absolute;
+    inset: auto;
+    top: anchor(--ilw-header-main bottom);
+    left: 0;
+  }
+}
+
+/* Utility links: separated by short orange rules. */
+
+.ilw-header-links ul {
+  display: flex;
+  padding-top: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ilw-header-links li {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.ilw-header-links li::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 0.5rem;
+  width: 2px;
+  height: 60%;
+  background-color: var(--ilw-header--accent);
+}
+
+.ilw-header-links li:first-child {
+  padding-left: 0;
+}
+
+.ilw-header-links li:first-child::before {
+  display: none;
+}
+
+.ilw-header-links a {
+  display: inline-block;
+  padding: 0 0.25rem;
+  font: 700 1rem/1.375rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* Search: the field and its button joined, the button labelling the field. */
+
+.ilw-header-search {
+  display: flex;
+  margin: 0;
+}
+
+.ilw-header-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 2.25rem;
+  margin: 0 -1px 0 0;
+  padding: 0 0.5rem;
+  border: 2px solid var(--ilw-header--field-border);
+  border-radius: 0.25rem 0 0 0.25rem;
+  background-color: var(--ilw-color--control);
+  color: var(--ilw-header--text);
+  font: 1rem/2rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-header-search input:hover {
+  position: relative;
+  border-color: var(--ilw-header--accent);
+}
+
+.ilw-header-search input:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 0;
+}
+
+.ilw-header-search button {
+  position: relative;
+  flex: none;
+  height: 2.25rem;
+  margin: 0 0 0 -1px;
+  /* The toolkit's button is 2em each side, then squeezed by its 290 px form; 1em at the end matches it. */
+  padding: 0 1em 0 2em;
+  border: 2px solid var(--ilw-header--field-border);
+  border-radius: 0 0.25rem 0.25rem 0;
+  background-color: var(--ilw-header--background);
+  color: var(--ilw-header--text);
+  font: 1rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ilw-header-search button svg {
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  translate: 0 -50%;
+  fill: currentColor;
+}
+
+.ilw-header-search button:hover {
+  text-decoration: underline;
+}
+
+/* Navigation. Items are links, <summary> toggles (a section) or a link and a
+   chevron-only <summary> (a linked section); a section's list follows its
+   summary. Shared: the chevron, which turns when its section opens. */
+
+.ilw-header-nav :where(a, summary, .ilw-header-megamenu-toggle) {
+  display: block;
+  font: var(--ilw-header--nav-font);
+  color: var(--ilw-header--text);
+}
+
+.ilw-header-nav :where(summary, .ilw-header-megamenu-toggle) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+  list-style: none;
+}
+
+.ilw-header-nav-linked > * > .ilw-header-chevron,
+.ilw-header-nav-linked > details > summary > .ilw-header-chevron {
+  margin-inline: 0;
+}
+
+.ilw-header-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+.ilw-header-chevron {
+  flex: none;
+  margin-inline: 3px;
+  width: 18px;
+  height: 18px;
+  padding: 2px;
+  fill: currentColor;
+  rotate: var(--ilw-header--chevron, 0deg);
+}
+
+.ilw-header-nav details[open] > summary,
+.ilw-header-megamenu-toggle:has(+ :popover-open) {
+  color: var(--ilw-header--hover);
+  background-color: var(--ilw-header--background);
+  text-decoration: underline;
+}
+
+.ilw-header-nav details[open] > summary,
+.ilw-header-megamenu-toggle:has(+ :popover-open) {
+  --ilw-header--chevron: var(--ilw-header--chevron-open, 180deg);
+}
+
+.ilw-header-nav :where(a, summary, .ilw-header-megamenu-toggle):hover {
+  color: var(--ilw-header--hover);
+  background-color: var(--ilw-header--background);
+  text-decoration: underline;
+}
+
+/* The linked section's link and toggle sit side by side; its list goes under both. */
+.ilw-header-nav-linked {
+  position: relative;
+}
+
+/* Narrow: one column, full-width rows, a left rule on hover, focus and the current page. */
+
+.ilw-header-nav {
+  --ilw-header--nav-font: 600 18px/28px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-header-links {
+  padding: 0.5rem;
+  border-top: 1px solid var(--ilw-header--rule);
+}
+
+.ilw-header-search {
+  padding: 20px;
+  border-top: 1px solid var(--ilw-header--rule);
+}
+
+.ilw-header-nav :where(a, summary, .ilw-header-megamenu-toggle) {
+  width: 100%;
+  padding: 6px 20px;
+  border-left: 4px solid transparent;
+}
+
+.ilw-header-nav :where(summary, .ilw-header-megamenu-toggle) {
+  justify-content: space-between;
+}
+
+.ilw-header-nav > ul > li {
+  border-bottom: 1px solid var(--ilw-header--rule);
+}
+
+.ilw-header-nav :where(a, summary, .ilw-header-megamenu-toggle):where(:hover) {
+  border-left-color: var(--ilw-header--accent);
+}
+
+.ilw-header-nav :where(a, summary, .ilw-header-megamenu-toggle):where(:focus-visible, [aria-current]) {
+  border-left-color: var(--ilw-header--text);
+}
+
+.ilw-header-nav details li {
+  border-top: 1px solid var(--ilw-header--rule);
+  background-color: var(--ilw-header--sub);
+}
+
+.ilw-header-nav details li :where(a, summary) {
+  padding-left: 40px;
+}
+
+.ilw-header-nav details details li :where(a, summary) {
+  padding-left: 60px;
+}
+
+/* The linked section's toggle: a 52 px square at the right of its link. */
+.ilw-header-nav-linked > a {
+  padding-right: 56px;
+}
+
+.ilw-header-nav-linked > details > summary,
+.ilw-header-nav-linked > .ilw-header-megamenu-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  justify-content: center;
+  width: 52px;
+  height: 40px;
+  padding: 0;
+  border-left: 0;
+}
+
+.ilw-header-dark-mode {
+  display: block;
+  padding: 20px;
+  border-top: 1px solid var(--ilw-header--rule);
+}
+
+.ilw-header-dark-mode:empty {
+  display: none;
+}
+
+/* Megamenu panels: popovers anchored under their button. */
+
+.ilw-header-megamenu-panel {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--ilw-header--rule);
+  background-color: var(--ilw-header--background);
+  color: var(--ilw-header--text);
+  box-shadow: var(--ilw-header--shadow);
+}
+
+@supports (top: anchor(bottom)) {
+  .ilw-header-megamenu-panel {
+    position: absolute;
+    /* Its implicit anchor: the button that opened it. */
+    position-anchor: auto;
+    inset: auto;
+    top: anchor(bottom);
+    left: 0;
+    width: 100%;
+  }
+}
+
+.ilw-header-megamenu-list {
+  --ilw-header--nav-font: 700 16px/22px var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-header-megamenu-list :where(a, .ilw-header-megamenu-label) {
+  display: block;
+  padding: 6px 20px;
+  border-left: 4px solid transparent;
+  font: var(--ilw-header--nav-font);
+  color: var(--ilw-header--text);
+}
+
+.ilw-header-megamenu-list a:hover {
+  border-left-color: var(--ilw-header--accent);
+  color: var(--ilw-header--hover);
+  text-decoration: underline;
+}
+
+.ilw-header-megamenu-list a:focus-visible,
+.ilw-header-megamenu-list a[aria-current] {
+  border-left-color: var(--ilw-header--text);
+}
+
+.ilw-header-megamenu-list ul a {
+  padding-left: 40px;
+  font-weight: 400;
+}
+
+/* Wide: the menu joins the header's grid; the nav is a bar of dropdowns. */
+
+@media (width >= 990px) {
+  .ilw-header {
+    display: grid;
+    grid-template-columns: var(--ilw-header--margin) 445px minmax(0, 1fr) 290px var(--ilw-header--margin);
+    grid-template-rows: 63px auto auto;
+    grid-template-areas:
+      '. wordmark links links .'
+      '. identity identity search .'
+      'nav nav nav nav nav';
+  }
+
+  .ilw-header-main {
+    display: contents;
+  }
+
+  .ilw-header-toggle {
+    display: none;
+  }
+
+  .ilw-header-menu[popover] {
+    display: contents;
+  }
+
+  .ilw-header-links {
+    grid-area: links;
+    align-self: start;
+    justify-self: end;
+    padding: 6px 0 28px;
+    border: 0;
+  }
+
+  .ilw-header-links ul {
+    justify-content: flex-end;
+    padding-top: 0;
+  }
+
+  .ilw-header-search {
+    grid-area: search;
+    align-self: start;
+    padding: 0 0 20px;
+    border: 0;
+  }
+
+  .ilw-header-nav {
+    --ilw-header--nav-font: 700 16px/22px var(--il-font-sans, 'Source Sans 3', sans-serif);
+    grid-area: nav;
+    background-color: var(--ilw-header--bar);
+  }
+
+  .ilw-header-nav > ul {
+    display: flex;
+    flex-wrap: wrap;
+    margin-inline: calc(var(--ilw-header--side) - 9px);
+    padding-top: 6px;
+  }
+
+  .ilw-header-nav > ul > li {
+    position: relative;
+    display: flex;
+    border: 0;
+  }
+
+  /* Top-level items: an orange underline on hover, blue on focus and on the current page. */
+  .ilw-header-nav > ul > li > a,
+  .ilw-header-nav > ul > li > details > summary,
+  .ilw-header-nav > ul > li > .ilw-header-megamenu-toggle {
+    display: flex;
+    align-items: center;
+    /* The toolkit's items are 41 px tall: its label box is a line taller than the text. */
+    min-height: 41px;
+    width: auto;
+    height: 100%;
+    padding: 6px 20px;
+    border-left: 0;
+    border-bottom: 4px solid transparent;
+  }
+
+  .ilw-header-nav > ul > li > a:hover,
+  .ilw-header-nav > ul > li > details > summary:hover,
+  .ilw-header-nav > ul > li > .ilw-header-megamenu-toggle:hover {
+    border-bottom-color: var(--ilw-header--accent);
+  }
+
+  .ilw-header-nav > ul > li > a:where(:focus-visible, [aria-current]),
+  .ilw-header-nav > ul > li > details > summary:where(:focus-visible, [aria-current]),
+  .ilw-header-nav > ul > li > .ilw-header-megamenu-toggle:where(:focus-visible, [aria-current]) {
+    border-bottom-color: var(--ilw-header--text);
+  }
+
+  .ilw-header-nav > ul > li.ilw-header-nav-linked > a {
+    padding-right: 2px;
+  }
+
+  .ilw-header-nav > ul > li.ilw-header-nav-linked > details > summary,
+  .ilw-header-nav > ul > li.ilw-header-nav-linked > .ilw-header-megamenu-toggle {
+    position: static;
+    width: auto;
+    padding: 6px 20px 6px 8px;
+  }
+
+  /* Dropdowns: a 250 px panel under the item; nested sections open to its right. */
+  .ilw-header-nav details > ul {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    width: 250px;
+    border: 1px solid var(--ilw-header--rule);
+    background-color: var(--ilw-header--background);
+    box-shadow: var(--ilw-header--shadow);
+  }
+
+  .ilw-header-nav details li {
+    position: relative;
+    border: 0;
+    background: none;
+  }
+
+  .ilw-header-nav details li :where(a, summary) {
+    padding: 6px 20px;
+  }
+
+  .ilw-header-nav details li details > ul {
+    top: 0;
+    left: 100%;
+  }
+
+  .ilw-header-nav details li > details > summary {
+    --ilw-header--chevron: -90deg;
+    --ilw-header--chevron-open: 90deg;
+  }
+
+  .ilw-header-nav details li.ilw-header-nav-linked > a {
+    padding-right: 56px;
+  }
+
+  .ilw-header-nav details li.ilw-header-nav-linked > details > summary {
+    height: 100%;
+  }
+
+  /* Megamenu: a panel as wide as the toolkit's (1270 px), from just left of the page margin. */
+  .ilw-header-megamenu-panel {
+    --ilw-header--panel-left: max(0px, calc(var(--ilw-header--side) - 39px));
+  }
+
+  @supports (top: anchor(bottom)) {
+    .ilw-header-megamenu-panel {
+      left: var(--ilw-header--panel-left);
+      width: min(1270px, calc(100% - var(--ilw-header--panel-left)));
+    }
+  }
+
+  .ilw-header-megamenu-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 320px));
+    grid-template-rows: repeat(5, auto);
+    grid-auto-flow: column;
+    margin-block: 30px;
+  }
+
+  .ilw-header-megamenu-list > li {
+    padding-left: 30px;
+  }
+
+  .ilw-header-megamenu-list--columns {
+    grid-template-rows: none;
+    grid-auto-flow: row;
+    margin-block: 0;
+  }
+
+  .ilw-header-megamenu-list--columns > li {
+    margin-block: 30px;
+    border-right: 2px solid var(--ilw-header--rule);
+  }
+
+  .ilw-header-megamenu-list--columns > li:nth-child(4n),
+  .ilw-header-megamenu-list--columns > li:last-child {
+    border-right: 0;
+  }
+
+  .ilw-header-megamenu-list :where(a, .ilw-header-megamenu-label) {
+    border-left: 0;
+    border-bottom: 4px solid transparent;
+  }
+
+  .ilw-header-megamenu-list a:hover {
+    border-bottom-color: transparent;
+  }
+
+  .ilw-header-megamenu-list a:focus-visible,
+  .ilw-header-megamenu-list a[aria-current] {
+    border-bottom-color: var(--ilw-header--text);
+  }
+
+  .ilw-header-megamenu-list ul {
+    padding-left: 30px;
+  }
+
+  .ilw-header-megamenu-list ul a {
+    padding-left: 20px;
+  }
+
+  /* The dark-mode switch sits at the right end of the nav bar, after the last item. */
+  .ilw-header-dark-mode {
+    grid-area: nav;
+    justify-self: end;
+    align-self: center;
+    margin-inline-end: var(--ilw-header--margin);
+    padding: 0;
+    border: 0;
+  }
+
+  .ilw-header:has(.ilw-header-dark-mode:not(:empty)) .ilw-header-nav > ul {
+    padding-inline-end: 9rem;
+  }
+}
+
+/* Forced colours: the bar, panels and toggles keep visible edges. */
+@media (forced-colors: active) {
+  .ilw-header-menu,
+  .ilw-header-megamenu-panel,
+  .ilw-header-nav details > ul {
+    border: 1px solid CanvasText;
+  }
+
+  .ilw-header-toggle {
+    border-color: ButtonText;
+  }
+}
