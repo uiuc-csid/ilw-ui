@@ -12,7 +12,8 @@
   const { Story } = defineMeta({
     title: 'Format',
     component: FormatSample,
-    parameters: { styles: 'ilw-ui' },
+    // Unformatted shell: each story puts .ilw-format on its own element, the thing under test.
+    parameters: { styles: 'ilw-ui', format: false },
   });
 
   const people: ComboboxItem[] = [

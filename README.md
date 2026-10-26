@@ -967,8 +967,12 @@ A node Vitest project also covers `core/` and the guard below, and
 
 **Parity stories.** Each story picks its stylesheets with `parameters.styles`:
 `'toolkit'` (`toolkit.css` only, inside `<ilw-page class="ilw-format">`),
-`'ilw-ui'` (`styles.css` only, inside the `Page` shell: skip link, then
-`<main id="main-content">`) or `'both'` (the default). A story that renders a
+`'ilw-ui'` (`styles.css` only, inside `<Page format>`: skip link, then
+`<main id="main-content">`, with `.ilw-format` as on the toolkit side) or
+`'both'` (the default). An `'ilw-ui'` story sets `parameters.format: false` to
+drop `.ilw-format`: the **Unformatted** stories render each presentational
+component that way and check its text is still in Source Sans, so a component
+that leans on the prose styles for its font fails. A story that renders a
 whole page (its own shell or footer) sets `parameters.shell: false` to skip
 the wrapper. A replacement gets `stories/parity/<Name>.parity.stories.svelte` with
 a `Toolkit` story (axe off: it documents upstream), an `IlwUi` story, and a
