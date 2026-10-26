@@ -28,6 +28,7 @@ export {
   type ModalSize,
   openModal,
 } from './modal.ts';
+export { default as Pagination } from './Pagination.svelte';
 export { default as Pager } from './Pager.svelte';
 export { default as SortableTh } from './SortableTh.svelte';
 export { default as TableSortTh } from './TableSortTh.svelte';
@@ -42,3 +43,5 @@ export {
   type HeaderNavItem,
   type HeaderSearch,
 } from './Header.svelte';
+export { default as BackToTop } from './BackToTop.svelte';
+export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';

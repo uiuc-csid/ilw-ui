@@ -98,6 +98,26 @@ Status: **pending human run.** Run each item wide (990 px or more) and narrow (u
 - [ ] Megamenu: "Admissions, button, collapsed"; Enter opens the panel ("expanded"), the next Tab reaches its first link, and Escape closes it with focus back on "Admissions".
 - [ ] Fixture Megamenu: after the nav, Tab reaches "Dark mode, switch".
 
+## Section nav (story: Page Chrome → Section nav → Fixture)
+
+Status: **pending human run.**
+
+- [ ] The landmarks list has a "Pages In This Section" navigation.
+- [ ] Tabbing reads "Undergraduate Degrees, link", then "Subpages of Undergraduate Degrees, button, expanded" (VoiceOver may say "disclosure triangle" or "summary"); the chevron is not read.
+- [ ] Enter or Space on a toggle flips it, the new state is announced, and focus stays on it; when open, the next Tab reaches the first child.
+- [ ] "Pre-Veterinary and Medical" is announced as the current page.
+- [ ] Lists are announced with their item counts, nested by level.
+- [ ] Wider than 700 px (the "Pages In This Section" toggle hidden): every link is still reachable with the virtual cursor and listed in the links list, in Safari and Firefox too (Chrome checked by script; this is the plan's "check first").
+- [ ] Narrower than 700 px: "Pages In This Section, button, collapsed"; Enter opens it.
+
+## Back to top (story: Page Chrome → Back to top → Fixture)
+
+Status: **pending human run.**
+
+- [ ] It is the last Tab stop on the page and reads "Back to top, link"; it is visible when focused, even at the top of the page.
+- [ ] Enter scrolls to the top; the next Tab reaches "Skip to main content". Nothing extra is announced when focus moves to the page shell (no role or name of its own), or the screen reader reads from the top of the page.
+- [ ] The arrow is not read.
+
 ## Dark-mode toggle (story: Page Chrome → Dark-mode toggle → Fixture)
 
 Status: **pending human run.**
@@ -105,6 +125,14 @@ Status: **pending human run.**
 - [ ] Tabbing to it reads "Dark mode, switch, off" (or "on", matching the OS setting); VoiceOver may say "toggle button" or "switch".
 - [ ] Space flips it and the new state is announced ("on"/"off"); the page colours change and focus stays on the switch.
 - [ ] In Windows High Contrast (forced colours) it shows as a native checkbox with its focus ring.
+
+## Pagination (story: Pagination → Fixture)
+
+Status: **pending human run.**
+
+- [ ] The landmarks list has a "Pages" navigation; inside it, the list is announced with its item count.
+- [ ] Tabbing reads "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
+- [ ] On the first page (Pagination → Ends), "Previous" is read as text, not a link.
 
 ## Results log
 

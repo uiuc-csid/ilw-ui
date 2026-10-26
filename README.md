@@ -6,7 +6,8 @@ WAI-ARIA Authoring Practices. The goal is a full replacement for the toolkit in
 Svelte apps: the same look without `toolkit.js` or `toolkit.css`, plus what the
 toolkit lacks. So far: a modal on native `<dialog>` with close reasons,
 focus return and a promise API, a filtering combobox, a free-text autocomplete,
-and a client-side sortable, filterable, paged table. The roadmap is
+a client-side sortable, filterable, paged table, and link-based pagination
+for server-rendered lists. The roadmap is
 [docs/plans/2026-10-20-toolkit-replacement.md](docs/plans/2026-10-20-toolkit-replacement.md),
 tracked in [#9](https://github.com/uiuc-csid/ilw-ui/issues/9).
 
@@ -26,9 +27,9 @@ to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
 
 ```js
 import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
-import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
+import { createDataTable, DataTable, DataRows, TableSortTh, Pager, Pagination, setTableFilter } from 'ilw-ui/svelte';
 import { Page, Footer, Breadcrumbs, PageTitle, Icon } from 'ilw-ui/svelte';
-import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce, campusFooter, campusLink } from 'ilw-ui/core';
+import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, pageHref, announce, campusFooter, campusLink } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
@@ -55,6 +56,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `page.css`       | `.ilw-page` shell, `.ilw-skip-link`, links in `main` (B1) |
 | `page-title.css` | `.ilw-page-title` (B5)                                    |
 | `breadcrumbs.css`| `.ilw-breadcrumbs` (B4)                                   |
+| `pagination.css` | `.ilw-pagination` (C5)                                    |
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
@@ -204,24 +206,25 @@ the specificity of a single element, so a class of yours wins.
 
 ## Page chrome
 
-The page shell, header, footer, breadcrumbs and page title replace
-`<ilw-page>`, `<ilw-header>` (with `<ilw-header-menu>` and
-`<ilw-header-megamenu>`), `<ilw-footer>`, `<ilw-breadcrumbs>` and
-`<ilw-page-title>` with plain HTML and classes: no script, so a server template
-renders them as they are. Each also ships as a Svelte component that renders
-exactly this markup. The classes are named after the toolkit elements; their
-shadow-DOM parts are light-DOM children. The plan, including the section nav
-and back-to-top still to come, is
+The page shell, header, footer, breadcrumbs, page title, section nav and
+back-to-top replace `<ilw-page>`, `<ilw-header>` (with `<ilw-header-menu>` and
+`<ilw-header-megamenu>`), `<ilw-footer>`, `<ilw-breadcrumbs>`,
+`<ilw-page-title>`, `<ilw-section-nav>` and `<ilw-back-to-top>` with plain HTML
+and classes: no script, so a server template renders them as they are. Each
+also ships as a Svelte component that renders exactly this markup. The classes
+are named after the toolkit elements; their shadow-DOM parts are light-DOM
+children. The plan is
 [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrome.md).
 
 ### Page shell (`Page`)
 
 ```html
-<div class="ilw-page ilw-format" id="top">
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
   <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
   <header>…</header>
   <main id="main-content" tabindex="-1">…</main>
   <footer class="ilw-footer">…</footer>
+  <a class="ilw-back-to-top" href="#top">…</a>  <!-- optional -->
 </div>
 ```
 
@@ -237,7 +240,10 @@ and back-to-top still to come, is
   matches `main`'s `id`; `tabindex="-1"` makes following it move focus into
   `main`, so the next Tab continues from the content. Props: `skipLinkText`,
   `mainId` (default `main-content`), `id` (default `top`, the back-to-top
-  target).
+  target), `backToTop` (renders `BackToTop` as the last child).
+- The shell's `tabindex="-1"` lets following back-to-top move focus to it (not
+  to `<body>`), so the next Tab is the skip link. Neither the shell nor `main`
+  shows a focus ring when focused this way.
 - The header and footer are direct children of the shell, outside `main`, so
   they are the page's banner and content-info landmarks.
 - The shell sets the page background and text from `--ilw-color--background`
@@ -501,6 +507,88 @@ a button and a popover panel of columns:
 - Props: `theme` (`'blue' | 'orange' | 'white'`; unset is white on the heading
   colour), `fade`, `image` (URL), `class`.
 - Not yet: the toolkit's `width` breakout (A5).
+
+### Section nav (`SectionNav`)
+
+```html
+<nav class="ilw-section-nav" aria-labelledby="ilw-section-nav-label">
+  <details class="ilw-section-nav-collapse">  <!-- open: start open at narrow widths -->
+    <summary id="ilw-section-nav-label">Pages In This Section<svg aria-hidden="true">…</svg></summary>
+    <ul>
+      <li><a class="ilw-section-nav--root" href="/programs">Programs of Study</a></li>
+      <li class="ilw-section-nav-branch">
+        <a href="/programs/ug">Undergraduate Degrees</a>
+        <details open>  <!-- open on the current page's ancestors -->
+          <summary><span class="ilw-visually-hidden">Subpages of Undergraduate Degrees</span><svg aria-hidden="true">…</svg></summary>
+          <ul>
+            <li><a href="/programs/ug/pre-vet" aria-current="page">Pre-Veterinary and Medical</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+  </details>
+</nav>
+```
+
+```svelte
+<SectionNav
+  items={[
+    { label: 'Programs of Study', href: '/programs' },
+    { label: 'Undergraduate Degrees', href: '/programs/ug', children: [
+      { label: 'Pre-Veterinary and Medical', href: '/programs/ug/pre-vet', current: true },
+    ] },
+  ]}
+/>
+```
+
+- No script: every disclosure is a `<details>`. A branch is a link and, beside
+  it, a separate toggle (a `summary` holding only "Subpages of …" and a
+  chevron), never a link inside a `summary`. Tab reaches the link, then its
+  toggle, then (open) the children; Enter or Space toggles.
+- The server opens the current page's branch: `SectionNav` sets `open` on
+  every ancestor of the `current` item and `aria-current="page"` on it.
+- At 700 px and narrower the list hides behind "Pages In This Section" (the
+  outer `details`), as upstream. Wider, that `summary` is hidden and the list
+  always shows, open or not, where `::details-content` is supported; elsewhere
+  the toggle stays.
+- Props: `items` (`SectionNavItem[]`: `{ label, href, current?, children? }`),
+  `label` (default "Pages In This Section": the nav's name and the narrow
+  toggle's text), `open` (the narrow toggle starts open), `expanded` (every
+  branch starts open), `root` (default true: the first item gets
+  `ilw-section-nav--root`), `id`, `class`. The toolkit's
+  `--ilw-section-nav--*` properties apply.
+- Differs from `<ilw-section-nav>`: branches collapse (upstream always shows
+  every level and has no branch toggles); the toggles are `summary`s, not
+  scripted buttons; no `collapse="true|false"` attribute (no forced or
+  prevented collapse) and no full-viewport-width breakout at narrow widths
+  (that waits for the A5 width utilities).
+
+### Back to top (`BackToTop`)
+
+```html
+<a class="ilw-back-to-top" href="#top">
+  <svg aria-hidden="true">…</svg><span class="ilw-visually-hidden">Back to top</span>
+</a>
+```
+
+```svelte
+<Page backToTop>…</Page>      <!-- or <BackToTop target="top" /> last in your own shell -->
+```
+
+- A link to the shell (`.ilw-page#top`, `tabindex="-1"`), the shell's last
+  child. Following it scrolls up and moves focus to the shell, so the next Tab
+  is the skip link, without the toolkit's script. Smooth scrolling unless the
+  user prefers reduced motion.
+- Fixed at the bottom right (`--ilw-back-to-top--right`/`--bottom`, 40 px), in
+  the toolkit's colours (its `--ilw-back-to-top--*` properties apply).
+- Where scroll-driven animations exist it fades in over the first screen of
+  scrolling; elsewhere, and on a page too short to scroll, it is always shown.
+  When focused from the keyboard it is always fully shown. It is never
+  `display: none` or `visibility: hidden`, so screen-reader users can reach it.
+- Props: `target` (default `top`), `label` (default "Back to top").
+- Differs from `<ilw-back-to-top>`: a link, not a button; no stepped scroll;
+  focus goes to the shell rather than the first focusable element (the next
+  Tab reaches it).
 
 ### Dark-mode toggle (`DarkModeToggle`)
 
@@ -1131,6 +1219,61 @@ not change yet. Consumers should drop it and move to the default markup
 The count isn't a live region: with two pagers it would be announced twice.
 Focus staying on the pressed button is what tells a screen-reader user the page
 changed.
+
+### `Pagination` and `.ilw-pagination`
+
+Links to the pages of a server-rendered list, replacing `<ilw-pagination>`.
+Each page has its own URL, so a page can be bookmarked and works without
+script. For a list paged in the browser, use `Pager` (above).
+
+```svelte
+<Pagination page={6} pages={12} url="/courses?term=fa26" />
+<!-- 0-based or path-based pages: build the links yourself -->
+<Pagination page={6} pages={12} href={(p) => `/courses/page/${p}`} />
+```
+
+**DOM contract** (page 6 of 12, `url="?term=fa26"`). Server templates render
+the same markup with `pagination.css` and no script:
+
+```html
+<nav class="ilw-pagination" aria-label="Pages">
+  <ul>
+    <li class="ilw-pagination-previous"><a href="?term=fa26&page=5" aria-label="Previous page">Previous</a></li>
+    <li><a href="?term=fa26&page=1" aria-label="Page 1">1</a></li>
+    <li class="ilw-pagination-ellipsis"><span>…</span></li>
+    <li><a href="?term=fa26&page=4" aria-label="Page 4">4</a></li>
+    <li><a href="?term=fa26&page=5" aria-label="Page 5">5</a></li>
+    <li><a href="?term=fa26&page=6" aria-label="Page 6" aria-current="page">6</a></li>
+    <li><a href="?term=fa26&page=7" aria-label="Page 7">7</a></li>
+    <li><a href="?term=fa26&page=8" aria-label="Page 8">8</a></li>
+    <li class="ilw-pagination-ellipsis"><span>…</span></li>
+    <li><a href="?term=fa26&page=12" aria-label="Page 12">12</a></li>
+    <li class="ilw-pagination-next"><a href="?term=fa26&page=7" aria-label="Next page">Next</a></li>
+  </ul>
+  <span class="ilw-pagination-count">Page 6 of 12</span>
+</nav>
+```
+
+- On the first page Previous is `<span>Previous</span>` instead of a link, and
+  on the last page Next is `<span>Next</span>`, so the row doesn't shift.
+- The page list is `Pager`'s: `pageWindow(page, pages)`, the first, the last
+  and two either side of the current page.
+- Props: `page` (1-based, clamped to `1…pages`), `pages`, `url` (default `''`:
+  links are just a query, relative to the current page), `parameter` (default
+  `"page"`), `href` (a function from the 1-based page to its link; replaces
+  `url` and `parameter`), `label` (default `"Pages"`; give two paginations on
+  one page distinct labels), `hidePageCount`, `class` (e.g. a theme class).
+- `pageHref(url, page, parameter = 'page')` (`ilw-ui/core`) builds each link:
+  it sets `parameter` in `url`'s query and keeps the other values and the
+  fragment. Server code can do the same.
+- Differs from `<ilw-pagination>`: no First and Last links (the first and last
+  page numbers are always shown instead); the current page stays a link with
+  `aria-current="page"` (the toolkit puts `aria-current` on an unlinked `li`);
+  focus is the two-tone ring of `.ilw-button`, not just a colour change; the
+  count is after the list, not an item in it. For the toolkit's `zerostart`,
+  pass `href={(p) => pageHref(url, p - 1)}`.
+- Not yet: the toolkit's `width` and `padding`; they come with the layout
+  utilities (A5).
 
 ### `mountIslands`
 

@@ -1,0 +1,83 @@
+/* Back to top (B7), the CSS form of <ilw-back-to-top>. Markup, the last child
+   of the page shell (.ilw-page#top):
+
+     <a class="ilw-back-to-top" href="#top">
+       <svg aria-hidden="true">…</svg><span class="ilw-visually-hidden">Back to top</span>
+     </a>
+
+   A link, not the toolkit's scripted button: following it scrolls to the top
+   and moves the sequential-focus starting point there, so the next Tab is the
+   skip link. The toolkit's --ilw-back-to-top--* properties still apply, set on
+   :root or on the link. */
+
+.ilw-back-to-top {
+  position: fixed;
+  right: var(--ilw-back-to-top--right, 40px);
+  bottom: var(--ilw-back-to-top--bottom, 40px);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  color: var(--ilw-back-to-top--color, var(--ilw-color--background));
+  background-color: var(--ilw-back-to-top--background, var(--ilw-color--heading));
+  border: 2px solid var(--ilw-back-to-top--color, var(--ilw-color--background));
+  border-radius: 50%;
+}
+
+.ilw-back-to-top svg {
+  width: 36px;
+  height: 36px;
+  fill: currentColor;
+}
+
+.ilw-back-to-top:hover {
+  color: var(--ilw-back-to-top--background, var(--ilw-color--heading));
+  background-color: var(--ilw-back-to-top--color, var(--ilw-color--background));
+  border-color: var(--ilw-back-to-top--background, var(--ilw-color--heading));
+}
+
+.ilw-back-to-top:focus {
+  color: var(--ilw-back-to-top--focus-color, var(--ilw-color--focus--text));
+  background-color: var(--ilw-back-to-top--focus-background-color, var(--ilw-color--focus--background));
+  border-color: var(--ilw-back-to-top--focus-color, var(--ilw-color--focus--text));
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling up, on a page that has the link, unless the user asked for
+   less motion (the toolkit jumps straight up then too). */
+@media (prefers-reduced-motion: no-preference) {
+  :root:has(.ilw-back-to-top) {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Reveal: fade in over the first screen of scrolling. Without scroll-driven
+   animations it is simply always shown. It is never hidden from assistive
+   technology, and a keyboard-focused link is always fully shown (WCAG 2.4.7). */
+@supports (animation-timeline: scroll()) {
+  @keyframes ilw-back-to-top-reveal {
+    from {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    to {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  .ilw-back-to-top {
+    animation: ilw-back-to-top-reveal linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100vh;
+  }
+
+  .ilw-back-to-top:focus-visible {
+    animation: none;
+  }
+}
