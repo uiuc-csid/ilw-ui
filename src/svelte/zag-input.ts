@@ -84,10 +84,14 @@ export function focusStaysPut<M extends { implementations?: { actions?: Record<s
  * the document's `activeElement`, and gets focus back on return. Committing
  * then would rewrite the text mid-word: typing `bla`, switching away and back,
  * then `ke` gave `Blake Brownke`. A real blur (Tab, a click elsewhere) has
- * already moved `activeElement` by the time `focusout` fires.
+ * already moved `activeElement` by the time `focusout` fires, and leaves the
+ * document focused. The document check covers a browser that reports
+ * `<body>` as active while the window deactivates.
  */
 export function focusLeft(root: HTMLElement, event: FocusEvent): boolean {
   const to = event.relatedTarget as Node | null;
   if (root.contains(to)) return false;
-  return !(to == null && root.contains(root.ownerDocument.activeElement));
+  if (to != null) return true;
+  const doc = root.ownerDocument;
+  return doc.hasFocus() && !root.contains(doc.activeElement);
 }

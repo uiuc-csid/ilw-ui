@@ -4,7 +4,7 @@
   with the header's `ilw-dark-mode-changed` event. Mount it on
   `<span data-ilw-island="dark-mode-toggle"></span>` with mountIslands.
   Without script (or on a server render) it renders nothing. Styled by
-  dark-mode-toggle.css.
+  dark-mode-toggle.css and switch.css.
 -->
 <script lang="ts">
   let {
@@ -58,5 +58,5 @@
 </script>
 
 {#if enabled !== undefined}
-  <label class="ilw-dark-mode-toggle"><input type="checkbox" role="switch" checked={enabled} {onchange} /> {label}</label>
+  <label class="ilw-dark-mode-toggle"><input type="checkbox" role="switch" class="ilw-switch" checked={enabled} {onchange} /> {label}</label>
 {/if}

@@ -207,7 +207,7 @@
 
   **Why:** when the window loses focus the input gets `blur`/`focusout` but stays the focused element. Treating that as leaving the field committed `Blake Brown` after `bla`, and the rest of the word landed after it (`Blake Brownke`). Headless WebKit on Linux does this on its own now and then, which made `Grouped` flaky in CI.
 
-  **Review:** type `bla`, switch to another window and back, then type `ke`. The field reads `blake`, the list is still open with Blake Brown highlighted, and nothing is selected until you press Enter or Tab.
+  **Review:** type `bla`, switch to another window and back, then type `ke`. The field reads `blake`, the list is still open with Blake Brown highlighted, and nothing is selected until you press Enter or Tab. Press Escape, switch away and back, then Backspace: the list opens again.
 -->
 <Story
   name="Window switch"
@@ -225,6 +225,26 @@
     await expect(input).toHaveValue('blake');
     await expect(input).toHaveAttribute('aria-expanded', 'true');
     await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
+    // A browser may report <body> as active while the window deactivates. The
+    // document has lost focus then, so it still isn't leaving the field.
+    const hasFocus = document.hasFocus;
+    document.hasFocus = () => false;
+    try {
+      input.blur();
+    } finally {
+      document.hasFocus = hasFocus;
+    }
+    input.focus();
+    await expect(input).toHaveValue('blake');
+    await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
+    // With the list closed, Zag's own blur handling used to idle the machine,
+    // and typing never reopened the list.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
+    input.dispatchEvent(new FocusEvent('blur'));
+    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    await userEvent.keyboard('{Backspace}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown'));
   }}
 />
 
