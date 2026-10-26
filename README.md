@@ -229,8 +229,7 @@ Svelte component that renders exactly this markup. The plan is
 - The breakout is `margin-inline: calc(50% - 50cqw)` against the nearest
   container: `.ilw-page` (an inline-size container since A5) or an
   `.ilw-container`. So it spans the page without the scrollbar, and the page
-  never scrolls sideways (`.ilw-page` also clips sub-pixel overflow with
-  `overflow-x: clip`). Like the toolkit's `left: 50%`, it assumes the parent is
+  never scrolls sideways. Like the toolkit's `left: 50%`, it assumes the parent is
   centred, as `main` is. Outside any container it spans the viewport.
 - The side margin is `--ilw-margin--side`, which `width.css` sets on `:root`
   as the toolkit does: `max(1.875rem, calc(50cqw - 35.625rem))`, 1140 px of
