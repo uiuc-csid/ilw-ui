@@ -111,6 +111,18 @@ Status: **pending human run.**
 - [ ] Space flips it and the new state is announced ("on"/"off"); the page colours change and focus stays on the switch.
 - [ ] In Windows High Contrast (forced colours) it shows as a native checkbox with its focus ring.
 
+## Field and RadioGroup (stories: Forms → Field → Fixture, Error, Markup; Forms → RadioGroup → Fixture, Error)
+
+Status: **pending human run.**
+
+- [ ] Tabbing to "Name" reads "Name, required, edit text" and does not read "star" (the marker's alternative text is empty).
+- [ ] In Error, the field reads as "invalid" and its description reads the help text, then the error message.
+- [ ] The checkbox reads "Email me updates, checkbox, not checked"; the switch reads "Show weekends, switch, off" (VoiceOver may say "toggle button"). Space flips each and the new state is announced.
+- [ ] Tabbing into a radio group announces the group name ("Term") and the checked option; arrows move and announce each option.
+- [ ] In Markup, the compact radio groups still announce their legend as the group name.
+- [ ] RadioGroup → Error: entering the group announces "Campus, radio group", "invalid" (or similar), "required", and its description (help text, then error). Check whether VoiceOver reads the fieldset's description; if not, record it.
+- [ ] In Windows High Contrast (forced colours), checkboxes, radios and the switch show as native controls with focus rings.
+
 ## Pagination (story: Pagination → Fixture)
 
 Status: **pending human run.**
