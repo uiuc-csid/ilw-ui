@@ -1,0 +1,259 @@
+/* Section nav (B6), the CSS form of <ilw-section-nav>. Markup:
+
+     <nav class="ilw-section-nav" aria-labelledby="ilw-section-nav-label">
+       <details class="ilw-section-nav-collapse">
+         <summary id="ilw-section-nav-label">Pages In This Section<svg aria-hidden="true">…</svg></summary>
+         <ul>
+           <li><a class="ilw-section-nav--root" href="/programs">Programs of Study</a></li>
+           <li class="ilw-section-nav-branch">
+             <a href="/programs/ug">Undergraduate Degrees</a>
+             <details open>
+               <summary><span class="ilw-visually-hidden">Subpages of Undergraduate Degrees</span><svg aria-hidden="true">…</svg></summary>
+               <ul><li><a href="…" aria-current="page">Pre-Veterinary and Medical</a></li></ul>
+             </details>
+           </li>
+         </ul>
+       </details>
+     </nav>
+
+   Wider than 700 px the outer details' summary is hidden and its content
+   forced visible, so the list always shows; at 700 px and below it is the
+   toolkit's "Pages In This Section" toggle. Each branch's toggle (a summary)
+   sits at the top right of its li, beside the link, never inside it. The
+   --ilw-section-nav--* properties are the toolkit's, with its values. */
+
+.ilw-section-nav {
+  --ilw-section-nav--margin-top: 1.5em;
+  --ilw-section-nav--collapsed--margin-bottom: 1.5em;
+  --ilw-section-nav--collapsed--border: 2px solid var(--ilw-color--control-text);
+  --ilw-section-nav--font: var(--il-font-sans, 'Source Sans 3', sans-serif);
+  --ilw-section-nav--line-height: 1.2rem;
+  --ilw-section-nav--level-padding: 0.9375rem;
+  --ilw-section-nav--level2-padding: 1.5625rem;
+  --ilw-section-nav--level0-font-size: 1.125rem;
+  --ilw-section-nav--level1-font-size: 1rem;
+  --ilw-section-nav--font-weight: 600;
+  --ilw-section-nav--item--height: 2.75rem;
+  --ilw-section-nav--item--padding-top: 0.7rem;
+  --ilw-section-nav--item--padding-right: 0.625rem;
+  --ilw-section-nav--item--padding-bottom: 0.7rem;
+  --ilw-section-nav--item--padding-left: 1.25rem;
+  --ilw-section-nav--level1-border: 1px solid var(--ilw-color--border-light);
+  --ilw-section-nav--root--font-size: 1.25rem;
+  /* Upstream: Storm 95, which stays light in dark mode; the gray palette's
+     background is Storm 95 in light and turns dark with the theme. */
+  --ilw-section-nav--root--background: var(--ilw-color--gray--background);
+  --ilw-section-nav--root--font-weight: 700;
+  --ilw-section-nav--toggle--font-size: 1rem;
+  /* Upstream: #E8E9EB, not a brand colour; the nearest brand grey. */
+  --ilw-section-nav--toggle--background: var(--ilw-color--gray--background);
+  --ilw-section-nav--toggle--font-weight: 400;
+  --ilw-section-nav--toggle--border: 1px solid var(--ilw-color--border-light);
+  --ilw-section-nav--current--size: 0.35rem;
+  --ilw-section-nav--current--left: -0.6875rem;
+  /* The branch toggle: a 44 x 44 px target (WCAG 2.5.8). */
+  --ilw-section-nav--branch-toggle--size: 2.75rem;
+
+  display: block;
+  margin-top: var(--ilw-section-nav--margin-top);
+  font-family: var(--ilw-section-nav--font);
+  color: var(--ilw-color--control-text);
+}
+
+.ilw-section-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Set on the li itself: .ilw-format sets a font on every li. */
+.ilw-section-nav li {
+  margin: 0;
+  font: var(--ilw-section-nav--font-weight) var(--ilw-section-nav--level0-font-size) / var(--ilw-section-nav--line-height)
+    var(--ilw-section-nav--font);
+  color: inherit;
+}
+
+.ilw-section-nav ul ul li {
+  font-size: var(--ilw-section-nav--level1-font-size);
+}
+
+/* Summaries: no marker (the toggles draw their own chevron). */
+.ilw-section-nav summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.ilw-section-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Links. */
+.ilw-section-nav a {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  min-height: var(--ilw-section-nav--item--height);
+  align-content: center;
+  padding: var(--ilw-section-nav--item--padding-top) var(--ilw-section-nav--item--padding-right)
+    var(--ilw-section-nav--item--padding-bottom) var(--ilw-section-nav--item--padding-left);
+  color: var(--ilw-color--control-text);
+  text-decoration: none;
+}
+
+/* Top-level items are divided by a light rule; the root link is not. */
+.ilw-section-nav-collapse > ul > li > a {
+  border-top: var(--ilw-section-nav--level1-border);
+}
+
+/* The indent grows with depth, as upstream: level 1 adds one step, level 2 a
+   wider one, and each level after that one more step. */
+.ilw-section-nav ul ul a {
+  padding-left: calc(var(--ilw-section-nav--item--padding-left) + var(--ilw-section-nav--level-padding));
+}
+
+.ilw-section-nav ul ul ul a {
+  --ilw-section-nav--padding-multiplier: 1;
+  padding-left: calc(
+    var(--ilw-section-nav--item--padding-left) + var(--ilw-section-nav--level-padding) *
+      var(--ilw-section-nav--padding-multiplier) + var(--ilw-section-nav--level2-padding)
+  );
+}
+
+.ilw-section-nav ul ul ul ul a {
+  --ilw-section-nav--padding-multiplier: 2;
+}
+
+.ilw-section-nav ul ul ul ul ul a {
+  --ilw-section-nav--padding-multiplier: 3;
+}
+
+.ilw-section-nav ul ul ul ul ul ul a {
+  --ilw-section-nav--padding-multiplier: 4;
+}
+
+.ilw-section-nav ul ul ul ul ul ul ul a {
+  --ilw-section-nav--padding-multiplier: 5;
+}
+
+.ilw-section-nav a.ilw-section-nav--root {
+  font-size: var(--ilw-section-nav--root--font-size);
+  font-weight: var(--ilw-section-nav--root--font-weight);
+  background: var(--ilw-section-nav--root--background);
+  border-top: none;
+}
+
+/* The current page: the hover colour and a small triangle before the text. */
+.ilw-section-nav a[aria-current='page'] {
+  color: var(--ilw-color--link-hover);
+}
+
+.ilw-section-nav a[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--ilw-section-nav--item--height) / 2 - var(--ilw-section-nav--current--size) - 1px);
+  margin-left: var(--ilw-section-nav--current--left);
+  border-top: var(--ilw-section-nav--current--size) solid transparent;
+  border-bottom: var(--ilw-section-nav--current--size) solid transparent;
+  border-left: var(--ilw-section-nav--current--size) solid currentColor;
+}
+
+.ilw-section-nav a:hover {
+  color: var(--ilw-color--link-hover);
+  text-decoration: underline;
+}
+
+.ilw-section-nav a:focus,
+.ilw-section-nav summary:focus {
+  color: var(--ilw-color--focus--text);
+  background-color: var(--ilw-color--focus--background);
+  /* Inside the item, so the nav's edges don't clip it. */
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: -2px;
+}
+
+/* A branch: the link, then its toggle at the top right, then (open) its children. */
+.ilw-section-nav-branch {
+  position: relative;
+}
+
+.ilw-section-nav-branch > a {
+  padding-right: calc(var(--ilw-section-nav--branch-toggle--size) + var(--ilw-section-nav--item--padding-right));
+}
+
+.ilw-section-nav-branch > details > summary {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: var(--ilw-section-nav--branch-toggle--size);
+  height: var(--ilw-section-nav--branch-toggle--size);
+  color: var(--ilw-color--control-text);
+}
+
+.ilw-section-nav-branch > details > summary:hover {
+  color: var(--ilw-color--link-hover);
+}
+
+.ilw-section-nav-branch > details > summary svg {
+  width: 0.75rem;
+  height: auto;
+  transition: transform 0.15s;
+}
+
+.ilw-section-nav-branch > details[open] > summary svg {
+  transform: scale(-1);
+}
+
+/* The "Pages In This Section" toggle (upstream's button, shown at 700 px and below). */
+.ilw-section-nav-collapse > summary {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  min-height: var(--ilw-section-nav--item--height);
+  padding: var(--ilw-section-nav--item--padding-top) calc(var(--ilw-margin--side, 1.25rem) + 1.25rem)
+    var(--ilw-section-nav--item--padding-bottom) var(--ilw-section-nav--item--padding-left);
+  font: var(--ilw-section-nav--toggle--font-weight) var(--ilw-section-nav--toggle--font-size) / var(--ilw-section-nav--line-height)
+    var(--ilw-section-nav--font);
+  color: var(--ilw-color--control-text);
+  background: var(--ilw-section-nav--toggle--background);
+  border-bottom: var(--ilw-section-nav--toggle--border);
+}
+
+.ilw-section-nav-collapse > summary svg {
+  position: absolute;
+  top: calc(50% - 0.25rem);
+  right: var(--ilw-margin--side, 1.25rem);
+  height: 0.5rem;
+  width: auto;
+}
+
+.ilw-section-nav-collapse[open] > summary svg {
+  transform: scale(-1);
+}
+
+@media (width <= 700px) {
+  .ilw-section-nav {
+    margin-top: 0;
+    margin-bottom: var(--ilw-section-nav--collapsed--margin-bottom);
+    border-bottom: var(--ilw-section-nav--collapsed--border);
+  }
+}
+
+/* Wider than 700 px: no toggle, the list always shows, open or not. Only where
+   ::details-content exists; elsewhere the toggle stays, so the list is never
+   out of reach. */
+@supports selector(::details-content) {
+  @media (width > 700px) {
+    .ilw-section-nav-collapse > summary {
+      display: none;
+    }
+
+    .ilw-section-nav-collapse::details-content {
+      display: block;
+      content-visibility: visible;
+    }
+  }
+}

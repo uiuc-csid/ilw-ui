@@ -3,9 +3,10 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Footer, Icon, PageTitle, Pagination } from '../src/svelte/index.ts';
+  import { Breadcrumbs, Button, Footer, Icon, PageTitle, Pagination, SectionNav } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
+  import { programs } from './section-nav-data.ts';
 
   // The Page shell without .ilw-format (`format: false`): a component that
   // leans on the prose styles for its font falls back to the browser's serif here.
@@ -94,6 +95,19 @@
 -->
 <Story name="Page Title" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-page-title h1'))}>
   <PageTitle>Graduate Programs</PageTitle>
+</Story>
+
+<!--
+  `SectionNav`, every branch open, outside `.ilw-format`.
+
+  **Why:** the play function checks the links are in Source Sans without the prose styles.
+
+  **Review:** matches **Parity/SectionNav → IlwUi**.
+-->
+<Story name="Section Nav" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-section-nav a'))}>
+  <div style:max-width="20rem">
+    <SectionNav items={programs} expanded />
+  </div>
 </Story>
 
 <!--
