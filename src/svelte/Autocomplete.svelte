@@ -131,20 +131,26 @@
 
   const api = $derived(combobox.connect(service, normalizeProps));
 
+  // Zag's blur handler (onBlur, onfocusout in Svelte) moves a closed list to
+  // idle, where typing no longer opens it. A window switch fires it too, so it
+  // runs from our onfocusout, after the focusLeft check.
+  const { onfocusout: zagFocusout, ...zagInputProps } = $derived(api.getInputProps());
+
   // mergeProps runs later arguments' handlers first, so ours go last.
   const inputProps = $derived(
-    mergeProps(api.getInputProps(), attrs, {
+    mergeProps(zagInputProps, attrs, {
       onkeydown(event: KeyboardEvent) {
         // ArrowDown/Up on a closed list opens it on the current text.
         if (!api.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) query = value;
       },
-      onfocusout(event: FocusEvent) {
+      onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLInputElement }) {
         if (!focusLeft(root, event)) return;
         // Tab and blur take the highlighted suggestion, as Enter does.
         const highlighted = api.open ? shown.find((i) => i.value === api.highlightedValue) : undefined;
         if (highlighted) choose(highlighted);
         // Close the way zag's own dismissal does, without pulling focus back.
         if (api.open) service.send({ type: 'LAYER.INTERACT_OUTSIDE', src: 'interact-outside', restoreFocus: false });
+        zagFocusout?.(event);
       },
     }),
   );

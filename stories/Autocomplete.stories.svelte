@@ -161,7 +161,7 @@
 
   **Why:** when the window loses focus the input gets `blur`/`focusout` but stays the focused element. Treating that like Tab took the highlighted suggestion while the user was away.
 
-  **Review:** type `brown`, ArrowDown, switch to another window and back. The field still reads `brown`, the list is open with B. Brown highlighted, and `chosen` is empty.
+  **Review:** type `brown`, ArrowDown, switch to another window and back. The field still reads `brown`, the list is open with B. Brown highlighted, and `chosen` is empty. Press Escape, switch away and back, then Backspace: the list opens again.
 -->
 <Story
   name="Window switch"
@@ -180,6 +180,14 @@
     await expect(input).toHaveAttribute('aria-expanded', 'true');
     await expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-bbrown');
     await expect(canvas.getByTestId('chosen')).toHaveTextContent('');
+    // With the list closed, Zag's own blur handling used to idle the machine,
+    // and typing never reopened the list.
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'false'));
+    input.dispatchEvent(new FocusEvent('blur'));
+    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    await userEvent.keyboard('{Backspace}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
   }}
 />
 
