@@ -60,14 +60,20 @@
       /^(rgba\(0, 0, 0, 0\.5\)|color\(srgb 0 0 0 \/ 0\.5\))$/,
     );
     const vw = document.documentElement.clientWidth;
-    const want = { small: Math.max(vw * 0.35, 320), medium: Math.max(vw * 0.5, 320), large: Math.min(vw, 1200) };
-    // Within 2%: with classic scrollbars (Linux CI), the gutter that
-    // scrollbar-gutter keeps narrows the viewport the percentages resolve against.
-    const width = m.getBoundingClientRect().width;
-    const expected = want[args.size as keyof typeof want];
-    await expect(width).toBeGreaterThan(expected * 0.98);
-    await expect(width).toBeLessThanOrEqual(expected + 0.5);
-    await expect(m.getBoundingClientRect().top).toBeCloseTo(window.innerHeight * 0.05, 0);
+    const rect = m.getBoundingClientRect();
+    if (window.innerWidth <= 600) {
+      // Below 600px (the Side By Side frames), every size is full width, 0.5rem in.
+      await expect(rect.width).toBeCloseTo(vw - 16, 0);
+      await expect(rect.top).toBeCloseTo(8, 0);
+    } else {
+      const want = { small: Math.max(vw * 0.35, 320), medium: Math.max(vw * 0.5, 320), large: Math.min(vw, 1200) };
+      // Within 2%: with classic scrollbars (Linux CI), the gutter that
+      // scrollbar-gutter keeps narrows the viewport the percentages resolve against.
+      const expected = want[args.size as keyof typeof want];
+      await expect(rect.width).toBeGreaterThan(expected * 0.98);
+      await expect(rect.width).toBeLessThanOrEqual(expected + 0.5);
+      await expect(rect.top).toBeCloseTo(window.innerHeight * 0.05, 0);
+    }
     const h2 = getComputedStyle(m.querySelector('h2')!);
     await expect(h2.fontSize).toBe('36px');
     await expect(h2.fontFamily).toMatch(/Montserrat/);

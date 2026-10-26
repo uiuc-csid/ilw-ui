@@ -84,7 +84,7 @@
 
     await userEvent.click(page.getByRole('button', { name: 'Got it' }));
     await closed();
-    await expect(canvas.getByRole('status')).toHaveTextContent('dismissed');
+    await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('dismissed'));
     await expect(trigger).toHaveFocus();
   }}
 />
@@ -119,7 +119,7 @@
 
     await userEvent.click(page.getByRole('button', { name: 'Delete' }));
     await closed();
-    await expect(canvas.getByRole('status')).toHaveTextContent('true');
+    await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('true'));
     await expect(getComputedStyle(document.documentElement).overflow).not.toBe('hidden');
     await expect(trigger).toHaveFocus();
 
@@ -128,7 +128,7 @@
     await expect(idNumber(m)).toBe(firstId + 1);
     await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
     await closed();
-    await expect(canvas.getByRole('status')).toHaveTextContent('false');
+    await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('false'));
     await expect(trigger).toHaveFocus();
   }}
 />
@@ -154,7 +154,7 @@
     await waitFor(() => expect(page.getByRole('button', { name: 'Keep editing' })).toHaveFocus());
     await userEvent.click(page.getByRole('button', { name: 'Save' }));
     await closed();
-    await expect(result).toHaveTextContent('save');
+    await waitFor(() => expect(result).toHaveTextContent('save'));
 
     // Every dismissal resolves null: the × button, the backdrop (and Escape, in
     // tests/e2e/modal.spec.ts: only a real key press closes a native dialog).
@@ -162,7 +162,7 @@
     await openedModal();
     await userEvent.click(page.getByRole('button', { name: 'Close' }));
     await closed();
-    await expect(result).toHaveTextContent('null');
+    await waitFor(() => expect(result).toHaveTextContent('null'));
     await expect(trigger).toHaveFocus();
 
     await userEvent.click(trigger);
@@ -174,7 +174,7 @@
     await expect(m).toHaveAttribute('open');
     clickAt(m, m, 2, 2);
     await closed();
-    await expect(result).toHaveTextContent('null');
+    await waitFor(() => expect(result).toHaveTextContent('null'));
     await expect(trigger).toHaveFocus();
   }}
 />
@@ -200,7 +200,7 @@
     await expect(within(m).getAllByRole('listitem')).toHaveLength(2);
     await userEvent.click(page.getByRole('button', { name: 'Got it' }));
     await closed();
-    await expect(canvas.getByRole('status')).toHaveTextContent('true');
+    await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('true'));
   }}
 />
 
@@ -223,7 +223,7 @@
     await expect(within(m).getByRole('link', { name: 'Preview “Lab A”' })).toBeVisible();
     await userEvent.click(within(m).getByRole('button', { name: 'Rename' }));
     await closed();
-    await expect(canvas.getByRole('status')).toHaveTextContent('rename:Lab A');
+    await waitFor(() => expect(canvas.getByRole('status')).toHaveTextContent('rename:Lab A'));
   }}
 />
 
