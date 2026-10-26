@@ -20,13 +20,14 @@ Status: pre-release (`private: true`), first consumer
 
 The package ships source (`.svelte`/`.ts`); your Vite + Svelte build compiles it.
 Peer dependency: `svelte ^5.57`. Dependencies, pinned exactly: `@zag-js/combobox`
-and `@zag-js/svelte` (1.44.0), and `@tanstack/table-core` and
-`@tanstack/svelte-table` (9.3.1).
+and `@zag-js/svelte` (1.44.0), `@tanstack/table-core` and
+`@tanstack/svelte-table` (9.3.1), and `phosphor-svelte` (3.1.1). To pass icons
+to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
 
 ```js
 import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
-import { Page, Footer, Breadcrumbs, PageTitle } from 'ilw-ui/svelte';
+import { Page, Footer, Breadcrumbs, PageTitle, Icon } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce, campusFooter, campusLink } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
@@ -55,6 +56,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `page-title.css` | `.ilw-page-title` (B5)                                    |
 | `breadcrumbs.css`| `.ilw-breadcrumbs` (B4)                                   |
 | `footer.css`     | `.ilw-footer` (B3)                                        |
+| `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Modal, Combobox, Autocomplete, Pager |
 
 ## Themes and dark mode
@@ -454,6 +456,54 @@ order.
 - **Size classes need `.ilw-button`** on a lone button (the toolkit also sizes a
   bare `button.ilw-button-large`).
 - **No new-window icon** on `a.ilw-button[target=_blank]` yet.
+
+### `Icon` and `.ilw-icon`
+
+The replacement for `<ilw-icon>`: a [Phosphor](https://phosphoricons.com) icon
+(MIT) as inline SVG. Like the toolkit's icon font, it is 1em and
+`currentColor`, so it follows the text's size and colour.
+
+```svelte
+<script>
+  import { Icon } from 'ilw-ui/svelte';
+  import Student from 'phosphor-svelte/lib/Student';
+</script>
+
+<a href="/admissions"><Icon icon={Student} /> Admissions</a>
+<Icon icon={Student} type="line" alt="Admissions records" />
+```
+
+```html
+<!-- Decorative -->
+<svg class="ilw-icon" aria-hidden="true" viewBox="0 0 256 256" width="1em" height="1em" fill="currentColor">…</svg>
+<!-- Labelled -->
+<svg class="ilw-icon" role="img" aria-label="Admissions records" viewBox="0 0 256 256" width="1em" height="1em" fill="currentColor">…</svg>
+
+<div class="ilw-icon-row">
+  <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+  <p>Email the department office.</p>
+</div>
+```
+
+- Props, as the toolkit's attributes: `icon` (a Phosphor component), `type`
+  (`'solid'`, the default, is Phosphor's fill weight; `'line'` is its regular
+  weight), `alt`, `size` (a CSS length; unset is 1em), `class`.
+- **Import each icon by its own path** (`phosphor-svelte/lib/Calendar`), not
+  from `phosphor-svelte`: the package index holds all ~6,000 icon components,
+  and your Vite would compile every one of them in dev.
+- Without `alt` the icon is decorative: `aria-hidden="true"` and no role.
+  With `alt` it is `role="img"` named by `alt`. Phosphor's own components set
+  `role="img"` with no name, which axe flags; `Icon` replaces it.
+- Server templates: paste the SVG for the icon's weight from
+  [`@phosphor-icons/core`](https://github.com/phosphor-icons/core) with the
+  `ilw-icon` class, as above.
+- **Toolkit names:** the **Parity/Icon** story maps every name in the
+  toolkit's font to a Phosphor icon (`stories/parity/icons.ts`). Most match
+  closely. Phosphor has no Bluesky, Substack, Weibo, Yelp or Flickr logo, and
+  no campus glyphs (admissions, alumni, donor, program of study, …); those map
+  to the nearest idea, so check them by eye. Google+ maps to the Google logo.
+- `.ilw-icon-row`'s `align-items` default is `flex-start`; upstream's is
+  `top`, which isn't a value, so its rows stretch.
 
 ### `SortableTh`
 
@@ -954,8 +1004,9 @@ CAPTCHA-blocks automated browsers. See the README there to refresh it.
 
 ## The import rule
 
-`src/` imports only `svelte`, `@zag-js/*`, `@tanstack/table-core` and
-`@tanstack/svelte-table` (each family pinned exactly, in lockstep) and its own
+`src/` imports only `svelte`, `@zag-js/*`, `@tanstack/table-core`,
+`@tanstack/svelte-table` and `phosphor-svelte/lib/*` (each family pinned
+exactly, in lockstep; `phosphor-svelte` itself for types only) and its own
 files, and uses no HTML sinks
 (`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
 `eval`, `new Function`). `tests/unit/guard.test.ts` enforces this and reports

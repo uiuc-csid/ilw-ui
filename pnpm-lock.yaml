@@ -178,6 +178,9 @@ importers:
       '@zag-js/svelte':
         specifier: 1.44.0
         version: 1.44.0(svelte@5.57.2)
+      phosphor-svelte:
+        specifier: 3.1.1
+        version: 3.1.1(svelte@5.57.2)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2))
     devDependencies:
       '@playwright/test':
         specifier: 1.64.1
@@ -1460,6 +1463,15 @@ packages:
   pathval@2.0.1:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
     engines: {node: '>= 14.16'}
+
+  phosphor-svelte@3.1.1:
+    resolution: {integrity: sha512-M+CeN2s7YAFHWVxctLj41SyXsjWxoIoNi/rZ15XIYh9XEpbgJ2mE2hn54tA30l6WSagaBg2bA/OazlZJVDUkpQ==}
+    peerDependencies:
+      svelte: ^5.0.0 || ^5.0.0-next.96
+      vite: '>=5'
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -2825,6 +2837,14 @@ snapshots:
   pathe@2.0.3: {}
 
   pathval@2.0.1: {}
+
+  phosphor-svelte@3.1.1(svelte@5.57.2)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)):
+    dependencies:
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+      svelte: 5.57.2
+    optionalDependencies:
+      vite: 8.3.4(@types/node@24.19.2)(esbuild@0.28.2)
 
   picocolors@1.1.1: {}
 
