@@ -1,6 +1,10 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: ['config:recommended'],
+  // pnpm refuses packages younger than its minimumReleaseAge (default 1440
+  // minutes), so Renovate waits as long or its lockfile update would fail.
+  // Global, not npm-only, so the Playwright image and packages stay in step.
+  minimumReleaseAge: '1 day',
   packageRules: [
     {
       // The CI image's browsers only work with the same Playwright version
