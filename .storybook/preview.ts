@@ -12,7 +12,9 @@ const preview: Preview = {
       applyTheme(globals.theme as ThemeGlobal | undefined);
       // `shell: false`: the story renders a whole page (its own shell and landmarks).
       if (parameters.shell === false) return Story();
-      return { Component: parameters.styles === 'ilw-ui' ? IlwUiPage : IlwPage };
+      if (parameters.styles !== 'ilw-ui') return { Component: IlwPage };
+      // `format: false`: the ilw-ui shell without .ilw-format, to catch a component that needs it for its font.
+      return { Component: IlwUiPage, props: { format: parameters.format !== false } };
     },
   ],
   globalTypes: {

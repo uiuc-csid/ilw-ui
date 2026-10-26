@@ -68,7 +68,7 @@ What they do today, in short:
 
 ### Dark-mode toggle island
 
-The one piece of script in the phase. It lands with B2 (it sits in the header), in its own component so a page without the header can still mount it.
+The one piece of script in the phase. It sits in the header (B2) but shipped before it, in its own component so a page without the header can still mount it.
 
 - **Without script:** nothing renders, and the page follows `prefers-color-scheme` through A1, unless the server writes `html[data-theme]`. A site without dark styles sets `data-theme="light"` (the toolkit's `data-dark-mode-supported="false"` has no CSS effect in ours, so it isn't read).
 - **Server contract (no flash):** the server reads the `ilw-dark-mode` cookie and writes `<html data-theme="dark|light">`. The README gives a Django snippet. The island never writes the attribute at load, only on change.
@@ -319,9 +319,11 @@ The last child of `.ilw-page`, so it is last in the focus order.
 ```text
 PR 1  this plan
 PR 2  B1 shell (no toggle), B3, B4, B5; Storybook's ilw-ui wrapper becomes B1
-PR 3  B2 header + menus, and the B1 dark-mode toggle island   (needs PR 2)
+PR 3  B2 header + menus                                       (needs PR 2)
 PR 4  B6 section nav, B7 back to top                          (needs PR 2; independent of PR 3)
 ```
+
+The B1 dark-mode toggle island shipped on its own, ahead of PR 3 (it was planned with the header); PR 3 puts its host in the header.
 
 PR 2 needs only A1 (merged). Its stories use `.ilw-format` where a real page would, so they look complete once A2 (#18) lands; nothing in PR 2 depends on A2's rules.
 

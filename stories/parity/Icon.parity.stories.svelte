@@ -34,7 +34,7 @@
 </Story>
 
 <!--
-  `Icon` with the Phosphor icon that replaces each toolkit name, solid (fill) then line (regular), then a labelled icon and an `.ilw-icon-row`, styled by ilw-ui's `styles.css` only, through `.ilw-format` on its own `<div>`.
+  `Icon` with the Phosphor icon that replaces each toolkit name, solid (fill) then line (regular), then a labelled icon and an `.ilw-icon-row`, styled by ilw-ui's `styles.css` only, inside the `.ilw-format` shell as on the toolkit side.
 
   **Why:** the play function checks the contract: decorative icons are hidden from assistive technology, a labelled one is an image with that name, the size follows the font or the `size` prop, the colour is the text's, and the text is in the brand font. axe checks the rest. The grid is the migration table: each toolkit name with its replacement.
 
@@ -67,18 +67,15 @@
     await expect(getComputedStyle(row).columnGap).toBe('18px');
   }}
 >
-  <!-- .ilw-format, as the toolkit side's <ilw-page class="ilw-format"> shell: the brand font and prose sizes. -->
-  <div class="ilw-format">
-    <ul class="icon-grid">
-      {#each toolkitIcons as [name, icon] (name)}
-        <li><Icon {icon} /><Icon {icon} type="line" /> {name}</li>
-      {/each}
-    </ul>
-    <p>Next session: <Icon icon={Calendar} alt="Calendar" size="2rem" /></p>
-    <div class="ilw-icon-row">
-      <Icon icon={Envelope} size="18px" />
-      <p>Email the department office.</p>
-    </div>
+  <ul class="icon-grid">
+    {#each toolkitIcons as [name, icon] (name)}
+      <li><Icon {icon} /><Icon {icon} type="line" /> {name}</li>
+    {/each}
+  </ul>
+  <p>Next session: <Icon icon={Calendar} alt="Calendar" size="2rem" /></p>
+  <div class="ilw-icon-row">
+    <Icon icon={Envelope} size="18px" />
+    <p>Email the department office.</p>
   </div>
 </Story>
 

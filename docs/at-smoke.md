@@ -83,6 +83,14 @@ Status: **pending human run.**
 - [ ] Page title: the heading is read as heading level 1; the background image is not announced.
 - [ ] Footer: the wordmark link reads "University of Illinois Urbana-Champaign, link" once, not twice (no extra "Illinois" image); the campus sections are level-3 headings under it; the legal links are a list.
 
+## Dark-mode toggle (story: Page Chrome → Dark-mode toggle → Fixture)
+
+Status: **pending human run.**
+
+- [ ] Tabbing to it reads "Dark mode, switch, off" (or "on", matching the OS setting); VoiceOver may say "toggle button" or "switch".
+- [ ] Space flips it and the new state is announced ("on"/"off"); the page colours change and focus stays on the switch.
+- [ ] In Windows High Contrast (forced colours) it shows as a native checkbox with its focus ring.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |

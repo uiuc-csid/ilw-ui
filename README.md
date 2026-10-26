@@ -104,7 +104,8 @@ passes WCAG only for large text (24px, or 18.66px bold); use it accordingly.
 
 **Dark mode:** the page is dark when `<html data-theme="dark">`, or when the OS
 prefers dark and `<html>` doesn't have `data-theme="light"`. That's the
-attribute the toolkit header's dark-mode toggle sets, so the header drives it.
+attribute the [dark-mode toggle](#dark-mode-toggle-darkmodetoggle) sets (and
+the one the toolkit's `DARKMODE.md` asks pages to set).
 Dark mode changes the white and gray palettes and the focus colours (near-black
 Blue 10 or Storm 10 surfaces, Storm 95 text, Industrial-lighter links, a light
 blue focus outline); the blue, orange and gradient themes keep their colours.
@@ -364,6 +365,74 @@ come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrom
 - Props: `theme` (`'blue' | 'orange' | 'white'`; unset is white on the heading
   colour), `fade`, `image` (URL), `class`.
 - Not yet: the toolkit's `width` breakout (A5).
+
+### Dark-mode toggle (`DarkModeToggle`)
+
+The one piece of page chrome that needs script: an optional island that lets
+the user override the OS colour scheme. Put the host where the toggle goes
+(the header, once B2 lands) and mount it with `mountIslands`:
+
+```html
+<span data-ilw-island="dark-mode-toggle"></span>
+```
+
+```js
+import { DarkModeToggle, mountIslands } from 'ilw-ui/svelte';
+
+mountIslands({ 'dark-mode-toggle': DarkModeToggle });
+```
+
+It renders:
+
+```html
+<label class="ilw-dark-mode-toggle"><input type="checkbox" role="switch"> Dark mode</label>
+```
+
+- **Without script** nothing renders, and the page follows
+  `prefers-color-scheme` (see [Themes and dark mode](#themes-and-dark-mode))
+  unless the server wrote `html[data-theme]`.
+- **State:** on when `<html data-theme="dark">`; off for any other
+  `data-theme`; with no `data-theme`, the OS preference. Until the user chooses
+  (no `ilw-dark-mode` cookie) and while `<html>` has no `data-theme`, it
+  follows changes to `prefers-color-scheme`. Mounting writes nothing.
+- **On change** it sets `html.dataset.theme` to `dark` or `light`, writes
+  `ilw-dark-mode=<true|false>; path=/; max-age=31536000; SameSite=Lax`, and
+  dispatches `ilw-dark-mode-changed` with `{ detail: { enabled } }` on
+  `window`. Several toggles on one page stay in step through that event.
+- `role="switch"`: screen readers announce "Dark mode, switch, on/off". Space
+  toggles it, as any checkbox.
+- Props: `label` (default "Dark mode").
+- **Styles** (`dark-mode-toggle.css`) are a stand-in until the form styles (A7)
+  land, which will take over the switch rules; the switch uses
+  `--ilw-color--control` and `--ilw-color--control-text`, so it follows themes
+  and dark mode. In forced-colours mode it falls back to a native checkbox.
+- Differs from the toolkit header's checkbox: a switch rather than a plain
+  checkbox, "Dark mode" in sentence case, it sets `data-theme` itself
+  (upstream leaves that to the page), its checked state comes from
+  `data-theme` and the OS rather than the cookie alone, and the cookie lasts a
+  year (upstream's ends with the browser session). The cookie name, values and
+  event are upstream's, so toolkit pages and ilw-ui pages share one
+  preference during migration.
+
+**Server contract (no flash of the wrong theme):** the server reads the
+`ilw-dark-mode` cookie and writes `<html data-theme="dark">` for `true`,
+`data-theme="light"` for `false`, and nothing without the cookie. The island
+never sets the attribute at load, so without this the page flashes or ignores
+the saved choice. In Django, a context processor:
+
+```python
+# myapp/context_processors.py (add to TEMPLATES OPTIONS context_processors)
+def ilw_theme(request):
+    return {"ilw_theme": {"true": "dark", "false": "light"}.get(request.COOKIES.get("ilw-dark-mode"))}
+```
+
+```django
+<html lang="en"{% if ilw_theme %} data-theme="{{ ilw_theme }}"{% endif %}>
+```
+
+A shared cache in front of such pages must vary on the cookie (`Vary: Cookie`;
+in Django, `@vary_on_cookie` or `patch_vary_headers`). A site without dark
+styles writes `data-theme="light"` always and leaves the toggle out.
 
 ## Components
 
@@ -1018,8 +1087,12 @@ A node Vitest project also covers `core/` and the guard below, and
 
 **Parity stories.** Each story picks its stylesheets with `parameters.styles`:
 `'toolkit'` (`toolkit.css` only, inside `<ilw-page class="ilw-format">`),
-`'ilw-ui'` (`styles.css` only, inside the `Page` shell: skip link, then
-`<main id="main-content">`) or `'both'` (the default). A story that renders a
+`'ilw-ui'` (`styles.css` only, inside `<Page format>`: skip link, then
+`<main id="main-content">`, with `.ilw-format` as on the toolkit side) or
+`'both'` (the default). An `'ilw-ui'` story sets `parameters.format: false` to
+drop `.ilw-format`: the **Unformatted** stories render each presentational
+component that way and check its text is still in Source Sans, so a component
+that leans on the prose styles for its font fails. A story that renders a
 whole page (its own shell or footer) sets `parameters.shell: false` to skip
 the wrapper. A replacement gets `stories/parity/<Name>.parity.stories.svelte` with
 a `Toolkit` story (axe off: it documents upstream), an `IlwUi` story, and a

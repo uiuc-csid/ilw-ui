@@ -1,6 +1,7 @@
 export { default as Autocomplete } from './Autocomplete.svelte';
 export { default as Button, type ButtonSize, type ButtonTheme } from './Button.svelte';
 export { default as Combobox } from './Combobox.svelte';
+export { default as DarkModeToggle } from './DarkModeToggle.svelte';
 export {
   type AnyDataTable,
   createDataTable,

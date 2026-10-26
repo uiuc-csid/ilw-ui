@@ -1,0 +1,60 @@
+/* The dark-mode toggle (B1): <label class="ilw-dark-mode-toggle"><input
+   type="checkbox" role="switch"> Dark mode</label>. A stand-in until the form
+   styles (A7) land: the switch rules below name only input[role='switch']
+   (in :where()) after the scoping class, so A7 can lift them out as its
+   generic switch, leaving only the label layout here. The toolkit header's checkbox is a plain
+   unstyled checkbox; ours is a switch to match role="switch".
+
+   Colours come from --ilw-color--control and --ilw-color--control-text, so the
+   switch follows the theme and dark mode, and the track's border and thumb
+   reach 3:1 against the control surface (WCAG 1.4.11). */
+
+.ilw-dark-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  color: var(--ilw-color--text);
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+  cursor: pointer;
+}
+
+/* The track is the input; the thumb is a background circle that slides from
+   left (off) to right (on). */
+.ilw-dark-mode-toggle :where(input[role='switch']) {
+  --ilw-switch--thumb-size: calc(1.5em - 4px);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 2.75em;
+  height: 1.5em;
+  margin: 0;
+  border: 2px solid var(--ilw-color--control-text);
+  border-radius: 0.75em;
+  background:
+    radial-gradient(circle closest-side, var(--ilw-color--control-text) 70%, transparent 75%) no-repeat left center /
+      var(--ilw-switch--thumb-size) var(--ilw-switch--thumb-size),
+    var(--ilw-color--control);
+  font: inherit;
+  appearance: none;
+  cursor: pointer;
+}
+
+.ilw-dark-mode-toggle :where(input[role='switch']:checked) {
+  background:
+    radial-gradient(circle closest-side, var(--ilw-color--control) 70%, transparent 75%) no-repeat right center /
+      var(--ilw-switch--thumb-size) var(--ilw-switch--thumb-size),
+    var(--ilw-color--control-text);
+}
+
+.ilw-dark-mode-toggle :where(input[role='switch']:focus-visible) {
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 2px;
+}
+
+/* Forced colours drop the gradient thumb: fall back to the native checkbox. */
+@media (forced-colors: active) {
+  .ilw-dark-mode-toggle :where(input[role='switch']) {
+    width: auto;
+    height: auto;
+    appearance: auto;
+  }
+}
