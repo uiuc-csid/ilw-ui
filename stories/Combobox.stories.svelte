@@ -225,6 +225,18 @@
     await expect(input).toHaveValue('blake');
     await expect(input).toHaveAttribute('aria-expanded', 'true');
     await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
+    // A browser may report <body> as active while the window deactivates. The
+    // document has lost focus then, so it still isn't leaving the field.
+    const hasFocus = document.hasFocus;
+    document.hasFocus = () => false;
+    try {
+      input.blur();
+    } finally {
+      document.hasFocus = hasFocus;
+    }
+    input.focus();
+    await expect(input).toHaveValue('blake');
+    await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
     // With the list closed, Zag's own blur handling used to idle the machine,
     // and typing never reopened the list.
     await userEvent.keyboard('{Escape}');
