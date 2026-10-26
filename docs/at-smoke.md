@@ -91,6 +91,14 @@ Status: **pending human run.**
 - [ ] Space flips it and the new state is announced ("on"/"off"); the page colours change and focus stays on the switch.
 - [ ] In Windows High Contrast (forced colours) it shows as a native checkbox with its focus ring.
 
+## Pagination (story: Pagination → Fixture)
+
+Status: **pending human run.**
+
+- [ ] The landmarks list has a "Pages" navigation; inside it, the list is announced with its item count.
+- [ ] Tabbing reads "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
+- [ ] On the first page (Pagination → Ends), "Previous" is read as text, not a link.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |
