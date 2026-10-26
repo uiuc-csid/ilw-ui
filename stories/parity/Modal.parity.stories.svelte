@@ -59,7 +59,13 @@
     await expect(getComputedStyle(m, '::backdrop').backgroundColor).toMatch(
       /^(rgba\(0, 0, 0, 0\.5\)|color\(srgb 0 0 0 \/ 0\.5\))$/,
     );
-    const vw = document.documentElement.clientWidth;
+    // The width the dialog's percentages resolve against: the viewport less any
+    // scrollbar gutter (scrollbar-gutter keeps one while the modal is open, on
+    // platforms with classic scrollbars). clientWidth doesn't subtract it.
+    const probe = document.body.appendChild(document.createElement('div'));
+    probe.style.cssText = 'position: fixed; inset: 0; visibility: hidden';
+    const vw = probe.getBoundingClientRect().width;
+    probe.remove();
     const rect = m.getBoundingClientRect();
     if (window.innerWidth <= 600) {
       // Below 600px (the Side By Side frames), every size is full width, 0.5rem in.
@@ -67,11 +73,7 @@
       await expect(rect.top).toBeCloseTo(8, 0);
     } else {
       const want = { small: Math.max(vw * 0.35, 320), medium: Math.max(vw * 0.5, 320), large: Math.min(vw, 1200) };
-      // Within 2%: with classic scrollbars (Linux CI), the gutter that
-      // scrollbar-gutter keeps narrows the viewport the percentages resolve against.
-      const expected = want[args.size as keyof typeof want];
-      await expect(rect.width).toBeGreaterThan(expected * 0.98);
-      await expect(rect.width).toBeLessThanOrEqual(expected + 0.5);
+      await expect(rect.width).toBeCloseTo(want[args.size as keyof typeof want], 0);
       await expect(rect.top).toBeCloseTo(window.innerHeight * 0.05, 0);
     }
     const h2 = getComputedStyle(m.querySelector('h2')!);
