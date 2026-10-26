@@ -20,6 +20,13 @@
   /* The toolkit leaves the page colours to the host; set them so dark mode shows. */
   background-color: var(--ilw-color--background);
   color: var(--ilw-color--text);
+  /* The container the A5 width breakouts (.ilw-width-*) and the side margin's
+     cqw resolve against: the page without the scrollbar. overflow-x: clip
+     hides sub-pixel overflow from a breakout without making a scroll
+     container, so sticky positioning still works (with .ilw-margin's
+     overflow-y: hidden it computes to hidden). */
+  container-type: inline-size;
+  overflow-x: clip;
 }
 
 /* The header row sits above main, so its menus overlay the content (upstream: z-index 300). */
@@ -58,7 +65,7 @@
 }
 
 .ilw-page.ilw-margin {
-  --ilw-page--margin: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 37.5rem)));
+  --ilw-page--margin: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
   overflow-y: hidden;
 }
 

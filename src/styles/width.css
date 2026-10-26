@@ -1,0 +1,40 @@
+/* Widths (A5): the toolkit's width="full|auto|page", written once as classes,
+   plus .ilw-container. Markup, inside a page with side margins:
+
+     <div class="ilw-width-full">…</div>   edge to edge
+     <div class="ilw-width-auto">…</div>   edge to edge, content at the side margin
+     <div class="ilw-width-page">…</div>   at the side margin
+     <div class="ilw-container">…</div>    query container and breakout boundary
+
+   The breakout is the parent's half-width minus the nearest container's
+   (.ilw-page, or an .ilw-container), so it spans the page without the
+   scrollbar that the toolkit's 100vw includes. Like the toolkit's left: 50%,
+   it assumes the parent is centred in that container. With no container, cqw
+   is the viewport. */
+
+/* The side margin, as the toolkit's :root sets it: at least 30px, and 1140px
+   of content. A custom property keeps cqw unresolved until it is used, so it
+   measures the container of whatever element uses it. */
+:root {
+  --ilw-margin--side: max(1.875rem, calc(50cqw - 35.625rem));
+}
+
+.ilw-container {
+  container-type: inline-size;
+}
+
+/* .ilw-width-full on a button keeps its button meaning (button.css). */
+.ilw-width-full:where(:not(.ilw-button, .ilw-buttons, button)),
+.ilw-width-auto {
+  box-sizing: border-box;
+  max-width: none;
+  margin-inline: calc(50% - 50cqw);
+}
+
+.ilw-width-auto {
+  padding-inline: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
+}
+
+.ilw-width-page {
+  margin-inline: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
+}

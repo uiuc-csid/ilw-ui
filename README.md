@@ -202,6 +202,154 @@ the specificity of a single element, so a class of yours wins.
   (3.3:1). The head text is 1.2rem bold, which counts as large text, so it
   passes AA there; don't put smaller text in that head.
 
+## Layout
+
+`width.css`, `content.css`, `columns.css`, `grid.css` and `spacer.css`
+replace `<ilw-content>`, `<ilw-columns>`, `<ilw-grid>`, `<ilw-spacer>` and the
+toolkit's `width` attribute with classes on plain HTML; each also ships as a
+Svelte component that renders exactly this markup. The plan is
+[docs/plans/2026-10-26-layout.md](docs/plans/2026-10-26-layout.md).
+
+### Widths and `.ilw-container`
+
+```html
+<div class="ilw-page ilw-format ilw-margin">
+  <main id="main-content" tabindex="-1">
+    <div class="ilw-width-full">…</div>   <!-- edge to edge -->
+    <div class="ilw-width-auto">…</div>   <!-- edge to edge, content at the side margin -->
+    <div class="ilw-width-page">…</div>   <!-- at the side margin, for a page without ilw-margin -->
+    <div class="ilw-container">…</div>    <!-- query container and breakout boundary -->
+  </main>
+</div>
+```
+
+- The toolkit's `width="full|auto|page"`, written once. Every component's
+  `width` prop (`LayoutWidth`: `'full' | 'auto' | 'page'`) renders one of these
+  classes, `Breadcrumbs` and `PageTitle` included.
+- The breakout is `margin-inline: calc(50% - 50cqw)` against the nearest
+  container: `.ilw-page` (an inline-size container since A5) or an
+  `.ilw-container`. So it spans the page without the scrollbar, and the page
+  never scrolls sideways (`.ilw-page` also clips sub-pixel overflow with
+  `overflow-x: clip`). Like the toolkit's `left: 50%`, it assumes the parent is
+  centred, as `main` is. Outside any container it spans the viewport.
+- The side margin is `--ilw-margin--side`, which `width.css` sets on `:root`
+  as the toolkit does: `max(1.875rem, calc(50cqw - 35.625rem))`, 1140 px of
+  content and at least 30 px a side. It is also `.ilw-margin`'s and the
+  footer's margin; set it to change them all.
+- `.ilw-width-full` on `.ilw-button`, `.ilw-buttons` or a `button` keeps its
+  button meaning (full-width button) and doesn't break out.
+- `.ilw-container` is ours (the toolkit has no layout rule of that name):
+  `container-type: inline-size`. A breakout inside it spans the container, and
+  columns inside it stack when it is under 700 px.
+- Differs from the toolkit: `<ilw-breadcrumbs width="auto">` is the same as
+  `full` (the trail goes to the edge); ours keeps the trail at the side margin,
+  as the toolkit's docs describe `auto`.
+
+### `Content` and `.ilw-content`
+
+```html
+<div class="ilw-content ilw-format" theme="gray">  <!-- + ilw-content--introduction | --lede | --inset,
+                                                      ilw-content--center | --right, ilw-content--decoration,
+                                                      ilw-content--transparent, ilw-width-* -->
+  <div class="ilw-content-inner">
+    <h2>Programs</h2>
+    <p>…</p>
+  </div>
+</div>
+```
+
+```svelte
+<Content mode="lede" decoration>
+  <p>Sodium is an essential micronutrient.</p>
+</Content>
+```
+
+- The prose is `.ilw-format`'s; the box paints `--ilw-color--background` and
+  `--ilw-color--text`, so a `theme` attribute (`white`, `gray`, `blue`,
+  `orange`, `blue-gradient`, `orange-gradient`; see
+  [Themes](#themes-and-dark-mode)) restyles it.
+- Modes as upstream: `introduction` (a centred column, max 1000 px + 3.75 rem,
+  of larger text), `lede` (the same, italic; `decoration` adds a 6 px accent
+  bar on the side the text starts, or a short rule under centred text), `inset`
+  (smaller headings, wide padding).
+- Props: `mode`, `align` (`'left' | 'center' | 'right'`), `decoration`,
+  `transparent` (no background), `theme`, `width`, `class`.
+- Differs from `<ilw-content>`: at `full` and `auto` the box spans the page
+  (upstream's `max-width: 100%` stops it at the parent's width); no `padding` attribute (an inline style, which
+  consumers' CSP blocks; use a class); the centred lede's rule is `::after`, not
+  a `<div role="presentation">`.
+
+### `Columns` and `.ilw-columns`
+
+```html
+<div class="ilw-columns ilw-2x1">  <!-- | ilw-1x2 | ilw-3x1 | ilw-1x3 | ilw-1x2x1 |
+                                      ilw-columns--sidebar-left | --sidebar-right;
+                                      + ilw-columns--reverse, ilw-fixed, ilw-width-*, theme -->
+  <div>…</div>
+  <div>…</div>
+</div>
+```
+
+```svelte
+<Columns mode="sidebar-left">
+  <nav aria-label="In this section">…</nav>
+  <div>…</div>
+</Columns>
+```
+
+- A flex row. `ilw-2x1` makes the first child twice the others, however many
+  there are (the toolkit's CSS-only classes); the sidebar modes give the first
+  (or last) child a fixed `--ilw-columns--width--sidebar` (280 px).
+- Gap `--ilw-columns--gap`: 20 px, 30 px for the sidebars (`gap` prop).
+- Stacks below 700 px: by container query (the nearest `.ilw-container` or
+  `.ilw-page`) and by media query, as upstream.
+- `ilw-columns--reverse` (`reverse`) flips the row on wide screens only. The
+  reading order stays the DOM order, so use it only when one side is
+  decorative.
+- Props: `mode` (`ColumnsMode`), `reverse`, `gap`, `theme`, `width`, `class`.
+- Differs from `<ilw-columns>`: no `padding` attribute and no default 40 px
+  bottom padding (the CSS-only class has none either); the gap defaults to the
+  CSS-only class's 20 px, not the element's 0.
+
+### `Grid` and `.ilw-grid`
+
+```html
+<ul class="ilw-grid">  <!-- or <div>; + ilw-fixed, ilw-width-*, theme -->
+  <li>…</li>
+  <li>…</li>
+</ul>
+```
+
+```svelte
+<Grid itemWidth="300px">
+  {#each cards as card (card.id)}<li><Card {card} /></li>{/each}
+</Grid>
+```
+
+- As many columns at least `--ilw-grid--item-width` (250 px; the toolkit's
+  `innerwidth`, the `itemWidth` prop) wide as fit, or
+  `--ilw-grid--template-columns`. Gap `--ilw-grid--gap` (10 px, `gap` prop).
+  An item wider than the grid shrinks to it.
+- Items stretch to the row's height, and an item's only child fills it.
+- A list by default, so screen readers announce the count. Props: `as`
+  (`'ul' | 'div'`), `itemWidth`, `gap`, `theme`, `width`, `class`.
+- Differs from `<ilw-grid>`: no `padding` attribute and no default 40 px
+  bottom padding.
+
+### `Spacer` and `.ilw-spacer`
+
+```html
+<div class="ilw-spacer" aria-hidden="true"></div>  <!-- --ilw-spacer--height, default 20px -->
+```
+
+```svelte
+<Spacer height="3rem" />
+```
+
+- Vertical space between two blocks, hidden from assistive technology
+  (`aria-hidden`; upstream's `role="presentation"` does nothing on an empty
+  `div`).
+
 ## Page chrome
 
 The page shell, footer, breadcrumbs and page title replace `<ilw-page>`,
@@ -340,9 +488,10 @@ come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrom
   readers don't read them (the toolkit's are read in some).
 - A theme class on the `nav` restyles it (`class="ilw-theme-blue-1"` is the
   toolkit's `theme="blue"`, with orange separators). Props: `label` (default
-  "Breadcrumbs"), `class`.
-- Not yet: the toolkit's `width` breakout; it comes with the layout utilities
-  (A5).
+  "Breadcrumbs"), `width`, `class`.
+- `width` (`full`, `auto`, `page`) adds the matching
+  [width class](#widths-and-ilw-container) to the `nav`. At `auto` the trail
+  keeps the page margin; the toolkit's goes to the edge.
 
 ### Page title (`PageTitle`)
 
@@ -363,8 +512,10 @@ come, is [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrom
   text sits on a colour plate (85 % over the image, solid with `fade`), as
   upstream.
 - Props: `theme` (`'blue' | 'orange' | 'white'`; unset is white on the heading
-  colour), `fade`, `image` (URL), `class`.
-- Not yet: the toolkit's `width` breakout (A5).
+  colour), `fade`, `image` (URL), `width`, `class`.
+- `width="full"` adds `ilw-width-full`: the box spans the page. `auto` and
+  `page` both add `ilw-width-auto` (the toolkit treats them alike): the box
+  spans the page and the text keeps the page margin.
 
 ### Dark-mode toggle (`DarkModeToggle`)
 

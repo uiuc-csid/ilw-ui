@@ -1,6 +1,8 @@
 export { default as Autocomplete } from './Autocomplete.svelte';
 export { default as Button, type ButtonSize, type ButtonTheme } from './Button.svelte';
+export { type ColumnsMode, default as Columns } from './Columns.svelte';
 export { default as Combobox } from './Combobox.svelte';
+export { default as Content } from './Content.svelte';
 export { default as DarkModeToggle } from './DarkModeToggle.svelte';
 export {
   type AnyDataTable,
@@ -17,7 +19,9 @@ export {
 export { default as DataRows } from './DataRows.svelte';
 export { default as DataTable } from './DataTable.svelte';
 export { enhanceSelect, enhanceSelects } from './enhance-select.ts';
+export { default as Grid } from './Grid.svelte';
 export { default as Icon } from './Icon.svelte';
+export { type LayoutTheme, type LayoutWidth } from './layout.ts';
 export { default as Modal } from './Modal.svelte';
 export {
   alert,
@@ -29,6 +33,7 @@ export {
   openModal,
 } from './modal.ts';
 export { default as Pager } from './Pager.svelte';
+export { default as Spacer } from './Spacer.svelte';
 export { default as SortableTh } from './SortableTh.svelte';
 export { default as TableSortTh } from './TableSortTh.svelte';
 export { type IslandRegistry, mountIslands } from './islands.ts';

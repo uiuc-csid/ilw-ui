@@ -1,0 +1,14 @@
+/* Spacer (A5), the CSS form of <ilw-spacer>: vertical space between two
+   blocks. Markup:
+
+     <div class="ilw-spacer" aria-hidden="true"></div>
+
+   The height is --ilw-spacer--height (the toolkit's `height`, default 20px). */
+
+.ilw-spacer {
+  display: block;
+  box-sizing: border-box;
+  block-size: var(--ilw-spacer--height, 20px);
+  margin: 0;
+  padding: 0;
+}

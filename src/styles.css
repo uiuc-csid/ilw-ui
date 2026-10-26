@@ -5,6 +5,11 @@
 
 @import './styles/tokens.css';
 @import './styles/format.css';
+@import './styles/width.css';
+@import './styles/content.css';
+@import './styles/columns.css';
+@import './styles/grid.css';
+@import './styles/spacer.css';
 @import './styles/button.css';
 @import './styles/table.css';
 @import './styles/page.css';

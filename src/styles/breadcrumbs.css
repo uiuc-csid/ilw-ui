@@ -8,12 +8,14 @@
      </nav>
 
    Colours come from the theme properties, so a theme class on the nav
-   (ilw-theme-blue, …) restyles it. */
+   (ilw-theme-blue, …) restyles it, and a width class (.ilw-width-full,
+   -auto, -page, from width.css) is the toolkit's `width`. */
 
 .ilw-breadcrumbs {
   --ilw-breadcrumbs--separator-color: var(--il-altgeld, #c84113);
   display: block;
-  padding: 0.5rem 0;
+  /* Block padding only: .ilw-width-auto sets the inline padding. */
+  padding-block: 0.5rem;
   background-color: var(--ilw-color--background);
   color: var(--ilw-color--text);
 }

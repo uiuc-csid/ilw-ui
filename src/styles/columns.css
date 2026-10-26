@@ -1,0 +1,93 @@
+/* Columns (A5), the CSS form of <ilw-columns> and the toolkit's CSS-only
+   div.ilw-columns. Markup:
+
+     <div class="ilw-columns ilw-2x1">
+       <div>…</div>
+       <div>…</div>
+     </div>
+
+   Modes, as the toolkit's classes: .ilw-1x2, .ilw-2x1, .ilw-1x3, .ilw-3x1,
+   .ilw-1x2x1 (unset: equal columns); as its `mode` attribute:
+   .ilw-columns--sidebar-left, --sidebar-right (a fixed
+   --ilw-columns--width--sidebar column). Other modifiers:
+   .ilw-columns--reverse (wide screens only), .ilw-fixed, .ilw-width-*, a theme
+   attribute (paints the background). Gap: --ilw-columns--gap.
+
+   Below 700px the columns stack: by container query (the nearest
+   .ilw-container or .ilw-page) and, as upstream, by media query, so a page
+   without a container stacks too. */
+
+.ilw-columns {
+  display: flex;
+  column-gap: var(--ilw-columns--gap, 20px);
+}
+
+.ilw-columns:is(.ilw-columns--sidebar-left, .ilw-columns--sidebar-right) {
+  column-gap: var(--ilw-columns--gap, 30px);
+}
+
+/* min-width: 0 so a long word can't push the row wider than its box. */
+.ilw-columns > * {
+  flex: 1 0 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.ilw-columns.ilw-2x1 > :first-child,
+.ilw-columns.ilw-1x2 > :last-child,
+.ilw-columns.ilw-1x2x1 > * {
+  flex-grow: 2;
+}
+
+.ilw-columns.ilw-3x1 > :first-child,
+.ilw-columns.ilw-1x3 > :last-child {
+  flex-grow: 3;
+}
+
+.ilw-columns.ilw-1x2x1 > :is(:first-child, :last-child) {
+  flex-grow: 1;
+}
+
+.ilw-columns.ilw-columns--sidebar-left > :first-child,
+.ilw-columns.ilw-columns--sidebar-right > :last-child {
+  flex: 0 0 var(--ilw-columns--width--sidebar, 280px);
+}
+
+.ilw-columns.ilw-columns--reverse {
+  flex-direction: row-reverse;
+}
+
+.ilw-columns.ilw-fixed {
+  margin-inline: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
+}
+
+.ilw-columns[theme] {
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}
+
+@container (max-width: 700px) {
+  .ilw-columns.ilw-columns {
+    flex-direction: column;
+    row-gap: var(--ilw-columns--gap, 20px);
+  }
+
+  /* Stacked, a column is as tall as its content: the weights stay, the
+     basis (the sidebar's 280px) goes. As heavy as the sidebar rule, and later. */
+  .ilw-columns.ilw-columns > :nth-child(n) {
+    flex-basis: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .ilw-columns.ilw-columns {
+    flex-direction: column;
+    row-gap: var(--ilw-columns--gap, 20px);
+  }
+
+  /* Stacked, a column is as tall as its content: the weights stay, the
+     basis (the sidebar's 280px) goes. As heavy as the sidebar rule, and later. */
+  .ilw-columns.ilw-columns > :nth-child(n) {
+    flex-basis: auto;
+  }
+}
