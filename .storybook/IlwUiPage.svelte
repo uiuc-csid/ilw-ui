@@ -3,10 +3,11 @@
 
   import Page from '../src/svelte/Page.svelte';
 
-  let { children }: { children: Snippet } = $props();
+  let { format = true, children }: { format?: boolean; children: Snippet } = $props();
 </script>
 
-<!-- 'ilw-ui' stories render inside ilw-ui's own page shell (B1): skip link, then main. -->
-<Page>
+<!-- 'ilw-ui' stories render inside ilw-ui's own page shell (B1): skip link, then main.
+     Formatted (.ilw-format) by default, as the toolkit side's <ilw-page class="ilw-format">. -->
+<Page {format}>
   {@render children()}
 </Page>

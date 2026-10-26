@@ -27,8 +27,10 @@ vendor/illinois-toolkit/   pinned toolkit.js/.css, served by Storybook at /toolk
 scripts/       vendor-footer.mjs (mise run vendor:footer: refresh src/core/campus-footer.ts from the brand API)
 .storybook/    Storybook config; styles.ts adds toolkit.css and/or styles.css per story from parameters.styles
                ('toolkit' | 'ilw-ui' | 'both', default 'both'); IlwPage.svelte wraps 'toolkit'/'both' stories in
-               <ilw-page class="ilw-format"><main>, IlwUiPage.svelte wraps 'ilw-ui' ones in the Page shell (B1:
-               skip link + <main id="main-content">); parameters.shell = false skips both (whole-page stories)
+               <ilw-page class="ilw-format"><main>, IlwUiPage.svelte wraps 'ilw-ui' ones in <Page format> (B1:
+               skip link + <main id="main-content">, .ilw-format like the toolkit side); parameters.format = false
+               drops .ilw-format (stories/Unformatted.stories.svelte: one per presentational component);
+               parameters.shell = false skips both (whole-page stories)
 ```
 
 The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `exports`: `./core`, `./svelte`, `./styles.css`, `./styles/*`.
