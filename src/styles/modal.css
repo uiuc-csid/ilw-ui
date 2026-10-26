@@ -1,0 +1,133 @@
+/* Modal (C1), the CSS form of <ilw-modal> on a native <dialog>. Markup:
+
+     <dialog id="m" class="ilw-modal ilw-modal--small" aria-labelledby="m-title">
+       <h2 class="ilw-modal-title" id="m-title">Delete?</h2>
+       <div class="ilw-modal-body"><p>This cannot be undone.</p></div>
+       <form method="dialog" class="ilw-modal-buttons">
+         <button class="ilw-button" value="cancel" autofocus>Cancel</button>
+         <button class="ilw-button" value="delete">Delete</button>
+       </form>
+       <button type="button" class="ilw-modal-close" aria-label="Close" commandfor="m" command="close">…</button>
+     </dialog>
+
+   Open it with dialog.showModal() or <button commandfor="m" command="show-modal">.
+   Sizes: --small (35%), --medium (50%), --large (1200px), --full. Colours
+   come from the theme-neutral --ilw-color--* properties (tokens.css), so a
+   theme class on the dialog recolours it and dark mode follows.
+
+   Differences from the toolkit, all deliberate:
+   - The title is --ilw-color--heading (upstream names `---ilw-color--heading`,
+     three dashes, so it falls back to the text colour).
+   - Below 600px every size is full width, as upstream; above it, small and
+     medium never drop under 20rem (35% of a 700px window is a 245px dialog).
+   - The × button's focus style is on :focus-visible, with the ilw-button ring. */
+
+.ilw-modal {
+  --ilw-modal--small: 35%;
+  --ilw-modal--medium: 50%;
+  --ilw-modal--large: 1200px;
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: max(var(--ilw-modal--medium), 20rem);
+  max-height: 80vh;
+  margin: 5vh auto auto;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  border-top: 8px solid var(--ilw-color--control-accent);
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--il-black, #000000) 10%, transparent);
+  font: 1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-modal--small {
+  max-width: max(var(--ilw-modal--small), 20rem);
+}
+
+.ilw-modal--large {
+  max-width: var(--ilw-modal--large);
+}
+
+.ilw-modal--full {
+  max-width: calc(100% - 2rem);
+}
+
+@media (max-width: 600px) {
+  .ilw-modal {
+    max-width: calc(100% - 1rem);
+    max-height: calc(100% - 1rem);
+    margin: 0.5rem auto auto;
+  }
+}
+
+.ilw-modal::backdrop {
+  background: color-mix(in srgb, var(--il-black, #000000) 50%, transparent);
+}
+
+/* The page behind stays put: no scrolling, no shift when its scrollbar goes. */
+html:has(.ilw-modal:modal) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.ilw-modal-title {
+  margin: 2rem 0 1.3125rem;
+  padding: 0 1.5rem;
+  color: var(--ilw-color--heading);
+  font: 700 2.25rem/1.2 var(--il-font-heading, 'Montserrat', sans-serif);
+}
+
+/* Its own formatting context, as upstream's flex item: the body's first and
+   last margins stay inside it. */
+.ilw-modal-body {
+  display: flow-root;
+  padding: 0 1.5rem;
+}
+
+.ilw-modal-body :where(p, div) {
+  margin-bottom: 1rem;
+}
+
+.ilw-modal-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 3rem;
+  padding: 0 1.5rem;
+}
+
+.ilw-modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ilw-color--background) 70%, transparent);
+  color: var(--ilw-color--control-text);
+  cursor: pointer;
+}
+
+.ilw-modal-close svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ilw-modal-close:hover {
+  color: var(--ilw-color--control-accent);
+}
+
+.ilw-modal-close:focus-visible {
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  outline: 2px solid var(--ilw-color--focus--text);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ilw-color--focus--background);
+}

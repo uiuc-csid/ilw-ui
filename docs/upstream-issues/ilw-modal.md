@@ -1,10 +1,10 @@
 # Draft upstream issues: `ilw-modal`
 
 Draft issues for <https://github.com/web-illinois/ilw-modal>, against **v1.2.1**
-(`src/ilw-modal.ts`). **Not filed.** Each is worked around inside
-`src/svelte/Modal.svelte` and listed under **Known issues** in the README. When
-one is filed, replace its "Not filed" line with the issue link here and in the
-README.
+(`src/ilw-modal.ts`). **Not filed.** ilw-ui no longer wraps `<ilw-modal>`: since
+C1, `Modal` is a native `<dialog>` that doesn't have these gaps, so the
+"Workaround in ilw-ui" lines below are history. They are kept as drafts for
+upstream, for pages that still use the toolkit.
 
 ---
 

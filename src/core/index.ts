@@ -74,3 +74,5 @@ export {
   campusLink,
   DEFAULT_FOOTER_SOURCE,
 } from './campus-footer.ts';
+
+export { tabbables } from './tabbable.ts';

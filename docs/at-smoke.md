@@ -14,13 +14,13 @@ in new tab"), then add a row to the log below.
 - [ ] In table navigation (NVDA: Ctrl+Alt+arrows; VoiceOver: VO+arrows), the sorted column announces "sorted ascending" / "sorted descending"; unsorted columns announce no sort state.
 - [ ] Pressing Enter or Space re-sorts; the new sort state is announced or discoverable by re-reading the header, and focus stays on the same button.
 
-## Modal (stories: Modal → Trigger, Custom buttons, Rich body)
+## Modal (stories: Modal → Trigger, Custom buttons, Rich body, Form trigger)
 
 - [ ] Opening announces a dialog with its title ("Delete assignment?, dialog").
-- [ ] The body text is read (on open or by reading forward).
+- [ ] The message is read as the dialog's description (on open or by reading forward); the buttons aren't read as part of it.
 - [ ] Focus starts on the autofocus button (Cancel) and it is announced.
-- [ ] Tab and Shift+Tab cycle only through the modal's buttons and the close (×) button, which is announced as "Close modal, button".
-- [ ] The virtual/browse cursor can't reach the page behind the modal (it is `inert`).
+- [ ] Tab and Shift+Tab cycle only through the modal's buttons and the close (×) button, which is announced as "Close, button". In Form trigger, the Preview link joins the cycle once you type a name.
+- [ ] The virtual/browse cursor can't reach the page behind the modal (`showModal()` makes it inert).
 - [ ] Escape closes it; focus returns to the trigger and is announced.
 
 ## Combobox (stories: Combobox → Fixture, Fixture preselected, Many, Free text)

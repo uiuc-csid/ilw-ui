@@ -1,80 +1,126 @@
 <script lang="ts" generics="T">
   import { onMount, type Snippet } from 'svelte';
-  import { on } from 'svelte/events';
 
-  import type { CloseReason, ModalButton } from './modal.ts';
+  import { nextId, tabbables } from '../core/index.ts';
+  import type { CloseReason, ModalButton, ModalSize } from './modal.ts';
 
   let {
-    id,
+    id = nextId('ilw-modal'),
     title = '',
+    label = 'Dialog',
     size = 'small',
     body,
     message = '',
     buttons,
     onclose,
   }: {
-    id: string;
+    id?: string;
+    /** Rendered as the `<h2>` that names the dialog. */
     title?: string;
-    size?: string;
+    /** The dialog's name when there is neither `title` nor `message`. */
+    label?: string;
+    size?: ModalSize;
     /** Rich content; takes precedence over `message`. */
     body?: Snippet;
-    /** Plain text, rendered as a `<p>`. */
+    /** Plain text, rendered as a `<p>`: the dialog's description (its name if there is no title). */
     message?: string;
     buttons: ModalButton<T>[];
     /** Called once, when the modal closes: the clicked button's value, or null when dismissed. */
     onclose: (reason: CloseReason, value: T | null) => void;
   } = $props();
 
-  type IlwModal = HTMLElement & { open: boolean; updateComplete: Promise<boolean> };
-  let modal: IlwModal;
+  let dialog: HTMLDialogElement;
   let row: HTMLElement;
-  let clicked: ModalButton<T> | null = null;
+  let closed = false;
+  // Where the current click started: a drag from the content to the backdrop isn't a backdrop click.
+  let downOnBackdrop = false;
+
+  const titleId = $derived(`${id}-title`);
+  const messageId = $derived(`${id}-message`);
+  const hasMessage = $derived(!body && !!message);
+  const labelledby = $derived(title ? titleId : hasMessage ? messageId : undefined);
 
   onMount(() => {
-    // Set as attributes: Svelte would assign properties on the upgraded
-    // element, and ilw-modal reflects neither (its `id` even shadows the
-    // native, reflecting one), so selectors like `ilw-modal#id` would miss.
-    modal.setAttribute('id', id);
-    modal.setAttribute('size', size);
-    // ilw-modal fires no close event (Escape, × and the backdrop just clear
-    // `open`), so watch the reflected attribute.
-    const observer = new MutationObserver(() => {
-      if (modal.hasAttribute('open')) return;
-      observer.disconnect();
-      onclose(clicked ? 'button' : 'dismiss', clicked ? clicked.value : null);
-    });
-    observer.observe(modal, { attributes: true, attributeFilter: ['open'] });
     // Mark the initial button only now, after insertion: WebKit queues a
     // button inserted with `autofocus` as an autofocus candidate and focuses
     // it at a later rendering update, pulling focus back to it after the user
     // has already tabbed on. An attribute added later is never a candidate.
     const initial = buttons.findIndex((button) => button.autofocus);
-    const target = initial === -1 ? null : (row.children[initial] as HTMLElement);
-    target?.setAttribute('autofocus', '');
-    modal.open = true;
-    // ilw-modal honours `autofocus` only on its direct slotted children, not
-    // on buttons nested in .modal-buttons, so focus it once rendered.
-    modal.updateComplete.then(() => target?.focus());
-    return () => observer.disconnect();
+    if (initial !== -1) row.children[initial].setAttribute('autofocus', '');
+    dialog.showModal();
+    // showModal() runs the dialog focusing steps, but browsers disagree on
+    // the fallback when nothing has `autofocus`; the APG wants the first
+    // focusable element.
+    (dialog.querySelector<HTMLElement>('[autofocus]') ?? tabbables(dialog)[0])?.focus();
   });
 
-  // Not `onclick`: Svelte delegates that to the mount root, and ilw-modal's
-  // dialog stops click propagation, so the handler would never run.
-  function chooses(button: ModalButton<T>) {
-    return (el: HTMLElement) =>
-      on(el, 'click', () => {
-        clicked = button;
-        modal.open = false;
-      });
+  function handleClose() {
+    if (closed) return;
+    closed = true;
+    // A choice button submits the form with its index as `returnValue`;
+    // Escape, × and the backdrop leave it empty.
+    const chosen = dialog.returnValue === '' ? undefined : buttons[Number(dialog.returnValue)];
+    if (chosen) onclose('button', chosen.value);
+    else onclose('dismiss', null);
+  }
+
+  // The native modal keeps focus in the page but lets Tab leave for the
+  // browser's own UI; the APG wraps it. The list is read on every Tab, so
+  // content added or enabled while open is in the cycle.
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key !== 'Tab' || e.defaultPrevented) return;
+    const list = tabbables(dialog);
+    const active = document.activeElement;
+    if (list.length === 0) {
+      e.preventDefault();
+    } else if (e.shiftKey && (active === list[0] || active === dialog)) {
+      e.preventDefault();
+      list.at(-1)!.focus();
+    } else if (!e.shiftKey && active === list.at(-1)) {
+      e.preventDefault();
+      list[0].focus();
+    }
+  }
+
+  // The backdrop is part of the <dialog> box for hit-testing: a click there
+  // targets the dialog itself, outside its border box.
+  function outside(e: MouseEvent) {
+    if (e.target !== dialog) return false;
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
   }
 </script>
 
-<ilw-modal bind:this={modal}>
-  {#if title}<h2 slot="title">{title}</h2>{/if}
-  {#if body}{@render body()}{:else if message}<p>{message}</p>{/if}
-  <div class="modal-buttons" bind:this={row}>
-    {#each buttons as button, i (i)}
-      <button type="button" class="ilw-button" {@attach chooses(button)}>{button.label}</button>
-    {/each}
+<dialog
+  bind:this={dialog}
+  {id}
+  class="ilw-modal ilw-modal--{size}"
+  aria-labelledby={labelledby}
+  aria-label={labelledby ? undefined : label}
+  aria-describedby={title && hasMessage ? messageId : undefined}
+  onclose={handleClose}
+  onkeydown={handleKeydown}
+  onpointerdown={(e) => (downOnBackdrop = outside(e))}
+  onclick={(e) => {
+    if (downOnBackdrop && outside(e)) dialog.close();
+    downOnBackdrop = false;
+  }}
+>
+  {#if title}<h2 class="ilw-modal-title" id={titleId}>{title}</h2>{/if}
+  <div class="ilw-modal-body">
+    {#if body}{@render body()}{:else if message}<p id={messageId}>{message}</p>{/if}
   </div>
-</ilw-modal>
+  <form method="dialog" class="ilw-modal-buttons" bind:this={row}>
+    {#each buttons as button, i (i)}
+      <button class="ilw-button" value={String(i)}>{button.label}</button>
+    {/each}
+  </form>
+  <button type="button" class="ilw-modal-close" aria-label="Close" onclick={() => dialog.close()}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 51.26 51.26" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="m37.84 32.94-7.63-7.63 7.63-7.63a3.24 3.24 0 0 0-4.58-4.58l-7.63 7.63L18 13.1a3.24 3.24 0 0 0-4.58 4.58L21 25.31l-7.62 7.63A3.24 3.24 0 1 0 18 37.52l7.63-7.63 7.63 7.63a3.24 3.24 0 0 0 4.58-4.58Z"
+      />
+    </svg>
+  </button>
+</dialog>

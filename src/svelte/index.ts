@@ -19,7 +19,15 @@ export { default as DataTable } from './DataTable.svelte';
 export { enhanceSelect, enhanceSelects } from './enhance-select.ts';
 export { default as Icon } from './Icon.svelte';
 export { default as Modal } from './Modal.svelte';
-export { alert, type CloseReason, confirm, type ModalButton, type ModalOptions, openModal } from './modal.ts';
+export {
+  alert,
+  type CloseReason,
+  confirm,
+  type ModalButton,
+  type ModalOptions,
+  type ModalSize,
+  openModal,
+} from './modal.ts';
 export { default as Pager } from './Pager.svelte';
 export { default as SortableTh } from './SortableTh.svelte';
 export { default as TableSortTh } from './TableSortTh.svelte';

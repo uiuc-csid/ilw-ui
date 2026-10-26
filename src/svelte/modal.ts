@@ -1,11 +1,11 @@
-// App modals, built on the Illinois toolkit's <ilw-modal>. The host page must
-// load the toolkit.
+// App modals on a native <dialog> opened with showModal(), styled by
+// modal.css after the toolkit's <ilw-modal>.
 //
 // openModal() mounts a Modal on document.body, opens it, and resolves with the
 // `value` of the button the user clicked, or null if they closed it some other
 // way (the × button, a click on the backdrop, or Escape). While it is open the
-// rest of the page is inert. Once closed it is removed from the DOM and focus
-// returns to `returnFocusEl`.
+// browser makes the rest of the page inert. Once closed it is removed from the
+// DOM and focus returns to `returnFocusEl`.
 
 import { mount, type Snippet, unmount } from 'svelte';
 
@@ -13,6 +13,8 @@ import { nextId } from '../core/index.ts';
 import Modal from './Modal.svelte';
 
 export type CloseReason = 'button' | 'dismiss';
+
+export type ModalSize = 'small' | 'medium' | 'large' | 'full';
 
 export interface ModalButton<T> {
   label: string;
@@ -23,55 +25,46 @@ export interface ModalButton<T> {
 
 export interface ModalOptions<T> {
   title?: string;
+  /** The dialog's name when there is neither `title` nor `message`. Default 'Dialog'. */
+  label?: string;
   /** Rich content; takes precedence over `message`. */
   body?: Snippet;
   /** Plain text, rendered as a `<p>`. */
   message?: string;
   buttons?: ModalButton<T>[];
-  size?: 'small' | 'medium' | 'large' | 'full';
+  size?: ModalSize;
   /** Where focus goes on close. Default: whatever had focus at open. */
   returnFocusEl?: HTMLElement | null;
 }
 
 export async function openModal<T = true>({
   title = '',
+  label,
   body,
   message = '',
   buttons = [{ label: 'Got it', value: true as T }],
   size = 'small',
   returnFocusEl = document.activeElement as HTMLElement | null,
 }: ModalOptions<T> = {}): Promise<T | null> {
-  await customElements.whenDefined('ilw-modal');
-  // ilw-modal also opens on clicks of [data-modal-target=<id>]; a unique id
-  // keeps it from answering anyone else's trigger.
   const id = nextId('app-modal');
   return new Promise((resolve) => {
-    const before = new Set(document.body.children);
-    const priorInert = new Map<HTMLElement, boolean>();
     const component = mount(Modal<T>, {
       target: document.body,
       props: {
         id,
         title,
+        label,
         size,
         body,
         message,
         buttons,
         onclose: (_reason, value) => {
           unmount(component);
-          // Restore before focusing: an inert element can't take focus.
-          for (const [el, inert] of priorInert) el.inert = inert;
           returnFocusEl?.focus();
           resolve(value);
         },
       },
     });
-    for (const el of before) {
-      if (el instanceof HTMLElement) {
-        priorInert.set(el, el.inert);
-        el.inert = true;
-      }
-    }
   });
 }
 
