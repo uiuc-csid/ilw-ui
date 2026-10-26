@@ -59,6 +59,7 @@
     "@tanstack/svelte-table": "9.3.1",
     "@tanstack/table-core": "9.3.1",
     "@zag-js/combobox": "1.44.0",
-    "@zag-js/svelte": "1.44.0"
+    "@zag-js/svelte": "1.44.0",
+    "phosphor-svelte": "3.1.1"
   }
 }

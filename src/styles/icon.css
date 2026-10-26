@@ -1,0 +1,36 @@
+/* Icons (A6), the CSS form of <ilw-icon> and .ilw-icon-row. Markup: a Phosphor
+   icon's SVG (https://phosphoricons.com; the paths are in @phosphor-icons/core)
+   with the ilw-icon class:
+
+     <svg class="ilw-icon" aria-hidden="true" viewBox="0 0 256 256" width="1em" height="1em" fill="currentColor">…</svg>
+
+   With a name instead: role="img" aria-label="…" in place of aria-hidden. */
+
+/* The toolkit's icons are font glyphs: they sit on the text's baseline and
+   don't shrink in a flex row. */
+.ilw-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
+}
+
+/* An icon beside a block of text, as the toolkit's .ilw-icon-row. Upstream's
+   align-items default is `top`, which isn't a value (so rows stretch); ours is
+   what it means. */
+.ilw-icon-row {
+  --ilw-icon-row--align-items: flex-start;
+  --ilw-icon-row--gap: 18px;
+  --ilw-icon-row--margin-bottom: 25px;
+  display: flex;
+  align-items: var(--ilw-icon-row--align-items);
+  gap: var(--ilw-icon-row--gap);
+  margin-bottom: var(--ilw-icon-row--margin-bottom);
+}
+
+.ilw-icon-row img {
+  height: var(--ilw-icon-row--gap);
+}
+
+.ilw-icon-row p {
+  margin: 0;
+}

@@ -40,7 +40,7 @@ Delivery is one of: **CSS** (markup and classes), **Svelte** (component), or **I
 | A3 | Buttons | `.ilw-button(s)`, `-small`/`-large`, theme variants | CSS + Svelte `Button` | Works on `<a>` and `<button>`, with visible focus. |
 | A4 | Tables | `.ilw-table`, `.ilw-table-responsive` | CSS | The base styles for `DataTable`. |
 | A5 | Layout | `ilw-content`, `ilw-columns`, `ilw-grid`, `ilw-spacer`, `.ilw-container`, `.ilw-width-*` | CSS + Svelte | Built on CSS grid and container queries. |
-| A6 | Icons | `ilw-icon`, `.ilw-icon-row` | Svelte `Icon` | Inline SVG, `aria-hidden` unless it has a label. Source and licence of the icon set to be confirmed. |
+| A6 | Icons | `ilw-icon`, `.ilw-icon-row` | Svelte `Icon` | Inline SVG, `aria-hidden` unless it has a label. Phosphor icons (MIT) through `phosphor-svelte`. |
 | A7 | Form styles | `ilw-input` (`.ilw-input-entry*`, radio and checkbox variants, `-compact`, `.ilw-input-alert`, `.ilw-label-required`, `.ilw-toggle-slider`) | CSS + Svelte `Field` | `Field` connects the label, description and error to the input with `aria-describedby` and `aria-invalid`. The toggle becomes a `role="switch"` checkbox. |
 | A8 | `mountIslands` | (none) | core | Mounts components from `[data-ilw-island]`, with props from `data-*` or `json_script`; unmounts on `pagehide`. |
 | A9 | `announce()` | (none) | core | One shared polite `role="status"` region, with an assertive option. |
@@ -127,7 +127,6 @@ Each phase is a set of independent PRs that can run in parallel unless noted.
 
 ## Open questions
 
-- **Icons.** Which icon set does `ilw-icon` draw from, under what licence, and can we bundle it rather than load it from the CDN?
 - **Following upstream.** How do we keep up with toolkit visual changes? One option is a scheduled job that refreshes `vendor/illinois-toolkit` and reruns the parity stories.
 - **Footer content.** The campus footer has required links and text. Who owns them, and how do we keep ours in step?
 - **Distribution.** ilw-ui is `private` and ships source. Other apps need to install it: as a git dependency, from GitHub Packages, or from npm.
