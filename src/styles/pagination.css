@@ -2,21 +2,19 @@
 
      <nav class="ilw-pagination" aria-label="Pages">
        <ul>
-         <li class="ilw-pagination-first"><a href="?page=1" aria-label="First page">First</a></li>
          <li class="ilw-pagination-previous"><a href="?page=5" aria-label="Previous page">Previous</a></li>
          <li><a href="?page=1" aria-label="Page 1">1</a></li>
          <li class="ilw-pagination-ellipsis"><span>…</span></li>
          <li><a href="?page=6" aria-label="Page 6" aria-current="page">6</a></li>
          …
          <li class="ilw-pagination-next"><a href="?page=7" aria-label="Next page">Next</a></li>
-         <li class="ilw-pagination-last"><a href="?page=12" aria-label="Last page">Last</a></li>
        </ul>
        <span class="ilw-pagination-count">Page 6 of 12</span>
      </nav>
 
-   On the first page, First and Previous are a <span> in place of the link;
-   on the last, Next and Last are. Colours come from the theme properties, so
-   a theme class on the nav (ilw-theme-blue-1, …) restyles it. Differs from the toolkit: the current
+   On the first and last page, Previous and Next are a <span> in place of the
+   link. Colours come from the theme properties, so a theme class on the nav
+   (ilw-theme-blue-1, …) restyles it. Differs from the toolkit: the current
    page is a link with a focus stop, and focus is a two-tone ring, as on
    .ilw-button, instead of a colour change only. */
 

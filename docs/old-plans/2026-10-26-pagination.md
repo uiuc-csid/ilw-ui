@@ -10,7 +10,7 @@ _Phase 2 of [the toolkit-replacement plan](../plans/2026-10-20-toolkit-replaceme
 
 - **Markup and CSS first, Svelte second.** `.ilw-pagination` works from a server template without script; `Pagination` renders exactly that markup. It needs no island: the links do the work.
 - **Shared with `Pager`:** the page window (`pageWindow`: first, last, two either side), a labelled `nav` landmark (default "Pages"), named Previous/Next and `aria-current="page"`. `Pager` keeps its own classes and DOM contract (ta-manager selects on them); the two differ in buttons vs links and in look.
-- **First/Last kept,** as upstream, beside Previous/Next: plain text on the first/last page. The window still always includes the first and last numbers (`pageWindow`).
+- **No First/Last:** the first and last page numbers are always in the window, so the extra links only add Tab stops.
 - **The current page is a link** with `aria-current="page"`, so it's announced in the links list and has a focus stop (as `Pager`'s current button does).
 - **Previous/Next stay visible as text** on the first/last page, as upstream, so the row doesn't shift.
 - **Links:** `pageHref(url, page, parameter)` in `ilw-ui/core` sets the parameter and keeps the rest of the query and the fragment. `url` defaults to `''` (a relative `?page=N`), not `location.href`: no DOM access, and it renders the same on the server. `href` replaces both for 0-based (`zerostart`) or path-based pages.

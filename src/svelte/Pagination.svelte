@@ -2,10 +2,9 @@
   Pagination (C5), rendering the markup documented in the README: links to the
   pages of a server-rendered list, the CSS form of <ilw-pagination>. The page
   list is Pager's (pageWindow: the first, the last and two either side of the
-  current page), between First and Previous and Next and Last, with "Page x of
-  y" after it. The current page stays a link, marked aria-current="page";
-  First and Previous on the first page, and Next and Last on the last, are
-  plain text. Styled by pagination.css.
+  current page), between Previous and Next, with "Page x of y" after it. The
+  current page stays a link, marked aria-current="page"; Previous and Next on
+  the first and last page are plain text. Styled by pagination.css.
 -->
 <script lang="ts">
   import { pageHref, pageWindow } from '../core/index.ts';
@@ -46,9 +45,6 @@
 
 <nav class={['ilw-pagination', className]} aria-label={label}>
   <ul>
-    <li class="ilw-pagination-first">
-      {#if current > 1}<a href={link(1)} aria-label="First page">First</a>{:else}<span>First</span>{/if}
-    </li>
     <li class="ilw-pagination-previous">
       {#if current > 1}<a href={link(current - 1)} aria-label="Previous page">Previous</a>{:else}<span>Previous</span>{/if}
     </li>
@@ -61,9 +57,6 @@
     {/each}
     <li class="ilw-pagination-next">
       {#if current < total}<a href={link(current + 1)} aria-label="Next page">Next</a>{:else}<span>Next</span>{/if}
-    </li>
-    <li class="ilw-pagination-last">
-      {#if current < total}<a href={link(total)} aria-label="Last page">Last</a>{:else}<span>Last</span>{/if}
     </li>
   </ul>
   {#if !hidePageCount}<span class="ilw-pagination-count">Page {current} of {total}</span>{/if}

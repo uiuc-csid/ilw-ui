@@ -1016,7 +1016,6 @@ the same markup with `pagination.css` and no script:
 ```html
 <nav class="ilw-pagination" aria-label="Pages">
   <ul>
-    <li class="ilw-pagination-first"><a href="?term=fa26&page=1" aria-label="First page">First</a></li>
     <li class="ilw-pagination-previous"><a href="?term=fa26&page=5" aria-label="Previous page">Previous</a></li>
     <li><a href="?term=fa26&page=1" aria-label="Page 1">1</a></li>
     <li class="ilw-pagination-ellipsis"><span>…</span></li>
@@ -1028,14 +1027,13 @@ the same markup with `pagination.css` and no script:
     <li class="ilw-pagination-ellipsis"><span>…</span></li>
     <li><a href="?term=fa26&page=12" aria-label="Page 12">12</a></li>
     <li class="ilw-pagination-next"><a href="?term=fa26&page=7" aria-label="Next page">Next</a></li>
-    <li class="ilw-pagination-last"><a href="?term=fa26&page=12" aria-label="Last page">Last</a></li>
   </ul>
   <span class="ilw-pagination-count">Page 6 of 12</span>
 </nav>
 ```
 
-- On the first page First and Previous are `<span>`s instead of links, and on
-  the last page Next and Last are, so the row doesn't shift.
+- On the first page Previous is `<span>Previous</span>` instead of a link, and
+  on the last page Next is `<span>Next</span>`, so the row doesn't shift.
 - The page list is `Pager`'s: `pageWindow(page, pages)`, the first, the last
   and two either side of the current page.
 - Props: `page` (1-based, clamped to `1…pages`), `pages`, `url` (default `''`:
@@ -1046,9 +1044,8 @@ the same markup with `pagination.css` and no script:
 - `pageHref(url, page, parameter = 'page')` (`ilw-ui/core`) builds each link:
   it sets `parameter` in `url`'s query and keeps the other values and the
   fragment. Server code can do the same.
-- Differs from `<ilw-pagination>`: the page window always includes the first
-  and last page numbers (the toolkit shows five pages around the current
-  one); the current page stays a link with
+- Differs from `<ilw-pagination>`: no First and Last links (the first and last
+  page numbers are always shown instead); the current page stays a link with
   `aria-current="page"` (the toolkit puts `aria-current` on an unlinked `li`);
   focus is the two-tone ring of `.ilw-button`, not just a colour change; the
   count is after the list, not an item in it. For the toolkit's `zerostart`,

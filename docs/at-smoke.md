@@ -96,8 +96,8 @@ Status: **pending human run.**
 Status: **pending human run.**
 
 - [ ] The landmarks list has a "Pages" navigation; inside it, the list is announced with its item count.
-- [ ] Tabbing reads "First page, link", "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link", "Last page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
-- [ ] On the first page (Pagination → Ends), "First" and "Previous" are read as text, not links.
+- [ ] Tabbing reads "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
+- [ ] On the first page (Pagination → Ends), "Previous" is read as text, not a link.
 
 ## Results log
 
