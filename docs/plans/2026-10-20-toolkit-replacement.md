@@ -61,7 +61,7 @@ Delivery is one of: **CSS** (markup and classes), **Svelte** (component), or **I
 
 | # | Item | Replaces | Delivery | Notes |
 | - | ---- | -------- | -------- | ----- |
-| C1 | `Modal` | `ilw-modal` (wrapped today) | Island | Built on native `<dialog>` with `showModal()`. Keeps the `openModal`/`alert`/`confirm` API, the close reasons and focus return. Also fixes the upstream gaps in `docs/upstream-issues/ilw-modal.md`. Changing the DOM contract breaks consumers (see Decisions). |
+| C1 | `Modal` | `ilw-modal` | Island | Done (#31, plan in `docs/old-plans/2026-10-26-modal.md`). Native `<dialog>` with `showModal()`, styled by `modal.css`. Keeps the `openModal`/`alert`/`confirm` API, the close reasons and focus return, and fixes the upstream gaps in `docs/upstream-issues/ilw-modal.md`. The DOM contract changed; ta-manager follows in its own PR (see Decisions). |
 | C2 | `Accordion` | `ilw-accordion`, `ilw-accordion-panel` | CSS + Island | Starts from `<details>`/`<summary>`. Optional single-open mode and an "expand all" button. |
 | C3 | `Tabs` | `ilw-tabs` | Island | APG tabs, with optional automatic activation and a hash link to each tab. Without JavaScript, the panels show as headed sections. |
 | C4 | `Tooltip` | `ilw-tooltip` | Island | Uses `popover` plus anchor positioning, with a fallback where those aren't supported. Shows on hover and focus, closes on Escape, and stays open while hovered (WCAG 1.4.13). |
