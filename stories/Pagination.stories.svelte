@@ -18,7 +18,7 @@
 
   **Why:** the fixture for `tests/e2e/pagination.spec.ts` (Tab order, Enter follows a link).
 
-  **Review:** Previous, 1 … 4 5 6 7 8 … 12, Next, then "Page 6 of 12". 6 is filled.
+  **Review:** First, Previous, 1 … 4 5 6 7 8 … 12, Next, Last, then "Page 6 of 12". 6 is filled.
 -->
 <Story name="Fixture">
   <Pagination page={6} pages={12} {href} />
@@ -27,24 +27,28 @@
 <!--
   The first and last pages, and a single page.
 
-  **Why:** the play function checks Previous is text on the first page, Next is text on the last, and one page renders just "1" between two text labels.
+  **Why:** the play function checks First and Previous are text on the first page, Next and Last are text on the last, and one page renders just "1" between text labels.
 
-  **Review:** three rows; the text Previous and Next aren't outlined.
+  **Review:** three rows; the text labels aren't outlined.
 -->
 <Story
   name="Ends"
   play={async ({ canvas }) => {
     const first = canvas.getByRole('navigation', { name: 'Pages, first' });
+    await expect(first.querySelector('.ilw-pagination-first > span')).toHaveTextContent('First');
     await expect(first.querySelector('.ilw-pagination-previous > span')).toHaveTextContent('Previous');
     await expect(first.querySelector('.ilw-pagination-next > a')).toHaveAttribute('href', '#page-2');
+    await expect(first.querySelector('.ilw-pagination-last > a')).toHaveAttribute('href', '#page-8');
 
     const last = canvas.getByRole('navigation', { name: 'Pages, last' });
+    await expect(last.querySelector('.ilw-pagination-first > a')).toHaveAttribute('href', '#page-1');
     await expect(last.querySelector('.ilw-pagination-previous > a')).toHaveAttribute('href', '#page-7');
     await expect(last.querySelector('.ilw-pagination-next > span')).toHaveTextContent('Next');
+    await expect(last.querySelector('.ilw-pagination-last > span')).toHaveTextContent('Last');
     await expect(last.querySelector('a[aria-current="page"]')).toHaveAccessibleName('Page 8');
 
     const one = canvas.getByRole('navigation', { name: 'Pages, single' });
-    await expect([...one.querySelectorAll('li')].map((li) => li.textContent?.trim())).toEqual(['Previous', '1', 'Next']);
+    await expect([...one.querySelectorAll('li')].map((li) => li.textContent?.trim())).toEqual(['First', 'Previous', '1', 'Next', 'Last']);
     await expect(one.querySelectorAll('a')).toHaveLength(1);
     await expect(one.querySelector('.ilw-pagination-count')).toHaveTextContent('Page 1 of 1');
   }}
