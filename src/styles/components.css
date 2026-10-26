@@ -1,5 +1,5 @@
-/* ilw-ui component styles (visually hidden, SortableTh, Modal, Combobox,
-   Autocomplete, Pager). Colors come from the brand palette's --il-* custom
+/* ilw-ui component styles (visually hidden, SortableTh, Combobox, Autocomplete,
+   Pager). Colors come from the brand palette's --il-* custom
    properties (https://cdn.brand.illinois.edu/illinois.css); each fallback is
    that token's brand value, for pages where the brand stylesheet didn't load.
    No rules on bare th/td: <ilw-page class="ilw-format"> restyles those. */
@@ -33,14 +33,6 @@
 
 .th-sort:hover {
   text-decoration: underline;
-}
-
-/* Modal: the row of choice buttons under the body. */
-.modal-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 1rem;
 }
 
 /* Combobox and Autocomplete: the field mirrors the toolkit's ilw-input (which styles inputs

@@ -4,7 +4,7 @@ Accessible Svelte 5 components that look like the
 [Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/) and follow the
 WAI-ARIA Authoring Practices. The goal is a full replacement for the toolkit in
 Svelte apps: the same look without `toolkit.js` or `toolkit.css`, plus what the
-toolkit lacks. So far: a sortable table heading, a modal with close events,
+toolkit lacks. So far: a modal on native `<dialog>` with close reasons,
 focus return and a promise API, a filtering combobox, a free-text autocomplete,
 and a client-side sortable, filterable, paged table. The roadmap is
 [docs/plans/2026-10-20-toolkit-replacement.md](docs/plans/2026-10-20-toolkit-replacement.md),
@@ -33,10 +33,10 @@ import 'ilw-ui/styles.css';
 ```
 
 Every page needs the brand stylesheet
-(`https://cdn.brand.illinois.edu/illinois.css`). **Until the replacements land,
-the host page still loads the toolkit** (`toolkit.js` as a module and
-`toolkit.css`): `Modal` wraps `<ilw-modal>`. This paragraph shrinks as each
-replacement lands.
+(`https://cdn.brand.illinois.edu/illinois.css`). No ilw-ui component needs the
+toolkit: a page that uses only ilw-ui can drop `toolkit.js` and `toolkit.css`.
+Load one of `toolkit.css` and `styles.css`, not both (see
+[Themes and dark mode](#themes-and-dark-mode)).
 
 **Tokens:** `styles.css` uses only the brand palette's `--il-*` custom
 properties, each with its brand value as a fallback in case the brand
@@ -57,7 +57,8 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `breadcrumbs.css`| `.ilw-breadcrumbs` (B4)                                   |
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
-| `components.css` | `.ilw-visually-hidden`, SortableTh, Modal, Combobox, Autocomplete, Pager |
+| `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
+| `components.css` | `.ilw-visually-hidden`, SortableTh, Combobox, Autocomplete, Pager |
 
 ## Themes and dark mode
 
@@ -536,22 +537,24 @@ DOM contract (consumers' tests select on it). The heading sits in a
 ascending, `↓` descending, after a non-breaking space) only there too. Focus
 stays on the button after sorting.
 
-### `openModal`, `alert`, `confirm`
+### `openModal`, `alert`, `confirm`, `Modal` and `.ilw-modal`
 
-Promise wrappers around the toolkit's `<ilw-modal>`. Each call mounts a fresh
-modal on `document.body` and removes it once closed.
+The replacement for `<ilw-modal>`: a native `<dialog>` opened with
+`showModal()`, styled by `modal.css` to look like the toolkit's. Each call
+mounts a fresh modal on `document.body` and removes it once closed.
 
 ```js
 const choice = await openModal({
-  title: 'Unsaved changes',       // optional; rendered as <h2 slot="title">
-  message: 'Save before leaving?', // plain text, rendered as a <p>
+  title: 'Unsaved changes',       // optional; the <h2> that names the dialog
+  message: 'Save before leaving?', // plain text, rendered as a <p>: the dialog's description
   // or body: someSnippet,         // a Svelte snippet for rich content
+  // label: 'Preferences',         // the name when there is no title or message
   buttons: [                       // default: [{ label: 'Got it', value: true }]
     { label: 'Discard', value: 'discard' },
     { label: 'Keep editing', value: 'keep', autofocus: true },
     { label: 'Save', value: 'save' },
   ],
-  size: 'small',                   // ilw-modal size; default 'small'
+  size: 'small',                   // 'small' | 'medium' | 'large' | 'full'; default 'small'
   returnFocusEl: someButton,       // default: what had focus at open
 });
 // 'discard' | 'keep' | 'save', or null if dismissed (Escape, ×, backdrop)
@@ -561,25 +564,73 @@ const ok = await confirm({ title: 'Delete?', message: 'This cannot be undone.', 
 // true only for the confirm button; Cancel takes focus so a stray Enter never confirms
 ```
 
-While open, every other child of `<body>` is `inert`; their previous `inert`
-state is restored on close, before focus returns.
-
-DOM contract:
+DOM contract (`openModal` ids are `app-modal-N`):
 
 ```html
-<ilw-modal id="app-modal-1" size="small" open>
-  <h2 slot="title">Delete?</h2>
-  <p>This cannot be undone.</p>
-  <div class="modal-buttons">
-    <button type="button" class="ilw-button" autofocus>Cancel</button>
-    <button type="button" class="ilw-button">Delete</button>
-  </div>
-</ilw-modal>
+<dialog id="app-modal-1" class="ilw-modal ilw-modal--small" aria-labelledby="app-modal-1-title"
+        aria-describedby="app-modal-1-message" open>
+  <h2 class="ilw-modal-title" id="app-modal-1-title">Delete?</h2>
+  <div class="ilw-modal-body"><p id="app-modal-1-message">This cannot be undone.</p></div>
+  <form method="dialog" class="ilw-modal-buttons">
+    <button class="ilw-button" value="0" autofocus>Cancel</button>
+    <button class="ilw-button" value="1">Delete</button>
+  </form>
+  <button type="button" class="ilw-modal-close" aria-label="Close"><svg aria-hidden="true" …>…</svg></button>
+</dialog>
 ```
 
-`Modal` (the component `openModal` mounts) is exported too. It takes `id`,
-`title`, `size`, `body`/`message`, `buttons` and
-`onclose(reason: 'button' | 'dismiss', value)`, and opens on mount.
+Select an open one with `dialog.ilw-modal[open]` or by role
+(`getByRole('dialog', { name })`).
+
+- **Naming:** `aria-labelledby` the title. Without a title, the message names
+  the dialog instead; without either, `label` (default `'Dialog'`).
+  `aria-describedby` points at the message only when there is also a title. A
+  snippet body is never the description, so its controls aren't read twice.
+- **Focus:** on open, the first `[autofocus]` element (a button's `autofocus`,
+  or one in the body), else the first focusable element. Tab and Shift+Tab
+  wrap inside the dialog, over the elements present at each key press, so
+  content added while it is open is in the cycle. The × button is last. On
+  close, focus goes to `returnFocusEl`.
+- **The page behind** is inert while it is open (`showModal()`), and it doesn't
+  scroll (`html:has(.ilw-modal:modal)`).
+- **Closing:** a choice button submits the `method="dialog"` form, so
+  `returnValue` is its index. Escape, × and a click on the backdrop leave it
+  empty: dismissed. A drag that starts inside the dialog and ends on the
+  backdrop doesn't close it.
+
+`Modal` (the component `openModal` mounts) is exported too. It takes `id`
+(default `ilw-modal-N`), `title`, `label`, `size`, `body`/`message`, `buttons`
+and `onclose(reason: 'button' | 'dismiss', value)`, and opens on mount.
+Unmounting it while open removes it without calling `onclose`.
+
+**Without Svelte:** write the markup above (without `open`) in a server
+template and open it with `dialog.showModal()` or an invoker button,
+`<button commandfor="m" command="show-modal">`; `command="close"` on the ×
+button closes it. The form buttons, Escape and the page's inertness work
+without any script. Backdrop clicks and Tab wrapping (the browser lets Tab
+reach its own toolbar) need `Modal`.
+
+**Differences from `<ilw-modal>`:**
+
+- It fires `close`, honours `autofocus` anywhere inside, lets clicks
+  propagate, keeps the native `id`, and tracks the Tab cycle live: the gaps in
+  [docs/upstream-issues/ilw-modal.md](docs/upstream-issues/ilw-modal.md).
+- Initial focus goes to a control (APG), not the dialog box.
+- The title is `--ilw-color--heading` (Illinois blue in the default theme).
+  Upstream names `---ilw-color--heading` (three dashes), so its title takes
+  the inherited text colour.
+- Above 600px, small and medium never drop under 20rem. Below 600px every size
+  is full width, as upstream.
+- The × button is named "Close", not "Close modal", and its focus style is on
+  `:focus-visible`, with the `.ilw-button` ring.
+- Not carried over: the `image` slot and `align="center"` (with C8
+  `ImageGallery`), and `data-modal-target` triggers (use invoker commands).
+
+**Migrating from the `<ilw-modal>` wrapper:** `ilw-modal[open]` becomes
+`dialog.ilw-modal[open]`; `.modal-buttons` becomes `.ilw-modal-buttons` (a
+`<form>`, with `.ilw-modal-body` before it); `h2[slot=title]` becomes
+`h2.ilw-modal-title`; the × button's name is "Close". The page no longer has
+`inert` set on `<body>`'s children: check inertness with `dialog:modal`.
 
 ### `Combobox`
 
@@ -1013,25 +1064,6 @@ files, and uses no HTML sinks
 each violation as file:line.
 
 ## Known issues
-
-Upstream `<ilw-modal>` (1.2.1) gaps. Each is worked around once, inside `Modal`,
-where a workaround is possible. None is filed upstream yet. Draft issues are in
-[docs/upstream-issues/ilw-modal.md](docs/upstream-issues/ilw-modal.md).
-
-- **No open/close events.** `Modal` watches the reflected `open` attribute with a
-  `MutationObserver`.
-- **`autofocus` works only on direct slotted children.** `Modal` focuses the
-  `[autofocus]` button itself after `updateComplete`.
-- **Clicks inside the dialog stop propagating.** Svelte's delegated `onclick`
-  listens at the mount root and would never fire, so the buttons get direct
-  listeners.
-- **`id` and `size` don't reflect, and `id` overrides the native property.**
-  Svelte would set them as properties and the attributes would be missing, so
-  `Modal` sets them with `setAttribute`.
-- **Tab order is captured at open.** Content added to an open modal isn't in its
-  focus trap.
-- **`aria-describedby` points at the whole body slot,** so the buttons are read
-  as part of the description.
 
 Upstream Zag (`@zag-js/combobox` 1.44.0) gaps. Each is worked around once,
 inside `Combobox` (and `Autocomplete`, which shares the workarounds in

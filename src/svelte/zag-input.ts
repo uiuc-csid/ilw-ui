@@ -23,8 +23,8 @@ export function keepCaret(input: HTMLInputElement): () => void {
  * On Apple platforms Zag re-announces the highlighted option through a live
  * region it appends to `document.body` (`@zag-js/live-region`; the combobox
  * machine passes it no root). That puts it outside the page's own landmarks
- * (ta-manager's `<ilw-page>`), and outside a modal, where `inert` on the rest
- * of the page would silence it. While focus is in `root`, move each one into
+ * (ta-manager's `<ilw-page>`), and outside a modal dialog, which makes the rest
+ * of the page inert and would silence it. While focus is in `root`, move each one into
  * `root`. Zag finds the region by id and sets its text a task later, so moving
  * it in the same microtask keeps announcing working.
  */

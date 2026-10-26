@@ -35,7 +35,7 @@ The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `export
 
 ## Rules
 
-- **Layering:** native HTML first, `ilw-ui` second. The toolkit is the visual reference, not a runtime dependency: new components never require `toolkit.js` or `toolkit.css`. Components that still wrap a toolkit element (today: the modal helpers on `<ilw-modal>`) keep working until their replacement lands.
+- **Layering:** native HTML first, `ilw-ui` second. The toolkit is the visual reference, not a runtime dependency: no component may require `toolkit.js` or `toolkit.css` (since C1, none does).
 - **Visual parity, APG behaviour:** a component that replaces a toolkit one matches its look (themes, dark mode) and gets a parity story rendering both side by side. Behaviour follows the WAI-ARIA APG, not the toolkit; the README records where they differ.
 - **Islands and static pages:** every component mounts with `mount()` on a server-rendered element, with no SvelteKit imports and no DOM access at module top level. Presentational components also ship as documented markup plus classes in `styles.css`, usable from a server template without JavaScript.
 - **Imports:** `src/` imports only `svelte`, `@zag-js/*`, `@tanstack/table-core`, `@tanstack/svelte-table`, `phosphor-svelte/lib/<Icon>` (one icon per import; the package index only for types) and its own files. Pin each library family exactly, in lockstep. `tests/unit/guard.test.ts` enforces it.
