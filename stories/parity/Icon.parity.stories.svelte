@@ -34,9 +34,9 @@
 </Story>
 
 <!--
-  `Icon` with the Phosphor icon that replaces each toolkit name, solid (fill) then line (regular), then a labelled icon and an `.ilw-icon-row`, styled by ilw-ui's `icon.css` only.
+  `Icon` with the Phosphor icon that replaces each toolkit name, solid (fill) then line (regular), then a labelled icon and an `.ilw-icon-row`, styled by ilw-ui's `styles.css` only, through `.ilw-format` on its own `<div>`.
 
-  **Why:** the play function checks the contract: decorative icons are hidden from assistive technology, a labelled one is an image with that name, the size follows the font or the `size` prop, and the colour is the text's. axe checks the rest. The grid is the migration table: each toolkit name with its replacement.
+  **Why:** the play function checks the contract: decorative icons are hidden from assistive technology, a labelled one is an image with that name, the size follows the font or the `size` prop, the colour is the text's, and the text is in the brand font. axe checks the rest. The grid is the migration table: each toolkit name with its replacement.
 
   **Review:** matches **Toolkit** in size, weight and colour, icon by icon; the glyphs differ (Phosphor draws them, not the brand). The social logos and campus-specific names (Bluesky, Substack, Weibo, Yelp, Flickr, admissions, donor, …) are the nearest Phosphor idea.
 -->
@@ -51,8 +51,12 @@
       await expect(svg).toHaveAttribute('aria-hidden', 'true');
       await expect(svg).not.toHaveAttribute('role');
     }
-    // 1em: the icon follows the text's size and colour, as a font glyph does.
     const li = canvasElement.querySelector('.icon-grid li')!;
+    // The text is in the brand font, as on the toolkit side, and it has loaded.
+    await expect(getComputedStyle(li).fontFamily).toMatch(/^"?Source Sans/);
+    await document.fonts.ready;
+    await expect(document.fonts.check('1rem "Source Sans"')).toBe(true);
+    // 1em: the icon follows the text's size and colour, as a font glyph does.
     await expect(icons[0].getBoundingClientRect().height).toBeCloseTo(parseFloat(getComputedStyle(li).fontSize), 0);
     await expect(getComputedStyle(icons[0]).fill).toBe(getComputedStyle(li).color);
     // A labelled icon is an image with that name, at the size asked for.
@@ -63,15 +67,18 @@
     await expect(getComputedStyle(row).columnGap).toBe('18px');
   }}
 >
-  <ul class="icon-grid">
-    {#each toolkitIcons as [name, icon] (name)}
-      <li><Icon {icon} /><Icon {icon} type="line" /> {name}</li>
-    {/each}
-  </ul>
-  <p>Next session: <Icon icon={Calendar} alt="Calendar" size="2rem" /></p>
-  <div class="ilw-icon-row">
-    <Icon icon={Envelope} size="18px" />
-    <p>Email the department office.</p>
+  <!-- .ilw-format, as the toolkit side's <ilw-page class="ilw-format"> shell: the brand font and prose sizes. -->
+  <div class="ilw-format">
+    <ul class="icon-grid">
+      {#each toolkitIcons as [name, icon] (name)}
+        <li><Icon {icon} /><Icon {icon} type="line" /> {name}</li>
+      {/each}
+    </ul>
+    <p>Next session: <Icon icon={Calendar} alt="Calendar" size="2rem" /></p>
+    <div class="ilw-icon-row">
+      <Icon icon={Envelope} size="18px" />
+      <p>Email the department office.</p>
+    </div>
   </div>
 </Story>
 
