@@ -1,5 +1,5 @@
-// rowColumn's adapters against a stable legacy sort, and pageWindow against the
-// legacy unranked-courses pager code.
+// rowColumn's adapters against a stable legacy sort, pageWindow against the
+// legacy unranked-courses pager code, and pageHref.
 import {
   columnFilteringFeature,
   constructTable,
@@ -11,7 +11,7 @@ import {
 import { storeReactivityBindings } from '@tanstack/table-core/store-reactivity-bindings';
 import { describe, expect, test } from 'vitest';
 
-import { pageWindow, rowColumn } from '../../src/core/index.ts';
+import { pageHref, pageWindow, rowColumn } from '../../src/core/index.ts';
 
 interface Item {
   id: string;
@@ -118,5 +118,22 @@ describe('pageWindow', () => {
         expect(pageWindow(page, total)).toEqual(legacyWindow(page, total));
       }
     }
+  });
+});
+
+describe('pageHref', () => {
+  test.each([
+    ['', 3, 'page', '?page=3'],
+    ['?q=chem&page=1', 2, 'page', '?q=chem&page=2'],
+    ['/courses', 4, 'page', '/courses?page=4'],
+    ['/courses?term=fa26#results', 2, 'page', '/courses?term=fa26&page=2#results'],
+    ['#results', 2, 'page', '?page=2#results'],
+    ['https://example.edu/list?p=1&q=a+b', 5, 'p', 'https://example.edu/list?p=5&q=a+b'],
+  ])('pageHref(%j, %i, %j) is %j', (url, page, parameter, want) => {
+    expect(pageHref(url, page, parameter)).toBe(want);
+  });
+
+  test('parameter defaults to page', () => {
+    expect(pageHref('/list', 2)).toBe('/list?page=2');
   });
 });

@@ -1,0 +1,90 @@
+/* Pagination (C5), the CSS form of <ilw-pagination>. Markup (page 6 of 12):
+
+     <nav class="ilw-pagination" aria-label="Pages">
+       <ul>
+         <li class="ilw-pagination-previous"><a href="?page=5" aria-label="Previous page">Previous</a></li>
+         <li><a href="?page=1" aria-label="Page 1">1</a></li>
+         <li class="ilw-pagination-ellipsis"><span>…</span></li>
+         <li><a href="?page=6" aria-label="Page 6" aria-current="page">6</a></li>
+         …
+         <li class="ilw-pagination-next"><a href="?page=7" aria-label="Next page">Next</a></li>
+       </ul>
+       <span class="ilw-pagination-count">Page 6 of 12</span>
+     </nav>
+
+   On the first and last page, Previous and Next are a <span> in place of the
+   link. Colours come from the theme properties, so a theme class on the nav
+   (ilw-theme-blue-1, …) restyles it. Differs from the toolkit: the current
+   page is a link with a focus stop, and focus is a two-tone ring, as on
+   .ilw-button, instead of a colour change only. */
+
+.ilw-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 1px 0;
+  background-color: var(--ilw-color--background);
+  color: var(--ilw-color--control-text);
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+  font-size: 1.1875rem;
+}
+
+.ilw-pagination ul {
+  /* Flex, so whitespace between the <li>s in server markup adds no gaps. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-pagination li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-pagination li > *,
+.ilw-pagination-count {
+  display: flex;
+  justify-content: center;
+  min-width: 24px;
+  padding: 12px 18px;
+  line-height: 1.5;
+}
+
+.ilw-pagination a {
+  outline: thin solid var(--ilw-color--control-text);
+  background-color: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ilw-pagination a:hover {
+  background-color: var(--ilw-color--control-text);
+  color: var(--ilw-color--control);
+  text-decoration: underline;
+}
+
+.ilw-pagination a[aria-current='page'] {
+  background-color: var(--ilw-color--control-text);
+  color: var(--ilw-color--control);
+}
+
+/* Lifted over its neighbours, whose outlines would otherwise cover the ring. */
+.ilw-pagination a:focus-visible {
+  position: relative;
+  z-index: 1;
+  background-color: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  text-decoration: underline;
+  outline: 2px solid var(--ilw-color--focus--text);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ilw-color--focus--background);
+}
+
+.ilw-pagination-count {
+  margin-inline-start: 20px;
+}

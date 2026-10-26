@@ -3,7 +3,7 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Footer, Icon, PageTitle, SectionNav } from '../src/svelte/index.ts';
+  import { Breadcrumbs, Button, Footer, Icon, PageTitle, Pagination, SectionNav } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
   import { programs } from './section-nav-data.ts';
@@ -70,6 +70,20 @@
 -->
 <Story name="Breadcrumbs" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-breadcrumbs li > *'))}>
   <Breadcrumbs items={[{ label: 'Home', href: '#home' }]} current="Degree programs" />
+</Story>
+
+<!--
+  `Pagination` outside `.ilw-format`.
+
+  **Why:** the play function checks the links, the ellipsis, the disabled Previous and the page count are in Source Sans without the prose styles.
+
+  **Review:** matches **Parity/Pagination → IlwUi**, default theme.
+-->
+<Story
+  name="Pagination"
+  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-pagination li > *, .ilw-pagination-count'))}
+>
+  <Pagination page={1} pages={8} href={(p) => `#page-${p}`} />
 </Story>
 
 <!--

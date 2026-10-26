@@ -78,3 +78,19 @@ export function pageWindow(page: number, totalPages: number): Array<number | nul
   }
   return out;
 }
+
+/**
+ * `url` with its `parameter` query value set to `page`, keeping the rest of
+ * the query and the fragment. `url` may be relative (`''`, `?q=x`, `/list`)
+ * or absolute; the result is relative or absolute to match.
+ */
+export function pageHref(url: string, page: number, parameter = 'page'): string {
+  const hashAt = url.indexOf('#');
+  const hash = hashAt < 0 ? '' : url.slice(hashAt);
+  const rest = hashAt < 0 ? url : url.slice(0, hashAt);
+  const queryAt = rest.indexOf('?');
+  const path = queryAt < 0 ? rest : rest.slice(0, queryAt);
+  const query = new URLSearchParams(queryAt < 0 ? '' : rest.slice(queryAt + 1));
+  query.set(parameter, String(page));
+  return `${path}?${query}${hash}`;
+}
