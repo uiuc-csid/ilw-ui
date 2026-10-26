@@ -58,6 +58,7 @@ export {
   comparatorSortFn,
   type Predicate,
   predicateFilterFn,
+  pageHref,
   pageWindow,
   type RowColumn,
   rowColumn,
