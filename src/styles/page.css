@@ -1,7 +1,7 @@
 /* Page shell (B1), the CSS form of <ilw-page>: header, main and footer in one
    column, a skip link first, and the theme's page colours. Markup:
 
-     <div class="ilw-page" id="top">
+     <div class="ilw-page" id="top" tabindex="-1">
        <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
        <header class="ilw-header">…</header>
        <main id="main-content" tabindex="-1">…</main>
@@ -33,7 +33,9 @@
   margin-inline: var(--ilw-page--margin, 0);
 }
 
-/* Only the skip link focuses main (tabindex="-1"); don't ring the whole content area. */
+/* Only the skip link focuses main, and only back-to-top the shell (both
+   tabindex="-1"); don't ring the whole content area or page. */
+.ilw-page:focus,
 .ilw-page > main:focus {
   outline: none;
 }

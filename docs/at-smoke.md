@@ -83,6 +83,26 @@ Status: **pending human run.**
 - [ ] Page title: the heading is read as heading level 1; the background image is not announced.
 - [ ] Footer: the wordmark link reads "University of Illinois Urbana-Champaign, link" once, not twice (no extra "Illinois" image); the campus sections are level-3 headings under it; the legal links are a list.
 
+## Section nav (story: Page Chrome → Section nav → Fixture)
+
+Status: **pending human run.**
+
+- [ ] The landmarks list has a "Pages In This Section" navigation.
+- [ ] Tabbing reads "Undergraduate Degrees, link", then "Subpages of Undergraduate Degrees, button, expanded" (VoiceOver may say "disclosure triangle" or "summary"); the chevron is not read.
+- [ ] Enter or Space on a toggle flips it, the new state is announced, and focus stays on it; when open, the next Tab reaches the first child.
+- [ ] "Pre-Veterinary and Medical" is announced as the current page.
+- [ ] Lists are announced with their item counts, nested by level.
+- [ ] Wider than 700 px (the "Pages In This Section" toggle hidden): every link is still reachable with the virtual cursor and listed in the links list, in Safari and Firefox too (Chrome checked by script; this is the plan's "check first").
+- [ ] Narrower than 700 px: "Pages In This Section, button, collapsed"; Enter opens it.
+
+## Back to top (story: Page Chrome → Back to top → Fixture)
+
+Status: **pending human run.**
+
+- [ ] It is the last Tab stop on the page and reads "Back to top, link"; it is visible when focused, even at the top of the page.
+- [ ] Enter scrolls to the top; the next Tab reaches "Skip to main content". Nothing extra is announced when focus moves to the page shell (no role or name of its own), or the screen reader reads from the top of the page.
+- [ ] The arrow is not read.
+
 ## Dark-mode toggle (story: Page Chrome → Dark-mode toggle → Fixture)
 
 Status: **pending human run.**

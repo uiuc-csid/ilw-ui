@@ -42,7 +42,7 @@ What they do today, in short:
 ```html
 <html lang="en" data-theme="light">        <!-- data-theme optional: see dark mode -->
 <body>
-  <div class="ilw-page ilw-format" id="top">
+  <div class="ilw-page ilw-format" id="top" tabindex="-1">
     <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
     <header class="ilw-header">…</header>    <!-- B2, optional -->
     <main id="main-content" tabindex="-1">…</main>
@@ -55,7 +55,7 @@ What they do today, in short:
 - `.ilw-page` is a one-column grid (`auto 1fr auto`) like the toolkit's `.page`, and sets `background` and `color` from `--ilw-color--background`/`--ilw-color--text` so the A1 dark values show (the toolkit left these commented out). The header row gets `position: relative; z-index: 300`, as upstream, so menus overlay the main area.
 - Modifiers: `.ilw-margin` (side margins `--ilw-margin--side` on `main`), `.ilw-page--expanded` (top and bottom margin on `main`), and the A2 classes `.ilw-format`/`.ilw-font`, which this stylesheet doesn't define.
 - **Skip link.** The first focusable element; visually hidden until focused, then shown at the top left in the focus colours (`--ilw-color--focus--*`). Its target is `<main id="main-content" tabindex="-1">`: the `tabindex` makes focus move into `main` (not just the scroll position) in every browser, so the next Tab continues from the main content. `main:focus` has no outline (only programmatic focus lands on it). The id and the text are the contract; both are props in Svelte.
-- **`id="top"`** on `.ilw-page` is the target of B7.
+- **`id="top"`** on `.ilw-page` is the target of B7. **`tabindex="-1"`** on it (added in PR 4) makes following B7 move focus to the shell: without it, Chrome and Safari both drop focus to `<body>` when the fragment target isn't focusable. `.ilw-page:focus` has no outline, like `main:focus`.
 - Landmarks: one `banner` (the header, a direct child of the shell, not inside `main`), one `main`, one `contentinfo` (the footer, same rule). Nothing else in the shell adds roles.
 
 ### Svelte
@@ -282,6 +282,8 @@ Focus order: the link, then its toggle, then (when open) the children. Screen re
 
 The toolkit collapses the whole nav under 700 px. Ours wraps the list in `details.ilw-section-nav-collapse`, `open` from the server. At 700 px and up its `summary` is hidden and `::details-content` is forced visible, so the list always shows; below, it is a normal disclosure. **To check first** (it decides the design): that a closed `details` whose content is forced visible exposes that content to assistive technology in Chrome, Safari and Firefox. If one doesn't, the fallback drops the outer `details` and the list is always expanded.
 
+**Checked (PR 4):** in Chromium the real accessibility tree (CDP `Accessibility.getFullAXTree`) exposes every link inside the closed, forced-visible `details`, so the design stays. WebKit and Firefox have no scriptable AX tree here; their check is in `docs/at-smoke.md`. Where `::details-content` isn't supported, the narrow-width toggle shows at every width, so the list is never out of reach.
+
 ### Svelte
 
 `SectionNav`: props `items` (a tree of `{ label, href, current?, children? }`), `label` (default "Pages In This Section"). It sets `open` on every ancestor of the current item and `aria-current="page"` on it.
@@ -305,6 +307,16 @@ The last child of `.ilw-page`, so it is last in the focus order.
 ### Svelte
 
 `BackToTop`: props `target` (default `top`), `label` (default "Back to top").
+
+## Resolved while building B6 and B7 (PR 4)
+
+- **Section nav `open` default.** The outer `details` is closed unless `open` is passed, matching upstream's closed toggle at narrow widths; wider than 700 px the list shows anyway.
+- **Branches collapse.** Upstream always shows every level. Ours opens the current page's ancestors only (the plan's server-set `open`); `expanded` opens every branch for the upstream look (the parity story uses it).
+- **Extra `SectionNav` props:** `open`, `expanded`, `root` (upstream's `ilw-section-nav--root` on the first item, on by default), `id` (prefix for the label's id), `class`. Not ported: `collapse="true|false"` and `mode="manual"` (the markup contract is the manual form) and the narrow-width 100vw breakout (A5).
+- **Colours.** Upstream's root plate (Storm 95) and toggle background (`#E8E9EB`, not a brand colour) become `--ilw-color--gray--background`, so they turn dark with the theme.
+- **`Page`'s `backToTop` prop** renders `BackToTop` as the shell's last child, targeting the shell's `id`.
+- **Back-to-top reveal on short pages.** A page that doesn't scroll has an inactive scroll timeline, so the animation has no effect and the link shows (upstream hides it at the top). It is reachable either way.
+- **Back-to-top focus colours.** Upstream's focused icon keeps the button's background colour as its fill; ours uses `--ilw-color--focus--text` for the icon and border on the focus background, so the icon has contrast on the focus plate.
 
 ## Tests (every item)
 
