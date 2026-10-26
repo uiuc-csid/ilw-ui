@@ -84,11 +84,21 @@ What upstream does, in short:
 
 - `attrs` is `{ id, required, 'aria-describedby', 'aria-invalid' }`, with `undefined` for what doesn't apply, so spreading it adds nothing extra.
 - Props: `label`, `description`, `error` (each a string or a snippet; `error` set means invalid), `required`, `compact`, `variant` (`'entry'` default, `'checkbox'` for a checkbox or switch), `id` (default `nextId('ilw-field')`), `descriptionId` and `errorId` (default `<id>-description`, `<id>-error`), `class`.
-- Radio groups stay markup: `aria-invalid` isn't allowed on a `group`, so a group component (with the error on the `fieldset`'s description and the first radio) is left for later.
+
+`RadioGroup` renders a radio group (added to this item on review):
+
+```svelte
+<RadioGroup legend="Term" name="term" bind:value={term} required error={errors.term}
+  options={[{ value: 'fa', label: 'Fall' }, { value: 'sp', label: 'Spring' }]} />
+```
+
+- `aria-invalid` isn't allowed on a plain `group` or on a `radio` (svelte-check flags it), so the fieldset takes `role="radiogroup"`, which allows it and is still named by its legend. The fieldset carries `aria-describedby` (help, then error) and `aria-invalid`; each radio gets the native `required`, and the legend the marker. Radios of an invalid group get the checkbox's error ring.
+- Props: `legend`, `name`, `options` (`{ value, label, disabled? }[]`), `value` (bindable), `onchange`, `description`, `error`, `required`, `layout` (`'stacked'` or `'across'`, upstream's `-radio-vertical`), `compact`, `id` (default `nextId('ilw-radio-group')`; option `i` is `<id>-<i>`), `descriptionId`, `errorId`, `class`.
 
 ## Tests
 
 - **Play functions** (`stories/Field.stories.svelte`): the ARIA wiring (label `for`, `aria-describedby` order and targets, `aria-invalid` only with an error, `required` and the marker class, overridden ids), the marker's empty alternative text, computed sizes and colours against upstream's values, the compact grid, the radio legend placement in Chromium and WebKit, and the switch colours on and off.
+- **Keyboard (`tests/e2e/radio-group.spec.ts`):** Tab enters a group with no value on its first option, Space checks it, arrows move and check, skipping a disabled option (native radios wrap at the ends in Chromium, not WebKit), and Tab leaves the group.
 - **Keyboard (`tests/e2e/field.spec.ts`):** Tab reaches the controls in order, Space toggles the checkbox and the switch, arrow keys move within the radio group, the compact layout stacks under 800 px, and focus never falls to `<body>`. The dark-mode toggle's spec keeps passing unchanged.
 - **axe** on every story, including the error state, in light and dark.
 - **Parity pair** `stories/parity/Field.parity.stories.svelte`: upstream's `variations.html` sample inside `<ilw-content>` against ours.

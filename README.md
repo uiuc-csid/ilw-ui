@@ -28,7 +28,7 @@ to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
 ```js
 import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, Pagination, setTableFilter } from 'ilw-ui/svelte';
-import { Page, Footer, Breadcrumbs, PageTitle, Icon, Field } from 'ilw-ui/svelte';
+import { Page, Footer, Breadcrumbs, PageTitle, Icon, Field, RadioGroup } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, pageHref, announce, campusFooter, campusLink } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
@@ -493,7 +493,7 @@ It renders:
   toggles it, as any checkbox.
 - Props: `label` (default "Dark mode").
 - **Styles:** the switch is A7's `input.ilw-switch` (`switch.css`; see
-  [`Field` and the form classes](#field-and-the-form-classes));
+  [`Field`, `RadioGroup` and the form classes](#field-radiogroup-and-the-form-classes));
   `dark-mode-toggle.css` lays out the label. It uses `--ilw-color--control`
   and `--ilw-color--control-text`, so it follows themes and dark mode. In
   forced-colours mode it falls back to a native checkbox.
@@ -618,13 +618,14 @@ order.
   bare `button.ilw-button-large`).
 - **No new-window icon** on `a.ilw-button[target=_blank]` yet.
 
-### `Field` and the form classes
+### `Field`, `RadioGroup` and the form classes
 
 The toolkit's `ilw-input` form styles, from `forms.css` and `switch.css`: the
 same class names (`.ilw-input-entry*`, the radio and checkbox variants,
 `-compact`, `.ilw-input-alert`, `.ilw-label-required`), so toolkit markup looks
 the same once `<ilw-content>` is gone. Server templates write the markup;
-Svelte code can use `Field`, which renders it and wires up the ARIA.
+Svelte code can use `Field` and `RadioGroup`, which render it and wire up the
+ARIA.
 
 ```html
 <p>Fields marked * are required.</p>
@@ -644,11 +645,15 @@ Svelte code can use `Field`, which renders it and wires up the ARIA.
   <input id="notify" name="notify" type="checkbox">
 </div>
 
-<!-- Radio group: -radio stacks, -radio-vertical flows across; each has a -compact form -->
-<fieldset class="ilw-input-entry-radio">
-  <legend>Term</legend>
-  <input type="radio" id="term-fa" name="term" value="fa"><label for="term-fa">Fall</label>
-  <input type="radio" id="term-sp" name="term" value="sp"><label for="term-sp">Spring</label>
+<!-- Radio group: -radio stacks, -radio-vertical flows across; each has a -compact form.
+     role="radiogroup" keeps the legend as its name and allows aria-invalid (a plain group doesn't). -->
+<fieldset class="ilw-input-entry-radio" id="term" role="radiogroup"
+          aria-describedby="term-description term-error" aria-invalid="true">
+  <legend class="ilw-label-required">Term</legend>
+  <input type="radio" id="term-0" name="term" value="fa" required><label for="term-0">Fall</label>
+  <input type="radio" id="term-1" name="term" value="sp" required><label for="term-1">Spring</label>
+  <p class="ilw-input-description" id="term-description">The term you will teach.</p>
+  <p class="ilw-input-alert" id="term-error">Choose a term.</p>
 </fieldset>
 
 <!-- A bordered group, upstream's disclaimer box, and a form-level message -->
@@ -689,6 +694,8 @@ Svelte code can use `Field`, which renders it and wires up the ARIA.
 <Field label="Show weekends" variant="checkbox">
   {#snippet children(attrs)}<input type="checkbox" role="switch" class="ilw-switch" {...attrs} />{/snippet}
 </Field>
+<RadioGroup legend="Term" name="term" bind:value={term} required error={errors.term}
+  options={[{ value: 'fa', label: 'Fall' }, { value: 'sp', label: 'Spring' }]} />
 ```
 
 | Prop            | Type                          |                                                                    |
@@ -707,8 +714,26 @@ Svelte code can use `Field`, which renders it and wires up the ARIA.
 `attrs` (`FieldAttrs`) is `{ id, required, 'aria-describedby', 'aria-invalid' }`,
 with `undefined` for what doesn't apply, so spreading it adds nothing extra.
 DOM contract: exactly the entry markup above (label, control, description,
-error, in that order). Radio groups stay markup: `aria-invalid` isn't allowed
-on a `group`, so a group component is left for later.
+error, in that order).
+
+`RadioGroup` renders the radio-group markup above: `fieldset[role=radiogroup]`
+with the legend, then each option as `input#<id>-<i>` + `label`, then the help
+text and error. `aria-invalid` isn't allowed on a plain `group` or on a
+`radio`, so the fieldset takes `role="radiogroup"` (still named by its legend)
+and carries `aria-invalid` and `aria-describedby`; each radio gets the native
+`required`.
+
+| Prop            | Type                          |                                                                    |
+| --------------- | ----------------------------- | ------------------------------------------------------------------ |
+| `legend`        | `string \| Snippet`           | the group's name                                                   |
+| `name`          | `string`                      | the radios' `name`                                                 |
+| `options`       | `RadioOption[]`               | `{ value, label, disabled? }`                                      |
+| `value`         | `string` (bindable)           | the checked option's value; undefined for none                     |
+| `onchange`      | `(value: string) => void`     | called when the user picks an option                               |
+| `description`, `error`, `required`, `compact`, `class` | | as `Field`, on the group                              |
+| `layout`        | `'stacked' \| 'across'`       | default `'stacked'`; `'across'` is upstream's `-radio-vertical`    |
+| `id`            | `string`                      | the fieldset's id; default `nextId('ilw-radio-group')`             |
+| `descriptionId`, `errorId` | `string`           | default `<id>-description`, `<id>-error`                           |
 
 **Switch:** `input.ilw-switch` with `role="switch"` replaces
 `.ilw-toggle-slider`. The input itself is the track (no wrapper or painted
@@ -716,7 +741,9 @@ spans): off is the control surface with a control-text border and thumb, on is
 filled with control text, each 3:1 against the surface. Space toggles it, as
 any checkbox; it announces "switch, on/off". The dark-mode toggle uses it.
 
-**Behaviour:** native, including the radio group's arrow keys.
+**Behaviour:** native. In a radio group, Tab enters on the checked option (the
+first when none is), arrow keys move and check, skipping disabled options
+(Chromium wraps at the ends, WebKit doesn't), and Tab leaves the group.
 
 **Differs from the toolkit:**
 
@@ -730,8 +757,9 @@ any checkbox; it announces "switch, on/off". The dark-mode toggle uses it.
 - Help text is `.ilw-input-description` (a bare `<p>` still gets its look) and
   is connected to the control; in the compact forms it sits under the control,
   not under the label.
-- Radio groups are `<fieldset>` + `<legend>`, so the title names the group
-  (upstream: a `<div>` and a `<p>`; that markup still lays out).
+- Radio groups are `<fieldset role="radiogroup">` + `<legend>`, so the title
+  names the group and the group can be marked invalid (upstream: a `<div>` and
+  a `<p>`; that markup still lays out). An invalid group's radios get a ring.
 - The required marker is silent to screen readers, and no script adds it.
 - The select chevron is drawn with gradients in the link-hover colour, not a
   `data:` SVG (no `img-src data:` needed under a strict CSP).

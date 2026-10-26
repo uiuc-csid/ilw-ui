@@ -1,7 +1,7 @@
 /* Form styles (A7), after the toolkit's ilw-input under its class names:
    .ilw-input-entry and -compact (a label, a text control, select or textarea,
    help text, an error), .ilw-input-entry-checkbox and -checkbox-compact, the
-   four .ilw-input-entry-radio* groups, .ilw-label-required, .ilw-input-alert,
+   four .ilw-input-entry-radio* groups (RadioGroup renders them), .ilw-label-required, .ilw-input-alert,
    .ilw-fieldset and .ilw-input-disclaimer. The switch is switch.css.
 
    Every selector weighs one class (the entry, in :is()), the rest in :where(), as in
@@ -367,6 +367,19 @@
   padding-top: 5px;
   color: var(--ilw-color--text);
   font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* A group's error sits under its options. The radios of an invalid group
+   (role="radiogroup" with aria-invalid, or :user-invalid) get the same ring as
+   an invalid checkbox, so the error isn't colour alone. */
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(.ilw-input-alert) {
+  margin-top: 5px;
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact)
+  :where(input[type='radio']):where(:user-invalid, [aria-invalid='true'] > *):where(:not(:focus-visible)) {
+  outline: 2px solid var(--ilw-color--link-hover);
+  outline-offset: 1px;
 }
 
 /* A bordered group, and upstream's disclaimer box (a checkbox beside its text). */
