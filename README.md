@@ -6,7 +6,8 @@ WAI-ARIA Authoring Practices. The goal is a full replacement for the toolkit in
 Svelte apps: the same look without `toolkit.js` or `toolkit.css`, plus what the
 toolkit lacks. So far: a modal on native `<dialog>` with close reasons,
 focus return and a promise API, a filtering combobox, a free-text autocomplete,
-and a client-side sortable, filterable, paged table. The roadmap is
+a client-side sortable, filterable, paged table, and link-based pagination
+for server-rendered lists. The roadmap is
 [docs/plans/2026-10-20-toolkit-replacement.md](docs/plans/2026-10-20-toolkit-replacement.md),
 tracked in [#9](https://github.com/uiuc-csid/ilw-ui/issues/9).
 
@@ -26,9 +27,9 @@ to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
 
 ```js
 import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
-import { createDataTable, DataTable, DataRows, TableSortTh, Pager, setTableFilter } from 'ilw-ui/svelte';
+import { createDataTable, DataTable, DataRows, TableSortTh, Pager, Pagination, setTableFilter } from 'ilw-ui/svelte';
 import { Page, Footer, Breadcrumbs, PageTitle, Icon, Field } from 'ilw-ui/svelte';
-import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, announce, campusFooter, campusLink } from 'ilw-ui/core';
+import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, pageHref, announce, campusFooter, campusLink } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
 
@@ -57,6 +58,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `page.css`       | `.ilw-page` shell, `.ilw-skip-link`, links in `main` (B1) |
 | `page-title.css` | `.ilw-page-title` (B5)                                    |
 | `breadcrumbs.css`| `.ilw-breadcrumbs` (B4)                                   |
+| `pagination.css` | `.ilw-pagination` (C5)                                    |
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
@@ -1125,6 +1127,61 @@ not change yet. Consumers should drop it and move to the default markup
 The count isn't a live region: with two pagers it would be announced twice.
 Focus staying on the pressed button is what tells a screen-reader user the page
 changed.
+
+### `Pagination` and `.ilw-pagination`
+
+Links to the pages of a server-rendered list, replacing `<ilw-pagination>`.
+Each page has its own URL, so a page can be bookmarked and works without
+script. For a list paged in the browser, use `Pager` (above).
+
+```svelte
+<Pagination page={6} pages={12} url="/courses?term=fa26" />
+<!-- 0-based or path-based pages: build the links yourself -->
+<Pagination page={6} pages={12} href={(p) => `/courses/page/${p}`} />
+```
+
+**DOM contract** (page 6 of 12, `url="?term=fa26"`). Server templates render
+the same markup with `pagination.css` and no script:
+
+```html
+<nav class="ilw-pagination" aria-label="Pages">
+  <ul>
+    <li class="ilw-pagination-previous"><a href="?term=fa26&page=5" aria-label="Previous page">Previous</a></li>
+    <li><a href="?term=fa26&page=1" aria-label="Page 1">1</a></li>
+    <li class="ilw-pagination-ellipsis"><span>…</span></li>
+    <li><a href="?term=fa26&page=4" aria-label="Page 4">4</a></li>
+    <li><a href="?term=fa26&page=5" aria-label="Page 5">5</a></li>
+    <li><a href="?term=fa26&page=6" aria-label="Page 6" aria-current="page">6</a></li>
+    <li><a href="?term=fa26&page=7" aria-label="Page 7">7</a></li>
+    <li><a href="?term=fa26&page=8" aria-label="Page 8">8</a></li>
+    <li class="ilw-pagination-ellipsis"><span>…</span></li>
+    <li><a href="?term=fa26&page=12" aria-label="Page 12">12</a></li>
+    <li class="ilw-pagination-next"><a href="?term=fa26&page=7" aria-label="Next page">Next</a></li>
+  </ul>
+  <span class="ilw-pagination-count">Page 6 of 12</span>
+</nav>
+```
+
+- On the first page Previous is `<span>Previous</span>` instead of a link, and
+  on the last page Next is `<span>Next</span>`, so the row doesn't shift.
+- The page list is `Pager`'s: `pageWindow(page, pages)`, the first, the last
+  and two either side of the current page.
+- Props: `page` (1-based, clamped to `1…pages`), `pages`, `url` (default `''`:
+  links are just a query, relative to the current page), `parameter` (default
+  `"page"`), `href` (a function from the 1-based page to its link; replaces
+  `url` and `parameter`), `label` (default `"Pages"`; give two paginations on
+  one page distinct labels), `hidePageCount`, `class` (e.g. a theme class).
+- `pageHref(url, page, parameter = 'page')` (`ilw-ui/core`) builds each link:
+  it sets `parameter` in `url`'s query and keeps the other values and the
+  fragment. Server code can do the same.
+- Differs from `<ilw-pagination>`: no First and Last links (the first and last
+  page numbers are always shown instead); the current page stays a link with
+  `aria-current="page"` (the toolkit puts `aria-current` on an unlinked `li`);
+  focus is the two-tone ring of `.ilw-button`, not just a colour change; the
+  count is after the list, not an item in it. For the toolkit's `zerostart`,
+  pass `href={(p) => pageHref(url, p - 1)}`.
+- Not yet: the toolkit's `width` and `padding`; they come with the layout
+  utilities (A5).
 
 ### `mountIslands`
 

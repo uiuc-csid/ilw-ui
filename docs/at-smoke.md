@@ -102,6 +102,14 @@ Status: **pending human run.**
 - [ ] In Markup, the compact radio groups still announce their legend as the group name.
 - [ ] In Windows High Contrast (forced colours), checkboxes, radios and the switch show as native controls with focus rings.
 
+## Pagination (story: Pagination → Fixture)
+
+Status: **pending human run.**
+
+- [ ] The landmarks list has a "Pages" navigation; inside it, the list is announced with its item count.
+- [ ] Tabbing reads "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
+- [ ] On the first page (Pagination → Ends), "Previous" is read as text, not a link.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |
