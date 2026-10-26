@@ -3,7 +3,7 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Footer, Icon, PageTitle } from '../src/svelte/index.ts';
+  import { Breadcrumbs, Button, Field, Footer, Icon, PageTitle } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
 
@@ -34,6 +34,23 @@
 -->
 <Story name="Button" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-button'))}>
   <p><Button href="#unformatted">Link button</Button> <Button>Plain button</Button></p>
+</Story>
+
+<!--
+  `Field`, with help text and an error, and a switch, outside `.ilw-format`.
+
+  **Why:** the play function checks the label, the control, the help text and the error are in Source Sans without the prose styles.
+
+  **Review:** the same type as on **Forms → Field → Error**.
+-->
+<Story
+  name="Field"
+  play={({ canvasElement }) =>
+    brandSans(canvasElement.querySelectorAll('.ilw-input-entry label, .ilw-input-entry input, .ilw-input-description, .ilw-input-alert'))}
+>
+  <Field label="Email" description="We only use it to reply." error="Enter an email address.">
+    {#snippet children(attrs)}<input type="email" name="email" {...attrs} />{/snippet}
+  </Field>
 </Story>
 
 <!--

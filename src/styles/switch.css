@@ -1,0 +1,57 @@
+/* The switch (A7): input.ilw-switch, a native <input type="checkbox"
+   role="switch">, replaces the toolkit's .ilw-toggle-slider. The input itself
+   is the track and the thumb is a background circle that slides from left
+   (off) to right (on): no wrapper, hidden input or painted spans, so the focus
+   ring, hit area and forced-colours fallback are the input's own. The
+   dark-mode toggle (B1) uses it too.
+
+   Colours come from --ilw-color--control and --ilw-color--control-text, so the
+   switch follows the theme and dark mode, and the track's border and thumb
+   reach 3:1 against the control surface (WCAG 1.4.11), where upstream's white
+   thumb on Storm 80 doesn't. One class, so it weighs (0,1,0). */
+
+:where(input).ilw-switch {
+  --ilw-switch--thumb-size: calc(1.5em - 4px);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 2.75em;
+  height: 1.5em;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--ilw-color--control-text);
+  border-radius: 0.75em;
+  background:
+    radial-gradient(circle closest-side, var(--ilw-color--control-text) 70%, transparent 75%) no-repeat left center /
+      var(--ilw-switch--thumb-size) var(--ilw-switch--thumb-size),
+    var(--ilw-color--control);
+  font: inherit;
+  vertical-align: middle;
+  appearance: none;
+  cursor: pointer;
+}
+
+:where(input).ilw-switch:where(:checked) {
+  background:
+    radial-gradient(circle closest-side, var(--ilw-color--control) 70%, transparent 75%) no-repeat right center /
+      var(--ilw-switch--thumb-size) var(--ilw-switch--thumb-size),
+    var(--ilw-color--control-text);
+}
+
+:where(input).ilw-switch:where(:focus-visible) {
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 2px;
+}
+
+:where(input).ilw-switch:where(:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Forced colours drop the gradient thumb: fall back to the native checkbox. */
+@media (forced-colors: active) {
+  :where(input).ilw-switch {
+    width: auto;
+    height: auto;
+    appearance: auto;
+  }
+}

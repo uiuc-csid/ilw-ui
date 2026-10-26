@@ -1,0 +1,439 @@
+/* Form styles (A7), after the toolkit's ilw-input under its class names:
+   .ilw-input-entry and -compact (a label, a text control, select or textarea,
+   help text, an error), .ilw-input-entry-checkbox and -checkbox-compact, the
+   four .ilw-input-entry-radio* groups, .ilw-label-required, .ilw-input-alert,
+   .ilw-fieldset and .ilw-input-disclaimer. The switch is switch.css.
+
+   Every selector weighs one class (the entry, in :is()), the rest in :where(), as in
+   button.css: a page's own single-class rule beats them, and the :where()
+   prose rules in format.css never do. Colours come from the --ilw-color--*
+   properties (tokens.css), so themes and dark mode follow.
+
+   Differences from the toolkit, all deliberate:
+   - Rules hang off the entry classes, not <ilw-content>: a bare input
+     elsewhere on the page (a pager's select, a table filter) is left alone.
+   - The field is the theme's control surface (--ilw-color--control), not a
+     fixed white, so it is dark in dark mode and filled on the blue themes.
+   - Help text is .ilw-input-description (a bare <p> still gets its look), and
+     sits under the control in the compact layouts, not under the label.
+   - Errors (.ilw-input-alert, aria-invalid="true", :user-invalid) use
+     --ilw-color--link-hover, the required marker's colour, not #D40C0C (not a
+     brand colour, and unreadable on the coloured themes). An invalid control
+     also gets a second 1px ring, so the error isn't colour alone.
+   - The required marker's "*" has empty alternative text, so screen readers
+     don't read "star"; the input's native `required` says "required".
+   - Radio groups are <fieldset> + <legend>, where upstream uses a <div> and a
+     <p>, so the title names the group.
+   - The select chevron is two gradients in --ilw-color--link-hover, not a
+     data: SVG, so it follows the theme and needs no img-src data: in a CSP.
+   - Focus styles are on :focus-visible for checkboxes and radios; checkboxes
+     and radios fall back to the native controls in forced-colours mode. */
+
+:root {
+  --ilw-input-form-label-width: 225px;
+  --ilw-input-form-vertical-label-width: 125px;
+}
+
+/* Entries. */
+.ilw-input-entry {
+  margin: 25px 0;
+}
+
+.ilw-input-entry-checkbox,
+.ilw-input-entry-radio,
+.ilw-input-entry-radio-vertical,
+.ilw-input-entry-radio-compact,
+.ilw-input-entry-radio-vertical-compact {
+  margin: 20px 0;
+}
+
+/* Labels, legends and the alert share upstream's label type. */
+:is(.ilw-input-entry, .ilw-input-entry-compact, .ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(label, legend),
+.ilw-input-alert {
+  display: block;
+  margin: 0;
+  padding: 0 0 5px;
+  color: var(--ilw-color--text);
+  font: 500 1.25rem/1.5rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-align: left;
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact, .ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(label) {
+  cursor: pointer;
+}
+
+/* Text controls, selects and textareas. Upstream's box: 200px wide plus 10px
+   padding, a thin border in the text colour, 5px corners. */
+:is(.ilw-input-entry, .ilw-input-entry-compact)
+  :where(
+    input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='hidden'], [type='submit'], [type='button'], [type='reset'], [type='image']),
+    select,
+    textarea
+  ) {
+  box-sizing: content-box;
+  width: 200px;
+  margin: 0;
+  padding: 10px;
+  border: thin solid var(--ilw-color--text);
+  border-radius: 5px;
+  background-color: var(--ilw-color--control);
+  color: var(--ilw-color--text);
+  font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact) :where(textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  height: 122px; /* upstream's 100px content box plus padding and border */
+  font: 1rem/1.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact) :where(input, select).ilw-input-long {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact) :where(input).ilw-input-short {
+  width: 100px;
+}
+
+/* The chevron: two half-squares meeting in a "v", 12px from the right. */
+:is(.ilw-input-entry, .ilw-input-entry-compact) :where(select:not([multiple], [size])) {
+  width: 178px; /* upstream's 222px outer width, with room for the chevron */
+  padding-right: 32px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ilw-color--link-hover) 50%),
+    linear-gradient(135deg, var(--ilw-color--link-hover) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%;
+  background-size: 7px 7px;
+  background-repeat: no-repeat;
+  appearance: none;
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact)
+  :where(input:not([type='checkbox'], [type='radio']), select, textarea):where(:hover, :focus) {
+  background-color: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact) :where(input:not([type='checkbox'], [type='radio']), select, textarea):where(:focus) {
+  outline: 3px solid var(--ilw-color--link-hover);
+}
+
+/* Invalid: shown by the app (aria-invalid) or by the browser once the user has
+   interacted (:user-invalid). The second ring makes it more than a colour. */
+:is(.ilw-input-entry, .ilw-input-entry-compact)
+  :where(input, select, textarea):where([aria-invalid='true'], :user-invalid):where(:not([type='checkbox'], [type='radio'])) {
+  border-color: var(--ilw-color--link-hover);
+  box-shadow: 0 0 0 1px var(--ilw-color--link-hover);
+}
+
+/* Help text: .ilw-input-description, or upstream's bare <p>. */
+:is(.ilw-input-entry, .ilw-input-entry-compact, .ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact) :where(p:not(.ilw-input-alert)) {
+  width: fit-content;
+  margin: 0;
+  padding-top: 10px;
+  color: var(--ilw-color--text);
+  font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* The error message, and a form-level message (with role="alert") on its own. */
+.ilw-input-alert {
+  width: fit-content;
+  padding: 0 5px;
+  border-bottom: thin dashed;
+  color: var(--ilw-color--link-hover);
+}
+
+:is(.ilw-input-entry, .ilw-input-entry-compact, .ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact) :where(.ilw-input-alert) {
+  margin-top: 10px;
+}
+
+/* The required marker. The fallback line is for engines without alternative
+   text in `content`; the second gives the "*" empty alternative text, so
+   screen readers say "required" (from the input) and not "star". */
+.ilw-label-required::after {
+  content: '*';
+  content: '*' / '';
+  padding-left: 2px;
+  color: var(--ilw-color--link-hover);
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+/* Compact: the label right-aligned in a 225px column, the control, help text
+   and error beside it. A block again under 800px. */
+.ilw-input-entry-compact,
+.ilw-input-entry-checkbox-compact {
+  display: grid;
+  grid-template-columns: var(--ilw-input-form-label-width) auto;
+  align-items: center;
+  gap: 5px 10px;
+  margin: 20px 0;
+}
+
+:is(.ilw-input-entry-compact, .ilw-input-entry-checkbox-compact) > :where(label) {
+  padding: 0;
+  text-align: right;
+}
+
+:is(.ilw-input-entry-compact, .ilw-input-entry-checkbox-compact) > :where(:not(label)) {
+  grid-column: 2;
+  justify-self: start;
+}
+
+:is(.ilw-input-entry-compact, .ilw-input-entry-checkbox-compact) > :where(p) {
+  padding-top: 0;
+}
+
+:is(.ilw-input-entry-compact, .ilw-input-entry-checkbox-compact) > :where(.ilw-input-alert) {
+  margin-top: 0;
+}
+
+/* Checkboxes and radios: 18px boxes with a 10px mark (a tick, a dot) in the
+   control text colour. Not the switch (switch.css). */
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch)),
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio']) {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-content: center;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  margin: 5px 0;
+  padding: 0;
+  border: thin solid var(--ilw-color--text);
+  border-radius: 0;
+  background-color: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+  appearance: none;
+  cursor: pointer;
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio']) {
+  border-radius: 50%;
+}
+
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch))::before,
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio'])::before {
+  width: 10px;
+  height: 10px;
+  background-color: currentColor;
+  content: '';
+  transform: scale(0);
+}
+
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch))::before {
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio'])::before {
+  border-radius: 50%;
+}
+
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:checked)::before,
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio']:checked)::before {
+  transform: scale(1);
+}
+
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch)):where(:hover, :focus-visible),
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio']):where(:hover, :focus-visible) {
+  background-color: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+}
+
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch)):where(:focus-visible),
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+  :where(input[type='radio']):where(:focus-visible) {
+  outline: 3px solid var(--ilw-color--link-hover);
+  outline-offset: 2px;
+}
+
+:is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact) :where(input):where([aria-invalid='true'], :user-invalid) {
+  outline: 2px solid var(--ilw-color--link-hover);
+  outline-offset: 1px;
+}
+
+/* The checkbox entry: the box, then its label beside it (upstream's markup
+   puts the label first). A switch is wider than the 20px column, so the
+   column fits it. */
+.ilw-input-entry-checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 7px;
+}
+
+:is(.ilw-input-entry-checkbox) > :where(input) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+:is(.ilw-input-entry-checkbox) > :where(label) {
+  grid-row: 1;
+  grid-column: 2;
+  margin-right: 20px;
+  padding: 0;
+}
+
+:is(.ilw-input-entry-checkbox) > :where(:not(input, label)) {
+  grid-column: 2;
+}
+
+/* Radio groups: a fieldset whose legend is the title (upstream's <p>). The
+   legend stays the fieldset's rendered legend, above the options; the compact
+   forms take it out of flow (position: absolute, which every engine allows
+   for a legend, where a floated legend isn't a grid item in WebKit) into a
+   label column made of the fieldset's left padding. Upstream's <div> form
+   still lays out, without the legend. */
+.ilw-input-entry-radio,
+.ilw-input-entry-radio-vertical,
+.ilw-input-entry-radio-compact,
+.ilw-input-entry-radio-vertical-compact {
+  display: grid;
+  grid-template-columns: 20px auto;
+  align-items: center;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ilw-input-entry-radio-vertical,
+.ilw-input-entry-radio-vertical-compact {
+  grid-template-columns: repeat(auto-fill, 20px var(--ilw-input-form-vertical-label-width));
+}
+
+.ilw-input-entry-radio-compact,
+.ilw-input-entry-radio-vertical-compact {
+  position: relative;
+  column-gap: 10px;
+  padding-left: calc(var(--ilw-input-form-label-width) + 10px);
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(legend) {
+  margin: 0;
+  padding: 0 0 5px;
+  color: var(--ilw-color--text);
+  font: 600 1.125rem/1.4rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-align: left;
+}
+
+:is(.ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(legend) {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  width: var(--ilw-input-form-label-width);
+  padding: 0;
+  text-align: right;
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(label) {
+  display: block;
+  margin: 0 20px 0 5px;
+  padding: 0;
+  color: var(--ilw-color--text);
+  font: 500 1.25rem/1.5rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-align: left;
+  cursor: pointer;
+}
+
+:is(.ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(label) {
+  margin-left: 0;
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-compact) > :where(input) {
+  grid-column: 1;
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-compact) > :where(label) {
+  grid-column: 2;
+}
+
+/* The group's help text and error span the options' columns. */
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(p) {
+  grid-column: 1 / -1;
+}
+
+:is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(p:not(.ilw-input-alert)) {
+  margin: 0;
+  padding-top: 5px;
+  color: var(--ilw-color--text);
+  font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* A bordered group, and upstream's disclaimer box (a checkbox beside its text). */
+:where(fieldset).ilw-fieldset,
+.ilw-input-disclaimer {
+  margin: 20px auto;
+  padding: 20px;
+  border: thin solid var(--ilw-color--control-accent);
+}
+
+.ilw-input-disclaimer {
+  display: flex;
+  align-items: center;
+  column-gap: 30px;
+}
+
+@media (max-width: 800px) {
+  .ilw-input-entry-compact,
+  .ilw-input-entry-checkbox-compact {
+    display: block;
+  }
+
+  :is(.ilw-input-entry-compact, .ilw-input-entry-checkbox-compact) > :where(label) {
+    padding: 0 0 5px;
+    text-align: left;
+  }
+
+  :is(.ilw-input-entry-compact, .ilw-input-entry-checkbox-compact) > :where(p) {
+    padding-top: 10px;
+  }
+
+  .ilw-input-entry-radio-vertical,
+  .ilw-input-entry-radio-compact,
+  .ilw-input-entry-radio-vertical-compact {
+    grid-template-columns: 20px auto;
+    column-gap: 0;
+    padding-left: 0;
+  }
+
+  :is(.ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(legend) {
+    position: static;
+    width: auto;
+    padding: 0 0 5px;
+    text-align: left;
+  }
+
+  :is(.ilw-input-entry-radio-vertical, .ilw-input-entry-radio-vertical-compact) > :where(input) {
+    grid-column: 1;
+  }
+
+  :is(.ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact) > :where(label) {
+    grid-column: 2;
+    margin: 0 20px 0 5px;
+  }
+}
+
+/* Forced colours drop painted marks: fall back to the native controls. */
+@media (forced-colors: active) {
+  :is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch)),
+  :is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+    :where(input[type='radio']) {
+    appearance: auto;
+  }
+
+  :is(.ilw-input-entry-checkbox, .ilw-input-entry-checkbox-compact, .ilw-input-disclaimer, .ilw-fieldset) :where(input[type='checkbox']:not(.ilw-switch))::before,
+  :is(.ilw-input-entry-radio, .ilw-input-entry-radio-vertical, .ilw-input-entry-radio-compact, .ilw-input-entry-radio-vertical-compact, .ilw-fieldset)
+    :where(input[type='radio'])::before {
+    content: none;
+  }
+}

@@ -91,6 +91,17 @@ Status: **pending human run.**
 - [ ] Space flips it and the new state is announced ("on"/"off"); the page colours change and focus stays on the switch.
 - [ ] In Windows High Contrast (forced colours) it shows as a native checkbox with its focus ring.
 
+## Field (stories: Forms → Field → Fixture, Error, Markup)
+
+Status: **pending human run.**
+
+- [ ] Tabbing to "Name" reads "Name, required, edit text" and does not read "star" (the marker's alternative text is empty).
+- [ ] In Error, the field reads as "invalid" and its description reads the help text, then the error message.
+- [ ] The checkbox reads "Email me updates, checkbox, not checked"; the switch reads "Show weekends, switch, off" (VoiceOver may say "toggle button"). Space flips each and the new state is announced.
+- [ ] Tabbing into a radio group announces the group name ("Term") and the checked option; arrows move and announce each option.
+- [ ] In Markup, the compact radio groups still announce their legend as the group name.
+- [ ] In Windows High Contrast (forced colours), checkboxes, radios and the switch show as native controls with focus rings.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |
