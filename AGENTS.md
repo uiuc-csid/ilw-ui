@@ -15,8 +15,10 @@ Accessible Svelte 5 components that look and behave like the **Illinois Web Tool
 
 ```text
 src/
-  core/        framework-agnostic helpers (nextSort, nextId)
-  svelte/      Svelte components + index.ts exports (zag-input.ts: Zag workarounds shared by Combobox and Autocomplete)
+  core/        framework-agnostic code. index.ts is the public `ilw-ui/core` (nextSort, nextId, …); the modules it
+               doesn't re-export are internal logic every framework's components share (islands, zag-input: the Zag
+               workarounds, async-search, tabs, data-table, pager, sort, modal, dark-mode, layout, class-names)
+  svelte/      Svelte components + index.ts exports: thin views over core/
   styles.css   index: @imports src/styles/*.css (brand tokens only)
   styles/      tokens.css (--ilw-color--*, theme classes, dark mode), components.css
 stories/       *.stories.svelte (Svelte CSF) + story-only helper components

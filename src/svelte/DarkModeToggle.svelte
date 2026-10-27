@@ -7,6 +7,8 @@
   dark-mode-toggle.css and switch.css.
 -->
 <script lang="ts">
+  import { applyDarkMode, DARK_MODE_EVENT, darkModeChange, followsScheme, initialDarkMode } from '../core/dark-mode.ts';
+
   let {
     label = 'Dark mode',
   }: {
@@ -14,46 +16,34 @@
     label?: string;
   } = $props();
 
-  const COOKIE = 'ilw-dark-mode';
-  const ONE_YEAR = 60 * 60 * 24 * 365;
-
   // undefined until mounted: nothing renders before there is a document to read.
   let enabled = $state<boolean | undefined>();
 
-  function hasCookie(): boolean {
-    return document.cookie.split('; ').some((row) => row.startsWith(`${COOKIE}=`));
-  }
-
   $effect(() => {
-    const html = document.documentElement;
     const scheme = window.matchMedia('(prefers-color-scheme: dark)');
-    // The server writes data-theme from the cookie; without it, the OS decides.
-    enabled = html.dataset.theme ? html.dataset.theme === 'dark' : scheme.matches;
+    enabled = initialDarkMode(scheme);
 
-    // Follow the OS until the user chooses. A page that pins data-theme
-    // (a site without dark styles sets "light") doesn't follow it.
+    // Follow the OS until the user chooses.
     const onScheme = (event: MediaQueryListEvent) => {
-      if (!hasCookie() && !html.dataset.theme) enabled = event.matches;
+      if (followsScheme()) enabled = event.matches;
     };
     // Another toggle on the page (or the toolkit header) changed it.
     const onChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ enabled?: unknown }>).detail;
-      if (typeof detail?.enabled === 'boolean') enabled = detail.enabled;
+      const on = darkModeChange(event);
+      if (on !== undefined) enabled = on;
     };
     scheme.addEventListener('change', onScheme);
-    window.addEventListener('ilw-dark-mode-changed', onChanged);
+    window.addEventListener(DARK_MODE_EVENT, onChanged);
     return () => {
       scheme.removeEventListener('change', onScheme);
-      window.removeEventListener('ilw-dark-mode-changed', onChanged);
+      window.removeEventListener(DARK_MODE_EVENT, onChanged);
     };
   });
 
   function onchange(event: Event & { currentTarget: HTMLInputElement }) {
     const on = event.currentTarget.checked;
     enabled = on;
-    document.documentElement.dataset.theme = on ? 'dark' : 'light';
-    document.cookie = `${COOKIE}=${on}; path=/; max-age=${ONE_YEAR}; SameSite=Lax`;
-    window.dispatchEvent(new CustomEvent('ilw-dark-mode-changed', { detail: { enabled: on } }));
+    applyDarkMode(on);
   }
 </script>
 

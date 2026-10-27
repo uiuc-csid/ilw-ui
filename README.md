@@ -20,10 +20,10 @@ Status: pre-release (`private: true`), first consumer
 ## Install and use
 
 ilw-ui isn't published to a registry yet. Install it from GitHub, pinned to a
-release tag:
+release tag, then add the peers for your framework (below):
 
 ```sh
-pnpm add github:uiuc-csid/ilw-ui#v0.1.0
+pnpm add github:uiuc-csid/ilw-ui#v0.2.0
 ```
 
 The repository is private, so the installing machine (and its CI) needs read
@@ -31,11 +31,29 @@ access to it, e.g. a token in `.npmrc` or a deploy key. Releases are tags on
 `main` (`vX.Y.Z`, with `version` in `package.json` bumped to match); there is no
 build step, so the tag is the release.
 
-The package ships source (`.svelte`/`.ts`); your Vite + Svelte build compiles it.
-Peer dependency: `svelte ^5.57`. Dependencies, pinned exactly: `@zag-js/combobox`
-and `@zag-js/svelte` (1.44.0), `@tanstack/table-core` and
-`@tanstack/svelte-table` (9.3.1), and `phosphor-svelte` (3.1.1). To pass icons
-to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
+The package ships source (`.svelte`/`.ts`); your Vite build compiles it. Its
+own dependencies are the headless engines, pinned exactly: `@zag-js/combobox`
+1.46.0 and `@tanstack/table-core` 9.3.1. Each framework's packages are
+**optional peer dependencies**, so a Svelte app never installs React and the
+other way round. Add the ones for your framework to your own dependencies, at
+these versions. The adapters are exact: each must match the engine ilw-ui
+ships. The frameworks take any later minor.
+
+| Framework | Peers to install |
+| --------- | ---------------- |
+| Svelte (`ilw-ui/svelte`) | `svelte` ^5.57, `@zag-js/svelte` 1.46.0, `@tanstack/svelte-table` 9.3.1, `phosphor-svelte` 3.1.1 |
+| React (`ilw-ui/react`, [planned](docs/plans/2026-10-27-react-components.md)) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
+
+```sh
+pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1
+```
+
+pnpm doesn't install optional peers for you. A missing one fails the build:
+Vite can't resolve the import. Pass icons to `Icon` from the same
+`phosphor-svelte`.
+
+**Next.js** (once `ilw-ui/react` ships): the package is `.tsx` source, so list
+it in `transpilePackages: ['ilw-ui']` in `next.config.js`.
 
 ```js
 import { Autocomplete, Combobox, MultiCombobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
@@ -2494,9 +2512,9 @@ each violation as file:line.
 
 ## Known issues
 
-Upstream Zag (`@zag-js/combobox` 1.44.0) gaps. Each is worked around once,
+Upstream Zag (`@zag-js/combobox` 1.46.0) gaps. Each is worked around once,
 inside `Combobox` (and `MultiCombobox` and `Autocomplete`, which share the
-workarounds in `src/svelte/zag-input.ts`). None is filed upstream yet. Draft issues are in
+workarounds in `src/core/zag-input.ts`). None is filed upstream yet. Draft issues are in
 [docs/upstream-issues/zag.md](docs/upstream-issues/zag.md).
 
 - **`openOnChange` as a function sees the text from before the keystroke,** so
@@ -2520,8 +2538,9 @@ workarounds in `src/svelte/zag-input.ts`). None is filed upstream yet. Draft iss
 - **An outside click within a frame of opening can leave the list open,** and
   Zag's deferred open focus can then pull focus back to the input. `Combobox`
   closes the list on blur itself (`LAYER.INTERACT_OUTSIDE`,
-  `restoreFocus: false`). The focus pull is a single-frame race and isn't worked
-  around.
+  `restoreFocus: false`), and `focusStaysPut` replaces Zag's deferred focus
+  with one that runs only while focus is still where it was (or has fallen to
+  `<body>`), so it no longer pulls focus back.
 - **On Apple platforms Zag adds an `aria-live` region to `document.body`** while
   the list is open, to announce the highlighted option (VoiceOver doesn't read
   `aria-activedescendant` reliably). The machine passes `@zag-js/live-region` no

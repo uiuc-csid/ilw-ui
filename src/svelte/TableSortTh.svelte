@@ -7,8 +7,7 @@
   import type { RowData } from '@tanstack/svelte-table';
   import { flushSync } from 'svelte';
 
-  import type { Sort } from '../core/index.ts';
-  import { type AnyDataTable, isPaged } from './data-table.ts';
+  import { type AnyDataTable, columnSort, toggleColumnSort } from '../core/data-table.ts';
   import SortableTh from './SortableTh.svelte';
 
   let {
@@ -22,16 +21,12 @@
     label: string;
   } = $props();
 
-  const sorted = $derived(table.getColumn(id)?.getIsSorted() ?? false);
-  const sort: Sort = $derived(sorted ? { key: id, dir: sorted === 'asc' ? 1 : -1 } : { key: '', dir: 1 });
+  const sort = $derived(columnSort(table, id));
 
   function onsort() {
-    const column = table.getColumn(id);
-    if (!column) return;
     const button = document.activeElement;
     const scope = button instanceof HTMLElement ? button.closest('table') : null;
-    column.toggleSorting(column.getIsSorted() === 'asc', false);
-    if (isPaged(table)) table.setPageIndex(0);
+    if (!toggleColumnSort(table, id)) return;
     flushSync();
     // If the page re-rendered its header, focus the new button.
     if (scope && !scope.contains(document.activeElement)) {

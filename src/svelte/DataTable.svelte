@@ -8,7 +8,7 @@
   import type { Snippet } from 'svelte';
   import type { HTMLTableAttributes } from 'svelte/elements';
 
-  import type { AnyDataTable } from './data-table.ts';
+  import type { AnyDataTable } from '../core/data-table.ts';
   import DataRows from './DataRows.svelte';
 
   let {

@@ -9,8 +9,8 @@
   import { tick } from 'svelte';
 
   import { type ComboboxItem, filterItems } from '../core/index.ts';
+  import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from '../core/zag-input.ts';
   import { AsyncSearch, type AsyncSource, statusText } from './async-search.svelte.ts';
-  import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,

@@ -15,8 +15,8 @@
   import type { RowData } from '@tanstack/svelte-table';
   import { flushSync } from 'svelte';
 
-  import { pageWindow } from '../core/index.ts';
-  import { ilwPagerClasses, legacyPagerClasses, type PagedDataTableInstance, type PagerClasses } from './data-table.ts';
+  import { ilwPagerClasses, legacyPagerClasses, type PagedDataTableInstance, type PagerClasses } from '../core/data-table.ts';
+  import { pagerModel } from '../core/pager.ts';
 
   let {
     table,
@@ -45,13 +45,9 @@
 
   const pagination = $derived(table.atoms.pagination.get());
   const total = $derived(table.getPrePaginatedRowModel().rows.length);
-  const totalPages = $derived(Math.max(1, Math.ceil(total / pagination.pageSize)));
-  const page = $derived(Math.min(pagination.pageIndex + 1, totalPages));
-  const first = $derived((page - 1) * pagination.pageSize);
-  const count = $derived(
-    total === 0 ? emptyLabel : `${first + 1}–${Math.min(first + pagination.pageSize, total)} of ${total}`,
+  const { page, totalPages, count, pages } = $derived(
+    pagerModel({ pageIndex: pagination.pageIndex, pageSize: pagination.pageSize, total, emptyLabel }),
   );
-  const pages = $derived(pageWindow(page, totalPages));
   const a11y = $derived(!legacy);
   const type = $derived(a11y ? 'button' : undefined);
 

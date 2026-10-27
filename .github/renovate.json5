@@ -25,5 +25,14 @@
     { groupName: 'Vitest', matchPackageNames: ['vitest', '@vitest/*'], separateMajorMinor: false },
     { groupName: 'Zag', matchPackageNames: ['@zag-js/*'], separateMajorMinor: false },
     { groupName: 'TanStack Table', matchPackageNames: ['@tanstack/*'], separateMajorMinor: false },
+    { groupName: 'React', matchPackageNames: ['react', 'react-dom', '@types/react', '@types/react-dom'], separateMajorMinor: false },
+    {
+      // The framework adapters are optional peers, exact or caret like their
+      // devDependencies. Renovate widens peer ranges by default; bump them
+      // instead, in the same PR as the devDependency
+      // (tests/unit/peers.test.ts).
+      matchDepTypes: ['peerDependencies'],
+      rangeStrategy: 'bump',
+    },
   ],
 }

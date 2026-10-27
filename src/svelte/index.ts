@@ -25,7 +25,7 @@ export { default as DataTable } from './DataTable.svelte';
 export { enhanceSelect, enhanceSelects } from './enhance-select.ts';
 export { default as Grid } from './Grid.svelte';
 export { default as Icon } from './Icon.svelte';
-export { type LayoutTheme, type LayoutWidth } from './layout.ts';
+export { type LayoutTheme, type LayoutWidth } from '../core/layout.ts';
 export { default as Modal } from './Modal.svelte';
 export { default as MultiCombobox } from './MultiCombobox.svelte';
 export { type AsyncSource } from './async-search.svelte.ts';

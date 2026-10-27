@@ -4,34 +4,23 @@
 
 import { flushSync, mount, unmount } from 'svelte';
 
+import { dispatchTabsChange, readTabsMarkup } from '../core/tabs.ts';
 import TabList from './TabList.svelte';
 
 const mounted = new Map<HTMLElement, ReturnType<typeof mount>>();
 
 function enhance(host: HTMLElement): ReturnType<typeof mount> | null {
-  // .ilw-tabs--ready: already tabs (enhanced here, or rendered by Tabs).
-  if (mounted.has(host) || host.classList.contains('ilw-tabs--ready')) return null;
-  const container = host.querySelector<HTMLElement>(':scope > .ilw-tabs-container') ?? host;
-  const panels = [...container.querySelectorAll<HTMLElement>(':scope > .ilw-tabs-panel[id]')];
-  if (!panels.length) return null;
-  const tabs = panels.map((panel) => ({
-    id: panel.id,
-    label: panel.querySelector('.ilw-tabs-heading')?.textContent?.trim() || panel.id,
-  }));
-  const data = host.dataset;
+  if (mounted.has(host)) return null;
+  const markup = readTabsMarkup(host);
+  if (!markup) return null;
   const instance = mount(TabList, {
-    target: container,
-    anchor: panels[0],
+    target: markup.container,
+    anchor: markup.anchor,
     props: {
       host,
-      tabs,
-      selected: data.selected,
-      automatic: data.automatic !== undefined,
-      hash: data.hash !== undefined,
-      horizontal: host.classList.contains('ilw-tabs--horizontal'),
-      label: data.label,
-      labelledby: data.labelledby,
-      onchange: (id: string) => host.dispatchEvent(new CustomEvent('ilw-tabs-change', { bubbles: true, detail: { id } })),
+      tabs: markup.tabs,
+      ...markup.options,
+      onchange: (id: string) => dispatchTabsChange(host, id),
     },
   });
   mounted.set(host, instance);

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Sort } from '../core/index.ts';
+  import { sortHeading } from '../core/sort.ts';
 
   let {
     key,
@@ -13,11 +14,11 @@
     onsort: (key: string) => void;
   } = $props();
 
-  let active = $derived(sort.key === key);
+  const heading = $derived(sortHeading(sort, key));
 </script>
 
-<th scope="col" aria-sort={active ? (sort.dir === 1 ? 'ascending' : 'descending') : undefined}>
-  <button type="button" class={['th-sort', active && 'on']} data-sort={key} onclick={() => onsort(key)}
-    >{label}{#if active}<span aria-hidden="true">&nbsp;{sort.dir === 1 ? '↑' : '↓'}</span>{/if}</button
+<th scope="col" aria-sort={heading.ariaSort}>
+  <button type="button" class={heading.className} data-sort={key} onclick={() => onsort(key)}
+    >{label}{#if heading.arrow}<span aria-hidden="true">&nbsp;{heading.arrow}</span>{/if}</button
   >
 </th>
