@@ -34,5 +34,14 @@
       matchDepTypes: ['peerDependencies'],
       rangeStrategy: 'bump',
     },
+    {
+      // The framework peers are a ^major.minor floor, not a pin: bump writes
+      // ^19.3.1 on every patch and replace/widen write ^20.0.0, all of which
+      // fail tests/unit/peers.test.ts. Renovate updates only the
+      // devDependency; raise the floor by hand when a major needs it.
+      matchDepTypes: ['peerDependencies'],
+      matchPackageNames: ['react', 'react-dom', 'svelte'],
+      enabled: false,
+    },
   ],
 }
