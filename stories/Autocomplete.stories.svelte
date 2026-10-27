@@ -93,6 +93,9 @@
     // Zag's selection is never kept: no option is ever aria-selected.
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    // Zag highlights the first match a frame after opening. Let it land here, or it can
+    // land after the Escape and clear below and leave a hidden option highlighted.
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-dadams'));
     await expect(canvasElement.querySelector('[aria-selected="true"]')).toBeNull();
 
     // Escape closes and keeps focus and the text.
