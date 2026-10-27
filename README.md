@@ -6,8 +6,8 @@ WAI-ARIA Authoring Practices. The goal is a full replacement for the toolkit in
 Svelte apps: the same look without `toolkit.js` or `toolkit.css`, plus what the
 toolkit lacks. So far: a modal on native `<dialog>` with close reasons,
 focus return and a promise API, a filtering combobox, a free-text autocomplete,
-a client-side sortable, filterable, paged table, and link-based pagination
-for server-rendered lists. The roadmap is
+a client-side sortable, filterable, paged table, link-based pagination
+for server-rendered lists, and a copy button. The roadmap is
 [docs/plans/2026-10-20-toolkit-replacement.md](docs/plans/2026-10-20-toolkit-replacement.md),
 tracked in [#9](https://github.com/uiuc-csid/ilw-ui/issues/9).
 
@@ -1755,6 +1755,71 @@ DOM contract:
 ```html
 <div role="status" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="polite">3 results</div>
 <div role="alert" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="assertive"></div>
+```
+
+### `CopyButton` and `copyText`
+
+Copies a value, or the text of an element, and says so through
+[`announce`](#announce). No toolkit equivalent.
+
+```svelte
+<script>
+  import { CopyButton } from 'ilw-ui/svelte';
+</script>
+
+<!-- An input's value, or an element's text, by id -->
+<label for="share-link">Course link</label>
+<input id="share-link" readonly value="https://tam.cs.illinois.edu/courses/cs-225/fa26" />
+<CopyButton target="share-link" label="Copy link" />
+
+<!-- A literal, icon only (the label is still the button's name) -->
+{row.netid} <CopyButton value={row.netid} label="Copy netid of {row.name}" hideLabel size="small" />
+
+<!-- Built when clicked, from the rows as they are then -->
+<CopyButton value={() => confirmed.map((r) => r.netid).join(', ')} label="Copy netids of confirmed students" />
+```
+
+```js
+import { copyText } from 'ilw-ui/core';
+
+// For a button you render yourself: announces "Copied" or the error, resolves true or false.
+if (!(await copyText(tsv))) showFallback();
+```
+
+- Props: `value` (a string, or a function called on each click) or `target`
+  (an element id: an `<input>` or `<textarea>` gives its value, anything else
+  its trimmed `textContent`); `label` ("Copy"), `copiedLabel` ("Copied"),
+  `failedLabel` ("Copy failed"), `failedMessage` ("Could not copy to the
+  clipboard"), `hideLabel`, `resetAfter` (ms, 1500), `oncopy(text)`,
+  `onfail()`, `Button`'s `size`, `theme`, `disabled` and `class`, and any
+  other `<button>` attribute.
+- After a click the icon becomes a check and the label `copiedLabel`, and
+  `copiedLabel` is announced in the polite `role="status"` region; after
+  `resetAfter` the button goes back. A refusal (permission denied, no
+  `navigator.clipboard` on a plain-http page, a `value` function that throws,
+  a missing `target`) shows a warning icon and `failedLabel`, and announces
+  `failedMessage` in the assertive `role="alert"` region. Focus stays on the
+  button throughout.
+- The label swap is for sighted users; the announcement is what a screen
+  reader hears, since a focused button's changed name is not reliably read.
+- `copyText(text, { copied?, failed? })` is the same write and announcement
+  without the button. `text` may be a function.
+- Needs JavaScript: there is no script-free form. On a server-rendered page,
+  mount it as an island.
+
+DOM contract (`data-state` is `idle`, `copied` or `failed`):
+
+```html
+<button type="button" class="ilw-button ilw-copy-button" data-state="idle">
+  <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+  <span class="ilw-copy-button-label">Copy link</span>
+</button>
+
+<!-- hideLabel -->
+<button type="button" class="ilw-button ilw-button-small ilw-copy-button" data-state="copied">
+  <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+  <span class="ilw-visually-hidden">Copied</span>
+</button>
 ```
 
 ## Tests
