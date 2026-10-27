@@ -6,7 +6,7 @@ _A plan for shipping every ilw-ui component in React 19 as well as Svelte, held 
 
 ilw-ui replaces the Illinois Web Toolkit for Svelte apps. React apps on campus need the same thing, and the scaffold plan expected it: "React/Vue adapters may come later on the same `core/`" (`docs/old-plans/2026-10-16-ilw-ui-scaffold.md`).
 
-"The same constraints" means every rule in AGENTS.md applies to React unchanged:
+"The same rules" means every rule in AGENTS.md applies to React unchanged:
 
 - A React component renders **the same documented markup** as its Svelte twin.
 - It uses the same `styles.css`, so a React page and a Svelte page look identical.
@@ -31,7 +31,7 @@ No React app is waiting on this, so the order follows dependencies, not a consum
 - **Both frameworks in lockstep.**
   - Once the React toolchain (R0d) merges, every new component ships in both frameworks in the same PR.
   - From then on, a roadmap row counts as done only when both versions pass.
-  - Components that already exist are ported by R1–R8 below.
+  - Components that already exist are ported by R0d–R8 below. A row that merges before R0d gets its own React port row added to [Order](#order).
 - **Adapters become optional peers.**
   - Headless engines stay in `dependencies`: `@zag-js/combobox` and `@tanstack/table-core`.
   - These move to optional peers (`peerDependenciesMeta`): `svelte`, `@zag-js/svelte`, `@tanstack/svelte-table`, `phosphor-svelte`, `react`, `react-dom`, `@zag-js/react`, `@tanstack/react-table`, `@phosphor-icons/react`. pnpm's `autoInstallPeers` installs non-optional peers, so otherwise a React app would get Svelte, and the other way round.
@@ -39,8 +39,8 @@ No React app is waiting on this, so the order follows dependencies, not a consum
 
     | Package | Peer version |
     | ------- | ------------ |
-    | `@zag-js/*` | 1.46.0, exact |
-    | `@tanstack/*` | 9.3.1, exact |
+    | `@zag-js/svelte`, `@zag-js/react` | 1.46.0, exact |
+    | `@tanstack/svelte-table`, `@tanstack/react-table` | 9.3.1, exact |
     | `phosphor-svelte` | 3.1.1, exact |
     | `@phosphor-icons/react` | 2.1.10, exact |
     | `react`, `react-dom` | `^19.3` |
@@ -94,8 +94,9 @@ The README documents each component's React API next to the Svelte one.
 
 #### Ids
 
-- Ids with a documented format (`ilw-field-N`, `ilw-radio-group-N`, `ilw-modal-N`, `combobox-N`, `app-modal-N`) keep `nextId`, through a `useNextId(prefix)` hook (a `useState` initializer).
-- StrictMode runs that initializer twice in development, so numbers can skip. The format still holds, and every existing assertion is a regex.
+- Ids with a documented format keep `nextId`.
+  - `openModal` calls it directly, outside any render, so `app-modal-N` stays consecutive, as the Modal "Confirm" story asserts.
+  - Components (`ilw-field-N`, `ilw-radio-group-N`, `ilw-modal-N`, `combobox-N`) call it through a `useNextId(prefix)` hook (a `useState` initializer). StrictMode runs that initializer twice in development, so numbers can skip. The format still holds, and every assertion on these ids is a regex.
 - `$props.id()` becomes `useId`.
 - A consumer that server-renders and hydrates passes explicit ids.
 
@@ -176,7 +177,7 @@ Each is settled in its port PR. They are listed here so nobody has to rediscover
 
 - `{' '}` before "Search" (JSX drops the leading space Svelte keeps).
 - `popoverTarget`, `<details name>`, and `popover=""` spelled out.
-- It renders the React `DarkModeToggle` in the pre-mounted island host.
+- It renders the React `DarkModeToggle` inside `span.ilw-header-dark-mode[data-ilw-island][data-ilw-mounted]`, which `mountIslands` skips because it is already mounted.
 
 ### Storybook and tests
 
@@ -196,7 +197,7 @@ The bar doesn't move: every React component gets the three layers in AGENTS.md, 
 Each React story file is the twin of a Svelte one:
 
 - **Ids.** It uses the same `title`, the Svelte build's `exportName` as its export, and the Svelte story's name as an explicit `name:`. Story ids therefore match, for example `page-chrome-header--fixture-megamenu`, and every spec and AT checklist entry works for both.
-- **Descriptions.** The description is the same text as the Svelte HTML comment, as a `/** … */` block with a ` * ` gutter directly above the export. Addon-docs reads only `/**` blocks and strips the gutter. The meta sets `tags: ['autodocs']`.
+- **Descriptions.** The description is the same text as the Svelte HTML comment, as a `/** … */` block with a ` * ` gutter directly above the export. Addon-docs reads only `/**` blocks and strips the gutter. The meta's `tags` match the Svelte meta's: `autodocs` only where the Svelte file has it (parity files leave it out on purpose).
 - **Play functions.** `play:` keys are written literally, not spread, so Storybook tags the story `play-fn` correctly.
 - **Demos.** React demos (`stories/react/*Demo.tsx`) reproduce the Svelte demos' ids, test ids, `<output>`s and page context, and start with the same "which page this stands in for" comment. Sample data (`table-data.ts`, `header-sample.ts`, `section-nav-data.ts`, `parity/*.ts`) is imported, not copied.
 - **Styles.** Story helpers with a `<style>` block move it to a plain `.css` file that both frameworks import. Svelte's scoped `svelte-xxxx` classes would otherwise differ between the twins.
@@ -207,12 +208,14 @@ Each React story file is the twin of a Svelte one:
 - Framework-specific steps (`flushSync`, `mountIslands`) are passed in. Shared plays never call `ctx.mount`.
 - They move one component at a time, in that component's port PR. The moved Svelte stories are proven stable with `--repeats 10` like new ones.
 
-**DOM contract snapshots.** This is what makes "DOM contracts are API" hold across frameworks.
+#### DOM contract snapshots
+
+This is what makes "DOM contracts are API" hold across frameworks.
 
 How it works:
 
 - A Vitest setup file, shared by both `storybook-*` projects, adds an `afterEach` that runs after every story's render and play.
-- It finds the story by `task.meta.storyId`.
+- It finds the story by `task.meta.storyId`. It skips parity `Toolkit` stories, which render upstream markup.
 - It normalizes the story's DOM: the canvas plus any `dialog`, `[popover]` or live region the story added to `<body>`.
 - It checks the result with `toMatchFileSnapshot('stories/contracts/<story-id>.html')`.
 
@@ -233,17 +236,17 @@ A story can opt out with `parameters.contract = false`, which needs a comment wi
 
 - Every `*.stories.svelte` has a React twin with the same title, story names, tags and descriptions. Svelte comments are read with a regex, React ones with `loadCsf` from `storybook/internal/csf-tools`.
 - The check skips:
-  - stories tagged `framework-neutral` (CSS- or core-only: Announce, Themes, Format, and the Table, Format, Themes and Width parity stories);
+  - stories tagged `framework-neutral`, which render only markup and CSS or call only `core/`: Announce, Themes, Format (except "Components inside"), Unformatted's Table, and the `IlwUi` stories of the Table, Format, Themes and Field parity pairs;
   - parity `Toolkit` and `Side By Side` stories.
 - A `twins-pending` allow-list holds stories not yet ported, and shrinks with each port.
 - It also compares the export names of `src/svelte/index.ts` and `src/react/index.ts`, type exports included, using the TypeScript compiler API and a rename map (`createDataTable` → `useDataTable`).
-- After both builds, CI compares the two `index.json` id sets.
+- After both builds, `scripts/compare-index.mjs` checks that the React build's story ids are the Svelte build's minus the skipped and `twins-pending` stories.
 
 #### Parity
 
 - The `Toolkit` and `Side By Side` stories, and Chromatic, stay in the Svelte build.
-- The React build carries the `IlwUi` side of every parity pair. Its contract snapshot is the same file as the Svelte one, so a React replacement matches the toolkit exactly when its Svelte twin does: same markup, same stylesheet.
-- R0d writes this into AGENTS.md ("Visual parity") and into this roadmap's "Visual parity, better behaviour" decision.
+- The React build carries the `IlwUi` side of every parity pair not tagged `framework-neutral`. Its contract snapshot is the same file as the Svelte one, so a React replacement matches the toolkit exactly when its Svelte twin does: same markup, same stylesheet.
+- R0d writes this into AGENTS.md ("Visual parity, APG behaviour") and into the toolkit-replacement roadmap's "Visual parity, better behaviour" decision.
 
 #### Keyboard and focus
 
@@ -292,7 +295,7 @@ A story can opt out with `parameters.contract = false`, which needs a comment wi
 
 - The rules apply unchanged.
 - Every new or moved story is proven with `pnpm test --repeats 10` on both projects.
-- Every new spec project is proven with `--repeat-each 20`.
+- Every spec a port PR runs on the React build is proven with `--repeat-each 20` on `react-chromium` and `react-webkit`.
 
 #### AT smoke
 
@@ -322,6 +325,7 @@ A story can opt out with `parameters.contract = false`, which needs a comment wi
 Each row is one PR. R0a–R0d run in order. After R0d, the ports can run in parallel, except that:
 
 - R5 needs R1 (`TableSortTh` renders `SortableTh`);
+- R6's twin of Format's "Components inside" needs R5 (it renders `DataTableDemo`);
 - R7 needs R6 (`SelectCombobox` renders `Combobox`).
 
 R2, R3, R4 and R8 are independent: `Header` imports only `DarkModeToggle`, `Modal` draws its own icon, and `Tabs` uses nothing but `layout.ts`. `CopyButton` renders `Button` and `Icon`, so it comes last in R1.
@@ -329,23 +333,24 @@ R2, R3, R4 and R8 are independent: `Header` imports only `DarkModeToggle`, `Moda
 | # | PR | Contents |
 | - | -- | -------- |
 | R0a | Shared core | Move the logic in [Shared core](#shared-core) into internal `src/core` modules; Svelte unchanged. Update docs that name the moved files: AGENTS.md "Source Layout", README "Known issues", `docs/upstream-issues/zag.md`. Fix two stale README facts: Zag is pinned at 1.46.0, not 1.44.0, and `focusStaysPut` now works around the focus pull. |
-| R0b | Svelte test plumbing | No behaviour change. `.storybook/shared.ts`. Rename the Vitest project to `storybook-svelte` and the Playwright projects to `svelte-*`. The per-subtree guard. The contract normalizer and snapshots for every existing Svelte story. Story-helper styles into `.css` files. AGENTS.md test commands. |
-| R0c | Packaging (v0.2.0) | Optional exact peers, the peer = devDependency test, Renovate rules, README "Install and use", the release note, and the ta-manager PR. |
-| R0d | React toolchain | React dependencies and the `./react` export. `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. This roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
-| R1 | Presentational | `Button`, `Icon`, `Columns`, `Content`, `Grid`, `Spacer`, `Breadcrumbs`, `PageTitle`, `SectionNav`, `Footer`, `Pagination`, `SortableTh`, then `CopyButton`, with their Unformatted, Layout and parity `IlwUi` twins. May split into layout, Button, Icon and `CopyButton`, then page chrome. |
-| R2 | Forms | `Field`, `RadioGroup`, `ChoiceChips`. |
-| R3 | Islands and header | React `mountIslands`, `DarkModeToggle`, `Header`, and the Islands stories. |
-| R4 | Modal | `Modal`, `openModal`, `alert`, `confirm`, and the `data-autofocus` story. |
-| R5 | Data | `useDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`. Re-exports `isPaged`, `setTableFilter` and both pager class maps. |
-| R6 | Zag | The `AsyncSearch` adapter, `Combobox`, `Autocomplete`, `MultiCombobox`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
+| R0b | Svelte test plumbing | No behaviour change. `.storybook/shared.ts`. Rename the Vitest project to `storybook-svelte` and the Playwright projects to `svelte-*`. The per-subtree guard, including the `src/react` list, `.tsx`/`.jsx` scanning and `dangerouslySetInnerHTML`. The contract normalizer and snapshots for every existing Svelte story. Story-helper styles into `.css` files. AGENTS.md test commands. |
+| R0c | Packaging (v0.2.0) | Optional exact peers for both frameworks, with the React devDependencies they need, the peer = devDependency test, Renovate rules, README "Install and use", the release note, and the ta-manager PR. |
+| R0d | React toolchain | The `./react` export and the build dependencies (`@vitejs/plugin-react`, `@storybook/react-vite`, ESLint and its plugins). `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. The toolkit-replacement roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
+| R1 | Presentational | `Button`, `Icon`, `Columns`, `Content`, `Grid`, `Spacer`, `Breadcrumbs`, `PageTitle`, `SectionNav`, `Footer`, `Pagination`, `SortableTh`, then `CopyButton`, with their Layout, Width and parity `IlwUi` twins and their own Unformatted stories (the other Unformatted stories land with their components). Re-exports `LayoutTheme` and `LayoutWidth`. Also finishes R0d's `Page` and `BackToTop`: their twin stories, README React API and at-smoke rows. May split into layout, Button, Icon and `CopyButton`, then page chrome. |
+| R2 | Forms | `Field`, `RadioGroup`, `ChoiceChips` (and `ChipOption`). |
+| R3 | Islands and header | React `mountIslands`, `DarkModeToggle`, `Header`, the Islands stories, and `islands.test.ts` over both adapters. |
+| R4 | Modal | `Modal`, `openModal`, `alert`, `confirm`, and the `data-autofocus` story. Re-exports `CloseReason`, `ModalButton`, `ModalOptions`, `ModalSize`. |
+| R5 | Data | `useDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`. Re-exports `isPaged`, `setTableFilter`, both pager class maps, and the table and pager types. |
+| R6 | Zag | The `AsyncSearch` adapter and `AsyncSource`, `Combobox`, `Autocomplete`, `MultiCombobox`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
 | R7 | Select enhancement | `SelectCombobox`, `enhanceSelect`, `enhanceSelects`. |
-| R8 | Tabs | `Tabs`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
+| R8 | Tabs | `Tabs`, `TabItem`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
 
 Every port PR includes:
 
 - the components in `src/react/`;
 - twin stories, with descriptions and page context;
 - that component's plays moved to `stories/plays/`;
+- its presentational components in `react-ssr.test.ts`;
 - both builds green on all three layers, with the contract snapshots matching;
 - the README's React API for the component;
 - an at-smoke log row;
@@ -355,7 +360,7 @@ Every port PR includes:
 
 - Under the lockstep rule, every row of the [toolkit-replacement roadmap](2026-10-20-toolkit-replacement.md) still open when R0d merges needs both frameworks to be done. Rows merged before then, such as C3 `Tabs`, E3 `MultiCombobox`, E5 `ChoiceChips` and E6 `CopyButton`, are ported in R1–R8.
 - Component plans written from now on have a React section: the API mapping and the hard parts.
-- The pending `page-chrome`, `form-styles` and `layout` plans describe components that already exist. Once they're checked off, they move to `docs/old-plans/`. Their components are ported in R1–R3, so lockstep doesn't apply to them.
+- The pending `page-chrome`, `form-styles` and `layout` plans describe components that already exist. Once they're checked off, they move to `docs/old-plans/`. Their components are ported in R0d–R3, so lockstep doesn't apply to them.
 
 ## Done when
 
