@@ -3,7 +3,19 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Field, Footer, Header, Icon, PageTitle, Pagination, SectionNav, ToggleGroup } from '../src/svelte/index.ts';
+  import {
+    Breadcrumbs,
+    Button,
+    ChoiceChips,
+    Field,
+    Footer,
+    Header,
+    Icon,
+    PageTitle,
+    Pagination,
+    SectionNav,
+    ToggleGroup,
+  } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
   import { programs } from './section-nav-data.ts';
@@ -52,6 +64,30 @@
   <Field label="Email" description="We only use it to reply." error="Enter an email address.">
     {#snippet children(attrs)}<input type="email" name="email" {...attrs} />{/snippet}
   </Field>
+</Story>
+
+<!--
+  `ChoiceChips`, with help text and an error, outside `.ilw-format`.
+
+  **Why:** the play function checks the legend, the chips, the help text and the error are in Source Sans without the prose styles.
+
+  **Review:** the same type as on **Forms → ChoiceChips → Error**.
+-->
+<Story
+  name="ChoiceChips"
+  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-chips legend, .ilw-chip, .ilw-input-description, .ilw-input-alert'))}
+>
+  <ChoiceChips
+    legend="Country"
+    name="country"
+    options={[
+      { value: 'us', label: 'United States' },
+      { value: 'ca', label: 'Canada' },
+    ]}
+    value="us"
+    description="Applicants are counted by home country."
+    error="Choose a country."
+  />
 </Story>
 
 <!--
