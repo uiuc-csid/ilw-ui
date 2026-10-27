@@ -6,6 +6,7 @@
     rows = [{ label: 'Default' }],
     theme = 'light',
     height = 200,
+    holdFocus = false,
   }: {
     /** The parity file's id prefix, e.g. 'parity-button' (its stories are `<pair>--toolkit` and `<pair>--ilw-ui`). */
     pair: string;
@@ -14,6 +15,13 @@
     /** The toolbar's theme global, passed on so both frames match it. */
     theme?: string;
     height?: number;
+    /**
+     * Keep focus on this page until someone clicks or types. For pairs whose
+     * stories focus something on load (Modal): only one frame on a page holds
+     * focus, so whichever frame called focus() last would draw the only focus
+     * ring, and which one that is changes from load to load.
+     */
+    holdFocus?: boolean;
   } = $props();
 
   // Storybook URL args/globals: key:value pairs joined by ';'.
@@ -27,11 +35,42 @@
     if (row.args) q.set('args', encode(row.args));
     return `iframe.html?${q}`;
   }
+
+  // Takes focus back from any frame that takes it on its own, until the first
+  // click or key press here or in a frame. The frames are same-origin.
+  function holdFocusIn(root: HTMLElement) {
+    if (!holdFocus) return;
+    const ac = new AbortController();
+    const opts = { capture: true, signal: ac.signal };
+    const release = () => ac.abort();
+    const listen = (w: Window | null) => {
+      w?.addEventListener('pointerdown', release, opts);
+      w?.addEventListener('keydown', release, opts);
+    };
+    listen(window);
+    // This window blurs when focus moves into a frame, and the frame's element
+    // is then the active one. Blurring it returns focus here in Chromium, and
+    // window.focus() in WebKit. Not during the blur event itself: Chromium
+    // ignores blur() until the event is over.
+    window.addEventListener(
+      'blur',
+      () =>
+        queueMicrotask(() => {
+          const a = document.activeElement;
+          if (!(a instanceof HTMLIFrameElement && root.contains(a))) return;
+          a.blur();
+          window.focus();
+        }),
+      opts,
+    );
+    for (const f of root.querySelectorAll('iframe')) f.addEventListener('load', () => listen(f.contentWindow), opts);
+    return release;
+  }
 </script>
 
 <!-- Each side is its own document, so toolkit.css and ilw-ui's styles.css
      (same class names) never meet. For people; tests use the pair stories. -->
-<div class="side-by-side">
+<div class="side-by-side" {@attach holdFocusIn}>
   <div class="head">Toolkit</div>
   <div class="head">ilw-ui</div>
   {#each rows as row (row.label)}
