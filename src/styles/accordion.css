@@ -1,0 +1,205 @@
+/* Accordion (C2), the CSS form of <ilw-accordion> and <ilw-accordion-panel>.
+   Markup:
+
+     <div class="ilw-accordion">
+       <details class="ilw-accordion-panel">          (name="faq" on every panel: one open at a time)
+         <summary>
+           <svg class="ilw-accordion-icon" aria-hidden="true">…</svg>
+           <h3 class="ilw-accordion-heading">How do I submit my application?</h3>
+         </summary>
+         <div class="ilw-accordion-body"><p>…</p></div>
+       </details>
+     </div>
+
+   No script: each panel is a details, so the summary is the button, find in
+   page opens a closed panel, and a shared name makes the browser close the
+   others. Wrapper classes: .ilw-accordion-compact (smaller, white, rules
+   between panels, no accent line) and .ilw-accordion-accent-<name> (orange,
+   arches, industrial, altgeld, gray, black, white; blue is the default). The
+   Accordion component adds ul.ilw-accordion-buttons (Expand All / Collapse
+   All) above the panels. The --ilw-accordion--* and --ilw-accordion-panel--*
+   properties are the toolkit's, with its values, plus --heading-color. */
+
+.ilw-accordion {
+  --ilw-accordion--accent: var(--il-blue, #13294b);
+  --ilw-accordion-panel--image-size: 20px;
+  --ilw-accordion-panel--image-transform: rotate(270deg);
+  --ilw-accordion-panel--image-transform-expand: rotate(0);
+  --ilw-accordion-panel--padding: 5px 10px 20px 65px;
+  --ilw-accordion-panel--section-margin: 0 0 20px 0;
+  --ilw-accordion-panel--expanded--section-margin: 0 0 10px 0;
+  --ilw-accordion-panel--header-padding: 30px 24px;
+  --ilw-accordion-panel--background: var(--ilw-color--gray--background);
+  --ilw-accordion-panel--background-hover: var(--ilw-color--gray--border-light);
+  --ilw-accordion-panel--border-left: 6px solid var(--ilw-accordion--accent);
+  --ilw-accordion-panel--summary-font: 600 1.375rem / 1.875rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  /* Upstream: a fixed Blue, unreadable on the dark-mode surface; the
+     surface's own heading colour is Blue in light mode. */
+  --ilw-accordion-panel--heading-color: var(--ilw-color--gray--heading);
+
+  display: block;
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+  font-size: 1.125rem;
+}
+
+.ilw-accordion-accent-orange {
+  --ilw-accordion--accent: var(--il-orange, #ff5f05);
+}
+
+.ilw-accordion-accent-arches {
+  --ilw-accordion--accent: var(--il-arches, #009fd4);
+}
+
+.ilw-accordion-accent-industrial {
+  --ilw-accordion--accent: var(--il-industrial, #1d58a7);
+}
+
+.ilw-accordion-accent-altgeld {
+  --ilw-accordion--accent: var(--il-altgeld, #c84113);
+}
+
+.ilw-accordion-accent-gray {
+  --ilw-accordion--accent: var(--il-storm-95, #f4f4f4);
+}
+
+.ilw-accordion-accent-black {
+  --ilw-accordion--accent: var(--il-black, #000000);
+}
+
+.ilw-accordion-accent-white {
+  --ilw-accordion--accent: var(--il-white, #ffffff);
+}
+
+.ilw-accordion-compact {
+  --ilw-accordion-panel--image-size: 15px;
+  --ilw-accordion-panel--header-padding: 10px 20px;
+  --ilw-accordion-panel--section-margin: 0;
+  --ilw-accordion-panel--border-left: none;
+  /* Upstream: white, which stays white in dark mode. */
+  --ilw-accordion-panel--background: var(--ilw-color--white--background);
+  --ilw-accordion-panel--background-hover: var(--ilw-color--gray--background);
+  --ilw-accordion-panel--expanded--section-margin: 0;
+  --ilw-accordion-panel--padding: 0 10px 2px 55px;
+  --ilw-accordion-panel--summary-font: 600 1.125rem / 1.375rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  --ilw-accordion-panel--heading-color: var(--ilw-color--white--heading);
+
+  border-bottom: thin solid var(--ilw-color--gray--border-light);
+}
+
+/* A panel. */
+.ilw-accordion-panel {
+  margin: var(--ilw-accordion-panel--section-margin);
+}
+
+.ilw-accordion-panel[open] {
+  margin: var(--ilw-accordion-panel--expanded--section-margin);
+}
+
+.ilw-accordion-compact .ilw-accordion-panel {
+  border-top: thin solid var(--ilw-color--gray--border-light);
+}
+
+/* The header: the summary is the button, holding the chevron and the heading. */
+.ilw-accordion-panel > summary {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+  padding: var(--ilw-accordion-panel--header-padding);
+  border-left: var(--ilw-accordion-panel--border-left);
+  background: var(--ilw-accordion-panel--background);
+  color: var(--ilw-color--gray--text);
+  list-style: none;
+  cursor: pointer;
+}
+
+.ilw-accordion-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ilw-accordion-panel > summary:hover {
+  background: var(--ilw-accordion-panel--background-hover);
+}
+
+/* Upstream's focus colours on the whole header, plus an outline inside it. */
+.ilw-accordion-panel > summary:focus-visible {
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: -2px;
+}
+
+.ilw-accordion-icon {
+  flex: none;
+  width: var(--ilw-accordion-panel--image-size);
+  height: auto;
+  transform: var(--ilw-accordion-panel--image-transform);
+}
+
+.ilw-accordion-panel[open] > summary .ilw-accordion-icon {
+  transform: var(--ilw-accordion-panel--image-transform-expand);
+}
+
+/* One class, after format.css: beats .ilw-format's heading rules. */
+.ilw-accordion-heading {
+  margin: 0;
+  padding: 0;
+  font: var(--ilw-accordion-panel--summary-font);
+  color: var(--ilw-accordion-panel--heading-color);
+}
+
+.ilw-accordion-panel > summary:focus-visible .ilw-accordion-heading {
+  color: inherit;
+}
+
+.ilw-accordion-body {
+  padding: var(--ilw-accordion-panel--padding);
+}
+
+/* Expand All / Collapse All. Normally .ilw-button in a ul.ilw-buttons-left,
+   spaced as upstream; compact, right-aligned text links split by a bar. */
+.ilw-accordion-buttons {
+  display: flex;
+  flex-flow: row wrap;
+  column-gap: 10px;
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ilw-accordion-buttons > li {
+  margin: 0;
+  padding: 0;
+}
+
+.ilw-accordion-compact .ilw-accordion-buttons {
+  justify-content: flex-end;
+}
+
+.ilw-accordion-compact .ilw-accordion-buttons button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ilw-color--text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ilw-accordion-compact .ilw-accordion-buttons button:hover {
+  color: var(--ilw-color--link-hover);
+}
+
+.ilw-accordion-compact .ilw-accordion-buttons button:focus-visible {
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 2px;
+}
+
+/* The bar between the links is decoration: empty alternative text. */
+.ilw-accordion-compact .ilw-accordion-buttons > li:not(:last-child)::after {
+  content: ' | ';
+  content: ' | ' / '';
+  margin-left: 0.5rem;
+}
