@@ -214,3 +214,5 @@ package
 # ilw-ui
 test-results/
 playwright-report/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
