@@ -26,6 +26,18 @@
       )!;
     return { header, menuEl, section };
   }
+
+  /**
+   * Opens the menu the way "Menu" does, when "Menu" is showing (under 990 px).
+   * From 990 px the menu is already part of the header; opening it there would
+   * turn it back into a panel. Returns whether it opened.
+   */
+  function openMenu(header: HTMLElement, menuEl: HTMLElement): boolean {
+    const toggle = header.querySelector('.ilw-header-toggle')!;
+    if (getComputedStyle(toggle).display === 'none') return false;
+    menuEl.showPopover();
+    return true;
+  }
 </script>
 
 {#snippet page(args: { mega?: boolean; darkModeToggle?: boolean })}
@@ -152,7 +164,7 @@
 <Story name="Fixture Megamenu" args={{ mega: true, darkModeToggle: true }} template={page} />
 
 <!--
-  The menu open (as after "Menu" on a narrow screen), with the "Information" section and its nested "Garnet" section open.
+  The "Information" section and its nested "Garnet" section open (and, under 990 px, the menu around them).
 
   **Why:** axe scans the open menu and both open dropdowns. The play function checks the `details` groups: opening "Start Here" closes "Information" (one `name`), and opening a nested section leaves its parent open (its own `name`).
 
@@ -162,9 +174,8 @@
   name="Menu Open"
   template={page}
   play={async ({ canvasElement }) => {
-    const { menuEl, section } = parts(canvasElement);
-    menuEl.showPopover();
-    await expect(menuEl.matches(':popover-open')).toBe(true);
+    const { header, menuEl, section } = parts(canvasElement);
+    openMenu(header, menuEl);
 
     const startHere = section('Start Here');
     const information = section('Subpages of Information');
@@ -227,10 +238,10 @@
   args={{ mega: true }}
   template={page}
   play={async ({ canvas, canvasElement }) => {
-    const { menuEl } = parts(canvasElement);
+    const { header, menuEl } = parts(canvasElement);
     // A manual popover, so a panel inside it restores focus when Escape closes it.
     await expect(menuEl).toHaveAttribute('popover', 'manual');
-    menuEl.showPopover();
+    const narrow = openMenu(header, menuEl);
     const buttons = menuEl.querySelectorAll<HTMLButtonElement>('.ilw-header-megamenu-toggle');
     await expect(buttons).toHaveLength(2);
     const panel = (b: HTMLButtonElement) => canvasElement.ownerDocument.getElementById(b.getAttribute('popovertarget')!)!;
@@ -248,13 +259,13 @@
     panel(buttons[1]).showPopover();
     await expect(panel(buttons[0]).matches(':popover-open')).toBe(false);
     await expect(panel(buttons[1]).matches(':popover-open')).toBe(true);
-    await expect(menuEl.matches(':popover-open')).toBe(true);
+    await expect(menuEl.matches(':popover-open')).toBe(narrow);
     await expect(within(panel(buttons[1])).getByRole('link', { name: 'Apply' })).toBeVisible();
   }}
 />
 
 <!--
-  The header on a dark page (`html[data-theme="dark"]`), with the dark-mode toggle and the menu open.
+  The header on a dark page (`html[data-theme="dark"]`), with the dark-mode toggle (and the menu open, under 990 px).
 
   **Why:** the header takes its colours from the theme: a dark background, light text, a dark bar. The play function checks those and that the toggle's island host renders the switch in the menu, already mounted. axe checks the dark contrast.
 
@@ -267,7 +278,7 @@
   template={page}
   play={async ({ canvasElement }) => {
     const { header, menuEl } = parts(canvasElement);
-    menuEl.showPopover();
+    openMenu(header, menuEl);
     await expect(getComputedStyle(header).backgroundColor).toBe('rgb(17, 24, 29)');
     await expect(getComputedStyle(header).color).toBe('rgb(225, 231, 241)');
     await expect(getComputedStyle(header).borderTopColor).toBe('rgb(255, 95, 5)');

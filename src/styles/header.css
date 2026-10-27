@@ -35,7 +35,8 @@
   background-color: var(--ilw-header--background);
   color: var(--ilw-header--text);
   font: 400 1rem/1 var(--il-font-sans, 'Source Sans 3', sans-serif);
-  anchor-scope: --ilw-header-main;
+  anchor-name: --ilw-header;
+  anchor-scope: --ilw-header, --ilw-header-main;
 }
 
 .ilw-header *,
@@ -585,6 +586,26 @@
 
   .ilw-header-menu[popover] {
     display: contents;
+  }
+
+  /* Opened on a narrow screen and then widened, the menu is still a popover: a
+     top-layer box can't join the grid, so it stays a panel under the whole
+     header, and "Menu" comes back (in the space the search left) to close it. */
+  .ilw-header-menu:popover-open {
+    display: block;
+  }
+
+  @supports (top: anchor(bottom)) {
+    .ilw-header-menu:popover-open {
+      top: anchor(--ilw-header bottom);
+    }
+  }
+
+  .ilw-header:has(.ilw-header-menu:popover-open) .ilw-header-toggle {
+    display: inline-flex;
+    grid-area: search;
+    justify-self: end;
+    align-self: start;
   }
 
   .ilw-header-links {
