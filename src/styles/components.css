@@ -142,10 +142,73 @@
 
 .combobox-popup .combobox-more,
 .combobox-popup .combobox-empty,
-.autocomplete-popup .autocomplete-empty {
+.combobox-popup .combobox-loading,
+.combobox-popup .combobox-error,
+.autocomplete-popup .autocomplete-empty,
+.autocomplete-popup .autocomplete-loading,
+.autocomplete-popup .autocomplete-error {
   color: var(--il-storm-30, #474948);
   font-style: italic;
   cursor: default;
+}
+
+/* An error isn't shown by colour alone: it is its own row with its own text. */
+.combobox-popup .combobox-error,
+.autocomplete-popup .autocomplete-error {
+  color: var(--il-altgeld-darker-1, #983220);
+}
+
+/* MultiCombobox: chosen options as tokens above the input, each with a remove button. */
+.combobox-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.combobox-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 2px 2px 2px 10px;
+  border: thin solid var(--il-blue, #13294b);
+  border-radius: 999px;
+  background-color: var(--il-arches-90, #c7edf8);
+  color: var(--il-blue, #13294b);
+  font: 0.875rem/1.25rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.combobox-token-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  font: 700 1rem/1 var(--il-font-sans, 'Source Sans 3', sans-serif);
+  cursor: pointer;
+}
+
+.combobox-token-remove:hover,
+.combobox-token-remove:focus {
+  background-color: var(--il-blue, #13294b);
+  color: var(--il-white, #ffffff);
+}
+
+.combobox-token-remove:focus-visible {
+  outline: 3px solid var(--il-altgeld, #c84113);
+  outline-offset: 1px;
+}
+
+.combobox-token-remove:disabled {
+  color: var(--il-storm-30, #474948);
+  cursor: not-allowed;
 }
 
 /* Pager: a row of page buttons in the toolkit's outline-button look. The

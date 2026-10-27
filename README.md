@@ -38,7 +38,7 @@ and `@zag-js/svelte` (1.44.0), `@tanstack/table-core` and
 to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
 
 ```js
-import { Autocomplete, Combobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
+import { Autocomplete, Combobox, MultiCombobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, Pagination, setTableFilter } from 'ilw-ui/svelte';
 import { Page, Footer, Breadcrumbs, PageTitle, Icon, Field, RadioGroup, ChoiceChips } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, pageHref, announce, campusFooter, campusLink } from 'ilw-ui/core';
@@ -75,9 +75,10 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
+| `tabs.css`       | `.ilw-tabs` headed sections and the tab list (C3)         |
 | `dark-mode-toggle.css` | `.ilw-dark-mode-toggle`'s layout; needs `switch.css` (B1) |
 | `accordion.css`  | `.ilw-accordion`, `details.ilw-accordion-panel` and its parts; the buttons need `button.css` (C2) |
-| `components.css` | `.ilw-visually-hidden`, SortableTh, Combobox, Autocomplete, Pager |
+| `components.css` | `.ilw-visually-hidden`, SortableTh, Combobox, MultiCombobox, Autocomplete, Pager |
 
 ## Themes and dark mode
 
@@ -1338,6 +1339,136 @@ reach its own toolbar) need `Modal`.
 `h2.ilw-modal-title`; the × button's name is "Close". The page no longer has
 `inert` set on `<body>`'s children: check inertness with `dialog:modal`.
 
+### `Tabs`, `enhanceTabs` and `.ilw-tabs`
+
+The replacement for `<ilw-tabs>`: APG tabs over a box of headed sections.
+The sections are the markup a server sends, and what a browser without script
+shows; `Tabs` (or `enhanceTabs`, on a server page) adds the tab list and turns
+the sections into tab panels. Styled by `tabs.css`.
+
+```svelte
+<script>
+  import { Tabs } from 'ilw-ui/svelte';
+
+  let selected = $state('degree');
+</script>
+
+{#snippet degree()}<p>Choose from more than 150 undergraduate majors.</p>{/snippet}
+{#snippet classroom()}<p>Small discussion sections and hands-on labs.</p>{/snippet}
+
+<h2 id="programs-heading">Programs</h2>
+<Tabs
+  labelledby="programs-heading"
+  tabs={[
+    { id: 'degree', label: 'Degree Programs', content: degree },
+    { id: 'classroom', label: 'Classroom Experience', content: classroom },
+  ]}
+  bind:selected
+/>
+```
+
+`Tabs` props: `tabs` (`{ id, label, content }[]`, `content` a snippet),
+`selected` (bindable panel id; the first tab when unset), `automatic`, `hash`,
+`horizontal`, `level` (the panels' heading level, default 3), `label` or
+`labelledby` (the tab list's name), `theme`, `width`, `id`, `class` and
+`onchange(id)`.
+
+DOM contract, as the server sends it (and `Tabs` renders before it mounts):
+
+```html
+<h2 id="programs-heading">Programs</h2>
+<div class="ilw-tabs" data-labelledby="programs-heading">   <!-- + theme="blue", .ilw-width-*, .ilw-tabs--horizontal -->
+  <div class="ilw-tabs-container">
+    <section class="ilw-tabs-panel" id="degree">
+      <h3 class="ilw-tabs-heading">Degree Programs</h3>
+      <p>Choose from more than 150 undergraduate majors.</p>
+    </section>
+    <section class="ilw-tabs-panel" id="classroom">
+      <h3 class="ilw-tabs-heading">Classroom Experience</h3>
+      <p>Small discussion sections and hands-on labs.</p>
+    </section>
+  </div>
+</div>
+```
+
+Once enhanced:
+
+```html
+<div class="ilw-tabs ilw-tabs--ready" data-labelledby="programs-heading">
+  <div class="ilw-tabs-container">
+    <div class="ilw-tabs-list" role="tablist" aria-labelledby="programs-heading" aria-orientation="vertical">
+      <button type="button" class="ilw-tabs-tab" role="tab" id="degree-tab" aria-controls="degree"
+              aria-selected="true" tabindex="0">Degree Programs</button>
+      <button type="button" class="ilw-tabs-tab" role="tab" id="classroom-tab" aria-controls="classroom"
+              aria-selected="false" tabindex="-1">Classroom Experience</button>
+    </div>
+    <section class="ilw-tabs-panel" id="degree" role="tabpanel" aria-labelledby="degree-tab" tabindex="0">…</section>
+    <section class="ilw-tabs-panel" id="classroom" role="tabpanel" aria-labelledby="classroom-tab" tabindex="0" hidden>…</section>
+  </div>
+</div>
+```
+
+- A tab's id is `<panel id>-tab`; its text is the panel's `.ilw-tabs-heading`.
+  The headings stay in the document, visually hidden, so heading navigation
+  still finds the open panel.
+- `aria-orientation` is `vertical` (the default column at the left) or
+  `horizontal` (`.ilw-tabs--horizontal`, a row over the panels). Under 800px
+  wide (a container query) both stack the tabs full width above the panel.
+- **Keys (APG):** Tab enters the list on the selected tab and leaves it for
+  the open panel. The arrows move focus to the previous or next tab, wrapping
+  at the ends (all four, in either orientation, since the list can stack);
+  Home and End go to the first and last. Enter, Space or a click selects. With
+  `automatic`, a tab is selected as soon as the arrows reach it.
+- **Hash links:** a URL fragment naming a panel, or anything inside one,
+  selects that tab, on load and on every `hashchange`, so an in-page link
+  `<a href="#classroom">` opens it. With `hash`, choosing a tab also writes
+  `#<panel id>` to the URL with `history.replaceState` (no history entry per
+  tab).
+- Destroying `Tabs`' tab list, or calling `enhanceTabs`' cleanup, puts the
+  sections back exactly as served.
+
+**Without Svelte:** write the markup above in a server template and enhance it
+from the page's script. Options are `data-*` attributes on `.ilw-tabs`:
+`data-label` or `data-labelledby`, `data-selected="<panel id>"`,
+`data-automatic`, `data-hash`. Each selection fires a bubbling
+`ilw-tabs-change` event with `detail.id`.
+
+```js
+import { enhanceAllTabs, enhanceTabs } from 'ilw-ui/svelte';
+import 'ilw-ui/styles.css';
+
+enhanceAllTabs(); // every .ilw-tabs in the document not yet enhanced
+document.addEventListener('ilw-tabs-change', (e) => console.log(e.detail.id));
+```
+
+```svelte
+<!-- Server-written markup inside a Svelte component; the cleanup restores the sections. -->
+<div class="ilw-tabs" {@attach enhanceTabs}>…</div>
+```
+
+`enhanceAllTabs(root?, selector?)` also removes the tab lists of boxes that
+have left the document, so it is safe to call after a fragment swap. A box
+already enhanced, or rendered by `Tabs`, is skipped.
+
+**Differences from `<ilw-tabs>`:**
+
+- Manual activation by default (APG): the arrows move focus, and Enter or
+  Space selects. Upstream selects on every arrow (`automatic` restores that).
+- The arrows wrap, and Home and End work; upstream stops at the ends and has
+  neither.
+- The panels are `tabpanel`s named by their tab, with `tabindex="0"`;
+  upstream's panels have no role or name.
+- Without script the content is readable as headed sections; upstream shows
+  nothing but unstyled buttons and every panel.
+- The tab list is generated from the panels' headings, not written by hand
+  (`slot="tabs"`). `default` becomes `selected` (`data-selected`).
+- Hash links are new.
+- Not carried over: `rounded` (not in upstream's docs; its colours aren't the
+  theme's) and upstream's mutation observer (call `enhanceAllTabs` again
+  after changing server markup; `Tabs` re-renders on its own).
+- Links in a panel take the text colour, as upstream (`color: unset`), except
+  while focused.
+
 ### `Combobox`
 
 A single-select filtering combobox on the [Zag](https://zagjs.com/) combobox
@@ -1353,8 +1484,12 @@ machine: a text input that filters a listbox of options, for picking one of many
 | --------------------------------- | ----------------------- | ------------- | ------------------------------------------------------------------- |
 | `id`                              | `string`                | required      | The input's id                                                      |
 | `popupId`                         | `string`                | `${id}-popup` | The listbox's id                                                    |
-| `items`                           | `ComboboxItem[]`        | required      | `{ value, label, search?, group? }`; `search` defaults to `label`   |
+| `items`                           | `ComboboxItem[]`        | `[]`          | `{ value, label, search?, group? }`; `search` defaults to `label`. With `source`, the known items (labels a preselected value) |
+| `source`                          | `AsyncSource`           |               | `(query, signal) => Promise<ComboboxItem[]>`: searches in place of filtering `items` (see [Async sources](#async-sources)) |
+| `debounce`                        | `number`                | `250`         | With `source`: ms after the last keystroke before searching         |
+| `loadingText`, `errorText`        | `string`                | `Loading…`, `Couldn't load results` | With `source`: the list's row and status message      |
 | `value`                           | `string \| null`        | `null`        | The selection (controlled: update it in `onchange`)                 |
+| `name`                            | `string`                |               | Adds `<input type="hidden" name value>` with the selection (`''` when none) |
 | `onchange`                        | `(value, item) => void` | required      | On each commit; `value`/`item` are `null` when text matches nothing |
 | `labelId`                         | `string`                |               | The `<label>`'s id; also labels the listbox                         |
 | `placeholder`                     | `string`                | `''`          | Also the listbox's `aria-label` when there is no `labelId`          |
@@ -1369,8 +1504,10 @@ On blur (`blurMatch`), the combobox commits an exact label or value match, else
 the only match, else `null`. Switching windows or tabs isn't a blur: the input
 keeps focus, so nothing is committed and the list stays as it was.
 
-There is no `name` or hidden form input: Zag would submit the label text. Keep
-the value in your own field (ta-manager keeps a hidden `<select>`).
+The text input has no `name` (Zag would submit the label text). With `name`,
+a hidden input inside the root carries the selected value for a plain form
+POST; without it, keep the value in your own field (ta-manager keeps a hidden
+`<select>`).
 
 Keyboard:
 
@@ -1415,6 +1552,8 @@ DOM contract (consumers' tests select on it):
 - With no matches, the list shows a disabled `.combobox-empty` "No matches" row in place of the "more" row.
 - The popup is placed with CSS, with no inline `style`, so it runs under `style-src-attr 'none'`.
 - While the list is open on macOS and iOS, Zag adds a visually hidden `span[role=alert][data-live-announcer]` that re-announces the highlight for VoiceOver. Zag appends it to `<body>`; the component moves it into its root `span`, so it stays inside the page's landmarks and outside `inert` (see Known issues).
+- With `name`, the root ends with `<input type="hidden" name="…" value="aadams">`.
+- With `source`, the root also holds `<span class="ilw-visually-hidden" role="status">` (see [Async sources](#async-sources)), and the list shows a disabled `.combobox-loading` row while a search runs and a `.combobox-error` row when it fails, each in place of the options. Without `source` neither is rendered.
 
 ### `Autocomplete`
 
@@ -1432,7 +1571,10 @@ only helps; use `Combobox` to pick one of a fixed set.
 | --------------------------------- | ---------------------- | ------------- | ---------------------------------------------------------------------------- |
 | `id`                              | `string`               | required      | The input's id                                                               |
 | `popupId`                         | `string`               | `${id}-popup` | The listbox's id                                                             |
-| `items`                           | `AutocompleteItem[]`   | required      | `{ value, label, text?, search? }`: `label` is listed, `text` is written     |
+| `items`                           | `AutocompleteItem[]`   | `[]`          | `{ value, label, text?, search? }`: `label` is listed, `text` is written     |
+| `source`                          | `AsyncSource`          |               | `(query, signal) => Promise<AutocompleteItem[]>` in place of `items` ([Async sources](#async-sources)) |
+| `debounce`                        | `number`               | `250`         | With `source`: ms after the last keystroke before searching                  |
+| `loadingText`, `errorText`        | `string`               | `Loading…`, `Couldn't load suggestions` | With `source`: the list's row and status message      |
 | `value`                           | `string`               | `''`          | The input's text (`bind:value`)                                              |
 | `oninput`                         | `(text) => void`       |               | On each keystroke                                                            |
 | `onselect`                        | `(item) => void`       |               | When a suggestion is chosen, after its `text` (or `label`) is written        |
@@ -1478,6 +1620,91 @@ DOM contract:
 - Choosing a suggestion fires a bubbling `change` on the input, after its text is written, as a native input would on a new value. (Blurring after typing fires the input's own `change` as usual.)
 - With `emptyText` and no matches, the list shows one disabled `.autocomplete-empty` option.
 - `aria-activedescendant`, the caret and Zag's VoiceOver live region behave as in `Combobox`.
+- With `source`: a `role="status"` span in the root and `.autocomplete-loading` / `.autocomplete-error` rows, as in `Combobox`. While a search runs the list is open on "Loading…"; a search with no results shows `emptyText`, or closes the list without it.
+
+### `MultiCombobox`
+
+A multi-select `Combobox` (E3): chosen options become removable tokens above the
+input, and `name` adds one hidden input per value, so a plain form POST sends
+`mentors=aadams&mentors=cclark` (Django's `getlist`; the replacement for
+Select2's `ModelSelect2Multiple`). A component of its own, so `Combobox` keeps
+its single-value API and markup.
+
+```svelte
+<label id="mentors-label" for="mentors-cb">Faculty mentors</label>
+<MultiCombobox id="mentors-cb" labelId="mentors-label" name="mentors" {source} items={initial}
+               {value} onchange={(v) => (value = v)} required />
+```
+
+| Prop                              | Type                      | Default       |                                                                   |
+| --------------------------------- | ------------------------- | ------------- | ----------------------------------------------------------------- |
+| `id`, `popupId`, `labelId`        | `string`                  |               | As in `Combobox`; `labelId` also names the tokens list            |
+| `items`, `source`, `debounce`     |                           |               | As in `Combobox` (`items` labels the preselected values with `source`) |
+| `value`                           | `string[]`                | `[]`          | The selection, in the order chosen (controlled)                   |
+| `onchange`                        | `(values, items) => void` | required      | On each add or removal                                            |
+| `name`                            | `string`                  |               | One `<input type="hidden" name value>` per selected value         |
+| `required`                        | `boolean`                 | `false`       | Blocks submit with nothing selected (`requiredText` is the message) |
+| `requiredText`                    | `string`                  | `Select at least one option.` |                                                   |
+| `removeLabel`                     | `(label) => string`       | `Remove ${label}` | The remove buttons' accessible names                          |
+| `placeholder`, `minChars`, `max`, `block`, `disabled`, `invalid`, `loadingText`, `errorText` | | | As in `Combobox` |
+
+Choosing an option adds it (choosing a selected one removes it); the text clears
+and the list closes, with focus left in the input. Typed text is never added on
+blur. The status region announces "Added …" and "Removed …".
+
+Keyboard (the input's keys are `Combobox`'s, except as noted):
+
+| Key                         | Where       | Action                                                                                   |
+| --------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| Enter                       | input       | Adds (or removes) the highlighted option; with nothing highlighted, does nothing          |
+| Backspace                   | empty input | Focuses the last token's remove button (removes nothing)                                 |
+| Tab / Shift+Tab             | anywhere    | The remove buttons are in the tab order, before the input                                |
+| Enter, Space, Backspace, Delete | token   | Removes it; focus goes to the next token, else the previous one, else the input           |
+| ArrowLeft / ArrowRight      | token       | Previous / next token; ArrowRight on the last returns to the input                       |
+
+DOM contract:
+
+```html
+<span class="combobox combobox-multi" data-scope="combobox" data-part="root">
+  <ul class="combobox-tokens" aria-labelledby="mentors-label">
+    <li class="combobox-token" data-value="aadams">
+      <span class="combobox-token-label">Avery Adams</span>
+      <button type="button" class="combobox-token-remove" aria-label="Remove Avery Adams"><span aria-hidden="true">×</span></button>
+    </li>
+  </ul>
+  <input id="mentors-cb" class="combobox-input" role="combobox" aria-required="true" … />
+  <div id="mentors-cb-popup" class="combobox-popup" role="listbox" aria-multiselectable="true" aria-labelledby="mentors-label">…</div>
+  <span class="ilw-visually-hidden" role="status">Added Avery Adams</span>
+  <input type="hidden" name="mentors" value="aadams" />
+</span>
+```
+
+- The tokens list is rendered only while something is selected. With `block`, the root is `combobox combobox-multi cb-block`.
+- The listbox, options, groups, "more"/"No matches"/loading/error rows and option ids are `Combobox`'s; every selected option has `aria-selected="true"`.
+- The text input never has `name` or `required`: `required` sets `aria-required` and a custom validity message (`setCustomValidity`) while nothing is selected.
+- With `disabled`, the remove buttons are disabled too.
+
+### Async sources
+
+`Combobox`, `MultiCombobox` and `Autocomplete` take a `source` in place of
+`items`: a function from the typed text to a promise of items. The server does
+the matching; the component shows what comes back, capped at `max`.
+
+```ts
+import type { AsyncSource } from 'ilw-ui/svelte';
+
+const source: AsyncSource<ComboboxItem> = async (query, signal) => {
+  const response = await fetch(`/people/search?q=${encodeURIComponent(query)}`, { signal });
+  if (!response.ok) throw new Error(response.statusText);
+  return response.json();
+};
+```
+
+- Typing searches `debounce` ms (250) after the last keystroke, once the text reaches `minChars`; below it the search is cancelled and the list closes. ArrowDown/ArrowUp on a closed list search at once (with the text as it stands, `''` included) and highlight the first/last result when it arrives.
+- Each new search aborts the one before it through its `AbortSignal` (pass it to `fetch`). An answer for an aborted search is dropped even if the source ignored the signal. Leaving the field aborts too.
+- While a search runs the list shows a disabled "Loading…" row; a rejected promise shows the error row. Typing again retries.
+- A visually hidden `role="status"` inside the component's root says "Loading…", "N results", the empty text or the error, so screen readers hear the outcome of a search without leaving the input. It sits in the root (not `<body>`) so it works inside a modal.
+- With `Combobox`, a lone result for the typed text is highlighted when it arrives, as with `items`. On blur, the text commits an exact label/value match among the results or known items, else the only result for exactly that text, else `null`.
 
 ### `enhanceSelect`, `enhanceSelects`
 
@@ -1995,8 +2222,8 @@ each violation as file:line.
 ## Known issues
 
 Upstream Zag (`@zag-js/combobox` 1.44.0) gaps. Each is worked around once,
-inside `Combobox` (and `Autocomplete`, which shares the workarounds in
-`src/svelte/zag-input.ts`). None is filed upstream yet. Draft issues are in
+inside `Combobox` (and `MultiCombobox` and `Autocomplete`, which share the
+workarounds in `src/svelte/zag-input.ts`). None is filed upstream yet. Draft issues are in
 [docs/upstream-issues/zag.md](docs/upstream-issues/zag.md).
 
 - **`openOnChange` as a function sees the text from before the keystroke,** so
@@ -2026,8 +2253,8 @@ inside `Combobox` (and `Autocomplete`, which shares the workarounds in
   the list is open, to announce the highlighted option (VoiceOver doesn't read
   `aria-activedescendant` reliably). The machine passes `@zag-js/live-region` no
   `root`, so it lands outside `<ilw-page>`, and is silenced by `inert` when the
-  component sits in a modal. While focus is in the component, `Combobox` and
-  `Autocomplete` move it into their root `span` (`keepLiveRegionIn`); Zag finds
+  component sits in a modal. While focus is in the component, `Combobox`,
+  `MultiCombobox` and `Autocomplete` move it into their root `span` (`keepLiveRegionIn`); Zag finds
   it by id and still announces and removes it.
 
 ## License

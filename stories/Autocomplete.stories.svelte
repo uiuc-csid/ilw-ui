@@ -4,6 +4,7 @@
 
   import type { AutocompleteItem } from '../src/core/index.ts';
   import AutocompleteDemo from './AutocompleteDemo.svelte';
+  import { StubServer } from './stub-source.svelte.ts';
 
   const faculty: AutocompleteItem[] = [
     { value: 'aadams', label: 'A. Adams — Avery Adams (aadams)', text: 'A. Adams', search: 'A. Adams Avery Adams aadams' },
@@ -15,6 +16,12 @@
     const n = String(i + 1).padStart(2, '0');
     return { value: `cs1${n}`, label: `CS 1${n}` };
   });
+
+  // One stub endpoint per async story, so stories on the Docs page don't share requests.
+  const asyncServer = new StubServer(faculty);
+  const emptyServer = new StubServer(faculty);
+  const errorServer = new StubServer(faculty);
+  const fixtureServer = new StubServer(faculty, { auto: true });
 
   const { Story } = defineMeta({
     title: 'Autocomplete',
@@ -422,3 +429,113 @@
   **Review:** like `Fixture`, but a search with no matches shows the "No matches" row.
 -->
 <Story name="Fixture empty text" args={{ emptyText: 'No matches' }} />
+
+<!--
+  An async source: suggestions come from a (stubbed) server search, with "Loading…" while it runs; a newer search aborts the older one.
+
+  **Why:** E3. The play function holds the stub's answers: it checks the loading row and the `role="status"` message, that typing on aborts the earlier request and its late answer changes nothing, then answers, picks a suggestion and leaves the list open on the results for axe.
+
+  **Review:** type `ad`. The list shows "Loading…" and the test server panel lists the search. Type `a`, and the `ad` search goes away. Press Respond. Avery and Drew Adams are suggested; the text you typed stays until you pick one.
+-->
+<Story
+  name="Async"
+  args={{ server: asyncServer, items: [] }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    const server = asyncServer;
+    server.reset();
+    const input = canvas.getByRole('combobox', { name: 'Professor' });
+    const status = canvasElement.querySelector('.autocomplete > [role="status"]')!;
+    await userEvent.click(input);
+    await userEvent.keyboard('ad');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    const loading = canvas.getByRole('option', { name: 'Loading…' });
+    await expect(loading.className).toBe('autocomplete-loading');
+    await expect(status).toHaveTextContent('Loading…');
+    await waitFor(() => expect(server.last?.query).toBe('ad'));
+    const stale = server.last!;
+
+    await userEvent.keyboard('a');
+    await waitFor(() => expect(server.last?.query).toBe('ada'));
+    await expect(server.requests.slice(0, -1).every((r) => r.signal.aborted)).toBe(true);
+    stale.respond();
+    await expect(canvas.getByRole('option', { name: 'Loading…' })).toBeVisible();
+
+    server.last!.respond();
+    await waitFor(() =>
+      expect(canvas.getAllByRole('option').map((o) => o.textContent)).toEqual([
+        'A. Adams — Avery Adams (aadams)',
+        'D. Adams — Drew Adams (dadams)',
+      ]),
+    );
+    await expect(status).toHaveTextContent('2 results');
+    await expect(input).toHaveValue('ada');
+    await expect(input).not.toHaveAttribute('aria-activedescendant');
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-dadams'));
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(input).toHaveValue('D. Adams'));
+    await expect(canvas.getByTestId('chosen')).toHaveTextContent('dadams');
+
+    // ArrowDown on the closed list searches the text at once and highlights the first result.
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(server.last?.query).toBe('D. Adams'));
+    server.last!.respond();
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-dadams'));
+  }}
+/>
+
+<!--
+  An async search with no results: with `emptyText` the list says so, and the status region announces it.
+
+  **Why:** after "Loading…", a search that finds nothing must end in a message, not an empty popup or a silent close. The play function checks the `.autocomplete-empty` row and the status text, then that without `emptyText` the list closes (the `Async` story covers the open path).
+
+  **Review:** type `zz`, press Respond. The list reads "Nobody by that name".
+-->
+<Story
+  name="Async empty"
+  args={{ server: emptyServer, items: [], emptyText: 'Nobody by that name' }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    emptyServer.reset();
+    const input = canvas.getByRole('combobox', { name: 'Professor' });
+    await userEvent.click(input);
+    await userEvent.keyboard('zz');
+    await waitFor(() => expect(emptyServer.last?.query).toBe('zz'));
+    emptyServer.last!.respond();
+    const empty = await canvas.findByRole('option', { name: 'Nobody by that name' });
+    await expect(empty.className).toBe('autocomplete-empty');
+    await expect(canvasElement.querySelector('.autocomplete > [role="status"]')).toHaveTextContent('Nobody by that name');
+  }}
+/>
+
+<!--
+  A failed search shows an error row and announces it, and is left open for axe.
+
+  **Why:** a directory outage must not read as "no suggestions". The play function fails the request and checks the `.autocomplete-error` row and the status text.
+
+  **Review:** type `br`, press Fail. The list reads "Couldn't load suggestions" in dark Altgeld italic, and the typed text is untouched.
+-->
+<Story
+  name="Async error"
+  args={{ server: errorServer, items: [] }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    errorServer.reset();
+    const input = canvas.getByRole('combobox', { name: 'Professor' });
+    await userEvent.click(input);
+    await userEvent.keyboard('br');
+    await waitFor(() => expect(errorServer.last?.query).toBe('br'));
+    errorServer.last!.fail();
+    const error = await canvas.findByRole('option', { name: "Couldn't load suggestions" });
+    await expect(error.className).toBe('autocomplete-error');
+    await expect(canvasElement.querySelector('.autocomplete > [role="status"]')).toHaveTextContent("Couldn't load suggestions");
+    await expect(input).toHaveValue('br');
+  }}
+/>
+
+<!--
+  Has no `play` function: an async autocomplete whose stub answers every search at once, for `tests/e2e/autocomplete.spec.ts`.
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
+  **Review:** behaves like `Fixture` after the debounce: type `ad` and the suggestions appear a quarter-second later.
+-->
+<Story name="Fixture async" args={{ server: fixtureServer, items: [] }} />

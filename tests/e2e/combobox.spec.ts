@@ -214,3 +214,53 @@ test('no live region is left on <body> while the list is in use', async ({ page 
   // Zag announces through it on macOS/iOS only; elsewhere there is none at all.
   await expect(page.locator('body > [data-live-announcer]')).toHaveCount(0);
 });
+
+test('async: typing searches after a pause; Enter commits; Tab moves on', async ({ page }) => {
+  await openStory(page, 'combobox--fixture-async');
+  const { input, after, selected } = parts(page);
+
+  await input.focus();
+  await type(page, 'ad');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByRole('option')).toHaveText(['Avery Adams', 'Drew Adams']);
+  await press(page, 'ArrowDown');
+  await press(page, 'ArrowDown');
+  await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-dadams');
+  await press(page, 'Enter');
+  await expect(selected).toHaveText('dadams');
+  await expect(input).toHaveValue('Drew Adams');
+  await expect(page.locator('input[type="hidden"][name="person"]')).toHaveValue('dadams');
+  await press(page, 'Tab');
+  await expect(after).toBeFocused();
+  await expect(selected).toHaveText('dadams');
+});
+
+test('async: "Loading…" until answered; a newer search replaces the older one', async ({ page }) => {
+  await openStory(page, 'combobox--fixture-async-manual');
+  const { input, selected } = parts(page);
+  const status = page.locator('.combobox > [role="status"]');
+  // Answer from the story's test-server panel without moving focus.
+  const respond = (i: number) => page.getByTestId(`respond-${i}`).evaluate((b: HTMLButtonElement) => b.click());
+
+  await input.focus();
+  await type(page, 'ad');
+  await expect(page.getByRole('option', { name: 'Loading…' })).toBeVisible();
+  await expect(status).toHaveText('Loading…');
+  await expect(page.locator('.stub-server q')).toHaveText(['ad']);
+  await type(page, 'a');
+  // The `ad` search was aborted; only `ada` waits.
+  await expect(page.locator('.stub-server q')).toHaveText(['ada']);
+  await respond(0);
+  await expect(page.getByRole('option')).toHaveText(['Avery Adams', 'Drew Adams']);
+  await expect(status).toHaveText('2 results');
+  await expect(input).toBeFocused();
+
+  // ArrowDown searches at once, and highlights the first result when it lands.
+  await press(page, 'Escape');
+  await press(page, 'ArrowDown');
+  await expect(page.locator('.stub-server q')).toHaveText(['ada']);
+  await respond(0);
+  await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-aadams');
+  await press(page, 'Enter');
+  await expect(selected).toHaveText('aadams');
+});

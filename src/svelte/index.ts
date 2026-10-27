@@ -27,6 +27,8 @@ export { default as Grid } from './Grid.svelte';
 export { default as Icon } from './Icon.svelte';
 export { type LayoutTheme, type LayoutWidth } from './layout.ts';
 export { default as Modal } from './Modal.svelte';
+export { default as MultiCombobox } from './MultiCombobox.svelte';
+export { type AsyncSource } from './async-search.svelte.ts';
 export {
   alert,
   type CloseReason,
@@ -57,3 +59,5 @@ export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte'
 export { default as Accordion } from './Accordion.svelte';
 export { default as AccordionPanel } from './AccordionPanel.svelte';
 export { type AccordionAccent } from './accordion.ts';
+export { default as Tabs, type TabItem } from './Tabs.svelte';
+export { enhanceAllTabs, enhanceTabs } from './tabs.ts';

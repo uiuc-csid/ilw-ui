@@ -4,6 +4,7 @@
 
   import type { ComboboxItem } from '../src/core/index.ts';
   import ComboboxDemo from './ComboboxDemo.svelte';
+  import { StubServer } from './stub-source.svelte.ts';
 
   const people: ComboboxItem[] = [
     { value: 'aadams', label: 'Avery Adams', search: 'Avery Adams aadams', group: 'Faculty' },
@@ -17,6 +18,16 @@
     const n = String(i + 1).padStart(3, '0');
     return { value: `s${n}`, label: `Student ${n}` };
   });
+
+  // One stub endpoint per async story, so stories on the Docs page don't share requests.
+  const directory = () => new StubServer(plain);
+  const asyncServer = directory();
+  const loadingServer = directory();
+  const errorServer = directory();
+  const openServer = directory();
+  const preselectedServer = directory();
+  const fixtureServer = new StubServer(plain, { auto: true });
+  const manualServer = directory();
 
   const { Story } = defineMeta({
     title: 'Combobox',
@@ -358,3 +369,174 @@
   **Review:** focus the field and press ArrowDown. Every option shows, and Casey Clark is highlighted.
 -->
 <Story name="Fixture preselected" args={{ value: 'cclark' }} />
+
+<!--
+  An async source: the list shows "Loading…" while a search runs, each new search aborts the last, and a hidden input carries the value.
+
+  **Why:** E3. The opportunities app searches the campus directory on the server. The play function holds the stub's answers: it checks the loading row and the `role="status"` message, that typing on aborts the earlier request and that answering it late changes nothing, then answers the newest one, picks with the keyboard and reads the hidden input.
+
+  **Review:** type `ad`. The list opens on "Loading…" and the test server panel below lists the search. Type `a`: the `ad` search disappears (aborted) and `ada` waits. Press Respond: Avery Adams and Drew Adams show. ArrowDown, Enter picks Avery Adams.
+-->
+<Story
+  name="Async"
+  args={{ server: asyncServer, items: [], name: 'person' }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    const server = asyncServer;
+    server.reset();
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    const status = canvasElement.querySelector('.combobox > [role="status"]');
+    const hidden = canvasElement.querySelector<HTMLInputElement>('input[type="hidden"][name="person"]')!;
+    await expect(hidden).toHaveValue('');
+    await expect(status).toHaveTextContent('');
+
+    await userEvent.click(input);
+    await userEvent.keyboard('ad');
+    await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'));
+    await expect(canvas.getByRole('option', { name: 'Loading…' })).toHaveAttribute('aria-disabled', 'true');
+    await expect(status).toHaveTextContent('Loading…');
+    await waitFor(() => expect(server.last?.query).toBe('ad'));
+    const stale = server.last!;
+
+    // Typing on replaces the search: the earlier request is aborted, and its
+    // late answer changes nothing.
+    await userEvent.keyboard('a');
+    await waitFor(() => expect(server.last?.query).toBe('ada'));
+    await expect(stale.signal.aborted).toBe(true);
+    await expect(server.requests.slice(0, -1).every((r) => r.signal.aborted)).toBe(true);
+    stale.respond();
+    await expect(canvas.getByRole('option', { name: 'Loading…' })).toBeVisible();
+    await expect(status).toHaveTextContent('Loading…');
+
+    server.last!.respond();
+    await waitFor(() => expect(canvas.getAllByRole('option').map((o) => o.textContent)).toEqual(['Avery Adams', 'Drew Adams']));
+    await expect(status).toHaveTextContent('2 results');
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-aadams'));
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(canvas.getByTestId('selected')).toHaveTextContent('aadams'));
+    await expect(input).toHaveValue('Avery Adams');
+    await expect(hidden).toHaveValue('aadams');
+    await expect(server.pending).toEqual([]);
+  }}
+/>
+
+<!--
+  Left open on "Loading…", so axe checks the list while a search runs.
+
+  **Why:** the loading row is a disabled option in an otherwise empty listbox; axe only checks what is rendered.
+
+  **Review:** the list shows one muted italic "Loading…" row and the test server panel lists the `ad` search. Press Respond to see the results.
+-->
+<Story
+  name="Async loading"
+  args={{ server: loadingServer, items: [] }}
+  play={async ({ canvas, userEvent }) => {
+    loadingServer.reset();
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('ad');
+    await waitFor(() => expect(loadingServer.last?.query).toBe('ad'));
+    await expect(canvas.getByRole('option', { name: 'Loading…' })).toBeVisible();
+  }}
+/>
+
+<!--
+  A search that fails shows an error row and announces it; typing again retries.
+
+  **Why:** a directory outage must not look like "No matches". The play function fails the request, checks the `.combobox-error` row and the status message, then retries and leaves the error showing for axe on a second failure.
+
+  **Review:** type `bro`, press Fail. The list reads "Couldn't load results" in dark Altgeld italic. Type another letter and press Respond to recover.
+-->
+<Story
+  name="Async error"
+  args={{ server: errorServer, items: [] }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    errorServer.reset();
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('bro');
+    await waitFor(() => expect(errorServer.last?.query).toBe('bro'));
+    errorServer.last!.fail();
+    const error = await canvas.findByRole('option', { name: "Couldn't load results" });
+    await expect(error.className).toBe('combobox-error');
+    await expect(error).toHaveAttribute('aria-disabled', 'true');
+    await expect(canvasElement.querySelector('.combobox > [role="status"]')).toHaveTextContent("Couldn't load results");
+    await expect(canvasElement.querySelector('.combobox-empty')).toBeNull();
+
+    // Typing retries; this time it works, and a lone result is highlighted.
+    await userEvent.keyboard('w');
+    await waitFor(() => expect(errorServer.last?.query).toBe('brow'));
+    errorServer.last!.respond();
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown'));
+    await expect(canvasElement.querySelector('.combobox > [role="status"]')).toHaveTextContent('1 result');
+
+    // Leave a failure showing for axe.
+    await userEvent.keyboard('n');
+    await waitFor(() => expect(errorServer.last?.query).toBe('brown'));
+    errorServer.last!.fail();
+    await canvas.findByRole('option', { name: "Couldn't load results" });
+  }}
+/>
+
+<!--
+  Left open on async results with an option highlighted, so axe checks the loaded list.
+
+  **Why:** the open-state scan for the async path; ArrowDown on a closed list searches at once (no debounce) and highlights the first result when it arrives.
+
+  **Review:** the list shows the four directory entries with Avery Adams highlighted.
+-->
+<Story
+  name="Async open"
+  args={{ server: openServer, items: [] }}
+  play={async ({ canvas, userEvent }) => {
+    openServer.reset();
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowDown}');
+    // ArrowDown searches the text as it stands (here, nothing) without waiting.
+    await waitFor(() => expect(openServer.last?.query).toBe(''));
+    openServer.last!.respond();
+    await waitFor(() => expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-aadams'));
+    await expect(canvas.getAllByRole('option')).toHaveLength(4);
+  }}
+/>
+
+<!--
+  An async combobox editing a saved record: `items` holds just the selected entry, for its label.
+
+  **Why:** with a source, the page has no option list to label the value from, so `items` carries the known entry (as Select2's initial `<option selected>` did). Tabbing through must keep the value, though no search has run.
+
+  **Review:** the field reads `Casey Clark`. Tab in and out: nothing is searched and the value stays `cclark`.
+-->
+<Story
+  name="Async preselected"
+  args={{ server: preselectedServer, items: [{ value: 'cclark', label: 'Casey Clark' }], value: 'cclark', name: 'person' }}
+  play={async ({ canvas, canvasElement, userEvent }) => {
+    preselectedServer.reset();
+    const input = canvas.getByRole('combobox', { name: 'Person' });
+    await expect(input).toHaveValue('Casey Clark');
+    await expect(canvasElement.querySelector('input[type="hidden"][name="person"]')).toHaveValue('cclark');
+    await userEvent.click(input);
+    await userEvent.tab();
+    await expect(canvas.getByTestId('selected')).toHaveTextContent('cclark');
+    await expect(canvas.getByTestId('changes')).toHaveTextContent('0');
+    await expect(preselectedServer.requests).toEqual([]);
+  }}
+/>
+
+<!--
+  Has no `play` function: an async combobox whose stub answers every search at once, for the keyboard tests in `tests/e2e/combobox.spec.ts`.
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
+  **Review:** behaves like `Fixture` after the debounce: type `ad` and the matches appear a quarter-second later.
+-->
+<Story name="Fixture async" args={{ server: fixtureServer, items: [], name: 'person' }} />
+<!--
+  Has no `play` function: an async combobox whose stub waits for the test server panel, for the loading and abort test in `tests/e2e/combobox.spec.ts`.
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
+  **Review:** type `ad`, then use the panel's Respond and Fail buttons.
+-->
+<Story name="Fixture async manual" args={{ server: manualServer, items: [] }} />
