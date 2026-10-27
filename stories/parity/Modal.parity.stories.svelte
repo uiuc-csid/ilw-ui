@@ -18,8 +18,8 @@
 
   // Focuses Cancel once <ilw-modal> has opened, as the ilw-ui side does. Left
   // alone, <ilw-modal> focuses its panel (it honours `autofocus` only on its
-  // direct children, not on a button inside the button row), and that panel's
-  // focus ring shows only in whichever Side By Side frame has focus.
+  // direct children, not on a button inside the button row), so the two stories
+  // would draw their focus ring on different elements.
   function focusAfterOpen(button: HTMLButtonElement) {
     const modal = button.closest('ilw-modal') as (HTMLElement & { updateComplete?: Promise<unknown> }) | null;
     void customElements
@@ -105,9 +105,9 @@
 <!--
   Both sides, each in its own iframe, at each size.
 
-  **Why:** the two stylesheets share class names, so they can't be compared in one document. Not a test (`!test`, axe off): its frames are the two stories above, which are tested themselves.
+  **Why:** the two stylesheets share class names, so they can't be compared in one document. Not a test (`!test`, axe off): its frames are the two stories above, which are tested themselves. Each frame focuses Cancel when its modal opens, and only one frame on a page can hold focus, so the last to open would draw the only focus ring, a different frame on each load (and a different Chromatic snapshot). `holdFocus` takes focus back to this page each time, so no frame shows a ring until someone clicks or types. **Toolkit** and **IlwUi** show the focused Cancel button.
 
-  **Review:** the same dialog on both sides at small, medium and large.
+  **Review:** the same dialog on both sides at small, medium and large, with no focus ring. Click into a frame: it keeps focus from then on, and Tab moves through its dialog.
 -->
 <Story name="Side By Side" tags={['!test']} parameters={{ styles: 'ilw-ui', a11y: { test: 'off' } }}>
   {#snippet template(_args, context)}
@@ -115,6 +115,7 @@
       pair="parity-modal"
       theme={String(context.globals.theme ?? 'light')}
       height={420}
+      holdFocus
       rows={[
         { label: 'Small', args: { size: 'small' } },
         { label: 'Medium', args: { size: 'medium' } },
