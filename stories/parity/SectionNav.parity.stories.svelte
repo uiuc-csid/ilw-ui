@@ -1,8 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect } from 'storybook/test';
 
   import SectionNav from '../../src/svelte/SectionNav.svelte';
+  import * as plays from '../plays/section-nav.ts';
   import { programs } from '../section-nav-data.ts';
   import SideBySide from './SideBySide.svelte';
 
@@ -45,27 +45,7 @@
 
   **Review:** matches **Toolkit**, plus a chevron toggle at the right of each branch.
 -->
-<Story
-  name="IlwUi"
-  parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas }) => {
-    const root = canvas.getByRole('link', { name: 'Programs of Study' });
-    await expect(getComputedStyle(root).fontSize).toBe('20px');
-    await expect(getComputedStyle(root).fontWeight).toBe('700');
-    // Indent: 1.25rem, + 0.9375rem at level 1, + 1.5625rem more at level 2.
-    const pad = (name: string) => getComputedStyle(canvas.getByRole('link', { name })).paddingLeft;
-    await expect(pad('Undergraduate Degrees')).toBe('20px');
-    await expect(pad('Animal Sciences Major')).toBe('35px');
-    await expect(pad('Pre-Veterinary and Medical')).toBe('60px');
-    await expect(canvas.getByRole('link', { name: 'Undergraduate Degrees' }).getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
-    const current = canvas.getByRole('link', { name: 'Pre-Veterinary and Medical' });
-    await expect(getComputedStyle(current).color).toBe('rgb(200, 65, 19)');
-    await expect(getComputedStyle(current, '::before').borderLeftWidth).not.toBe('0px');
-    // Each branch toggle is a 44 × 44 px target.
-    const toggle = canvas.getAllByText('Subpages of Undergraduate Degrees')[0].closest('summary')!.getBoundingClientRect();
-    await expect([toggle.width, toggle.height]).toEqual([44, 44]);
-  }}
->
+<Story name="IlwUi" parameters={{ styles: 'ilw-ui' }} play={plays.parity}>
   <div style:max-width="20rem">
     <SectionNav items={programs} expanded />
   </div>

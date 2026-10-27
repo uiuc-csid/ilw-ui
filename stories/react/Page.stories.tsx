@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment } from 'react';
 
+import { Breadcrumbs } from '../../src/react/Breadcrumbs.tsx';
+import { Footer } from '../../src/react/Footer.tsx';
 import { Page } from '../../src/react/Page.tsx';
+import { PageTitle } from '../../src/react/PageTitle.tsx';
+import * as plays from '../plays/page.ts';
 
 // The React twin of stories/Page.stories.svelte. A whole page from the static
 // chrome (B1, B3, B4, B5), ilw-ui's styles only.
@@ -14,6 +18,55 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const sections = ['CS 124', 'CS 128', 'CS 173', 'CS 225', 'CS 233', 'CS 341', 'CS 374', 'CS 421'];
+
+function WholePage() {
+  return (
+    <Page
+      format
+      header={
+        <header>
+          <p style={{ margin: 0, padding: '1rem' }}>Site header (B2 comes later)</p>
+        </header>
+      }
+      footer={<Footer siteName={<a href="#home">Sample Site</a>} />}
+    >
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '#home' },
+          { label: 'Academics', href: '#academics' },
+        ]}
+        current="Degree programs"
+      />
+      <PageTitle>Degree programs</PageTitle>
+      <p>
+        The page content, with <a href="#a-link">a link</a> to tab to after the skip link moves focus here.
+      </p>
+    </Page>
+  );
+}
+
+/**
+ * A whole page: skip link, header, breadcrumbs, page title, content and footer. No play function: the keyboard spec (`tests/e2e/page-chrome.spec.ts`) drives this one from a fresh load.
+ *
+ * **Why:** the fixture for the skip link and landmark checks, and a view of the static chrome together. axe scans it as a page.
+ *
+ * **Review:** press Tab: "Skip to main content" appears; Enter, then Tab again, reaches the breadcrumbs' first link.
+ */
+export const Fixture: Story = { name: 'Fixture', render: () => <WholePage /> };
+
+/**
+ * The same page with `html[data-theme="dark"]`.
+ *
+ * **Why:** the shell takes its colours from the theme, so the page turns dark; breadcrumbs follow; the page title and footer keep their brand plates, as upstream. axe checks the dark contrast.
+ *
+ * **Review:** a dark page with light text and light-blue links; the page title is light on dark; the footer bands are unchanged.
+ */
+export const Dark: Story = {
+  name: 'Dark',
+  globals: { theme: 'dark' },
+  render: () => <WholePage />,
+  play: plays.dark,
+};
 
 /**
  * The shell on its own, as an app that renders its own header and footer uses it: skip link, a plain `<header>`, `main`, a plain `<footer>`, and `backToTop`. No other ilw-ui component is on the page. No play function: the keyboard spec (`tests/e2e/page-chrome.spec.ts`) drives this one from a fresh load.

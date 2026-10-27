@@ -1,9 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect, within } from 'storybook/test';
 
-  import { campusFooter } from '../../src/core/index.ts';
   import Footer from '../../src/svelte/Footer.svelte';
+  import * as plays from '../plays/footer.ts';
   import SideBySide from './SideBySide.svelte';
 
   // No autodocs: a Docs page renders every story in one document, and the two
@@ -54,47 +53,7 @@
 
   **Review:** matches **Toolkit**: the gray site band with a blue rule, the blue campus band with an orange rule, the legal row. Narrow the window: the campus sections go from three columns to two to one, and the site band stacks.
 -->
-<Story
-  name="IlwUi"
-  parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas, canvasElement }) => {
-    const footer = canvas.getByRole('contentinfo');
-    for (const band of ['site', 'campus', 'legal']) {
-      await expect(footer.querySelector(`:scope > .ilw-footer-${band}`)).not.toBeNull();
-    }
-    await expect(canvas.getByRole('navigation', { name: 'Social media' })).toBeInTheDocument();
-    await expect(canvas.getByRole('navigation', { name: 'Resources' })).toBeInTheDocument();
-    await expect(canvasElement.querySelector('address.ilw-footer-address')).not.toBeNull();
-
-    // The wordmark link is named, and its SVG is hidden.
-    const home = canvas.getByRole('link', { name: 'University of Illinois Urbana-Champaign' });
-    await expect(home).toHaveAttribute('href', 'https://illinois.edu/?utm_source=ilw_ui&utm_medium=web&utm_campaign=Footer');
-    await expect(home.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
-
-    // Every campus section and link, with the UTM source.
-    const campus = within(footer.querySelector<HTMLElement>('.ilw-footer-campus')!);
-    for (const section of campusFooter.sections) {
-      await expect(campus.getByRole('heading', { level: 3, name: section.label })).toBeInTheDocument();
-      for (const link of section.links) {
-        const a = campus.getByRole('link', { name: link.label });
-        await expect(a.getAttribute('href')).toContain('utm_source=ilw_ui');
-      }
-    }
-
-    // Legal row: cookies, privacy, copyright, the site's own links, accessibility.
-    const legal = footer.querySelector<HTMLElement>('.ilw-footer-legal')!;
-    const items = [...legal.querySelectorAll('li')].map((li) => li.textContent?.trim());
-    await expect(items).toEqual(['About Cookies', 'Privacy Policy', 'Copyright', 'Terms of use', 'Accessibility']);
-    await expect(within(legal).getByRole('link', { name: 'Terms of use' })).toHaveAttribute('href', '#terms');
-    await expect(within(legal).getByRole('button', { name: 'About Cookies' })).toHaveClass('ot-sdk-show-settings');
-
-    // The toolkit's bands.
-    const bg = (sel: string) => getComputedStyle(footer.querySelector(sel)!).backgroundColor;
-    await expect(bg('.ilw-footer-site')).toBe('rgb(244, 244, 244)');
-    await expect(bg('.ilw-footer-campus')).toBe('rgb(19, 41, 75)');
-    await expect(bg('.ilw-footer-legal')).toBe('rgb(19, 41, 75)');
-  }}
->
+<Story name="IlwUi" parameters={{ styles: 'ilw-ui' }} play={plays.parity}>
   <Footer source="ilw_ui" cookiesButton legalLinks={[{ label: 'Terms of use', href: '#terms' }]}>
     {#snippet siteName()}<a href="#home">Computer Science</a>{/snippet}
     {#snippet social()}
@@ -125,15 +84,7 @@
 
   **Review:** a gray band with just the site name, then the campus and legal bands.
 -->
-<Story
-  name="Site Name Only"
-  parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvasElement }) => {
-    await expect(canvasElement.querySelector('.ilw-footer-site')).toHaveClass('ilw-footer-site--no-actions');
-    await expect(canvasElement.querySelector('.ilw-footer-social')).toBeNull();
-    await expect(canvasElement.querySelector('.ilw-footer-legal button')).toBeNull();
-  }}
->
+<Story name="Site Name Only" parameters={{ styles: 'ilw-ui' }} play={plays.siteNameOnly}>
   <Footer>
     {#snippet siteName()}Sample Site{/snippet}
   </Footer>
@@ -146,22 +97,7 @@
 
   **Review:** one campus section, "Override Section", and the legal row's privacy, copyright and accessibility links read "Override …".
 -->
-<Story
-  name="Campus Override"
-  parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvasElement }) => {
-    const footer = within(canvasElement.querySelector<HTMLElement>('footer')!);
-    const sections = canvasElement.querySelectorAll('.ilw-footer-section');
-    await expect(sections).toHaveLength(1);
-    await expect(footer.getByRole('heading', { level: 3, name: 'Override Section' })).toBeInTheDocument();
-    await expect(footer.getByRole('link', { name: 'Override Link' })).toHaveAttribute(
-      'href',
-      'https://example.illinois.edu/?utm_source=Illinois_App&utm_medium=web&utm_campaign=Footer',
-    );
-    const legal = [...canvasElement.querySelectorAll('.ilw-footer-legal a')].map((a) => a.textContent);
-    await expect(legal).toEqual(['Override Privacy', 'Override Copyright', 'Override Accessibility']);
-  }}
->
+<Story name="Campus Override" parameters={{ styles: 'ilw-ui' }} play={plays.campusOverride}>
   <Footer
     campus={{
       sections: [

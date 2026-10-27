@@ -1,8 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect } from 'storybook/test';
 
   import Pagination from '../../src/svelte/Pagination.svelte';
+  import * as plays from '../plays/pagination.ts';
   import SideBySide from './SideBySide.svelte';
 
   // No autodocs: a Docs page renders every story in one document, and the two
@@ -32,36 +32,7 @@
 
   **Review:** matches **Toolkit**: outlined page links, the current one filled, Previous and Next as text, the count after a gap. Tab to a link: it fills with the focus colour inside a two-tone ring.
 -->
-<Story
-  name="IlwUi"
-  parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas }) => {
-    const nav = canvas.getByRole('navigation', { name: 'Pages' });
-    const items = [...nav.querySelectorAll(':scope > ul > li')];
-    await expect(items.map((li) => li.textContent?.trim())).toEqual(
-      ['Previous', '1', '…', '4', '5', '6', '7', '8', '…', '12', 'Next'],
-    );
-    const current = nav.querySelector('a[aria-current="page"]')!;
-    await expect(current).toHaveAccessibleName('Page 6');
-    await expect(current).toHaveAttribute('href', 'https://example.edu/courses?term=fa26&page=6');
-    await expect(nav.querySelectorAll('[aria-current]')).toHaveLength(1);
-    await expect(canvas.getAllByRole('link', { name: 'Previous page' })[0]).toHaveAttribute(
-      'href',
-      'https://example.edu/courses?term=fa26&page=5',
-    );
-    await expect(nav.querySelector(':scope > .ilw-pagination-count')).toHaveTextContent('Page 6 of 12');
-    // The current page is filled with the control text colour.
-    await expect(getComputedStyle(current).backgroundColor).toBe(getComputedStyle(nav).color);
-
-    // Page 1: Previous is text, not a link; Next is.
-    const first = canvas.getByRole('navigation', { name: 'Pages, first' });
-    const previous = first.querySelector('.ilw-pagination-previous > *')!;
-    await expect(previous.tagName).toBe('SPAN');
-    await expect(previous).toHaveTextContent('Previous');
-    await expect(first.querySelector('.ilw-pagination-next > a')).toHaveAccessibleName('Next page');
-    await expect(first.querySelectorAll('a')).toHaveLength(5);
-  }}
->
+<Story name="IlwUi" parameters={{ styles: 'ilw-ui' }} play={plays.parity}>
   <Pagination page={6} pages={12} {url} />
   <Pagination page={1} pages={4} {url} label="Pages, first" />
 </Story>
