@@ -73,6 +73,16 @@ Status: **pending human run.**
 - [ ] Pressing the same button twice reads the message twice, not once.
 - [ ] Focus stays on the button. Nothing new appears on screen; reading to the end of the page with the browse/virtual cursor reaches the last message (the regions sit at the end of `<body>`).
 
+## Alert (stories: Components → Alert → Save Error Fixture, Server Markup Fixture)
+
+Status: **pending human run.**
+
+- [ ] Reading the page, the error is read as "Error: Your changes weren't saved, The server didn't answer…"; VoiceOver may prefix "alert".
+- [ ] "Try again" is followed by "Settings saved" being announced (a status), and focus is on "Save".
+- [ ] Pressing Save brings the error back and it is announced at once, without moving focus.
+- [ ] The × is announced as "Dismiss, button"; pressing it removes the banner and focus lands on "Course title", which is announced.
+- [ ] Server Markup Fixture: each "Dismiss message" removes its message and focus moves to the next ×, then to "Edit profile".
+
 ## Page chrome (story: Page Chrome → Page → Fixture)
 
 Status: **pending human run.**

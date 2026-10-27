@@ -56,5 +56,7 @@ export {
 } from './Header.svelte';
 export { default as BackToTop } from './BackToTop.svelte';
 export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';
+export { default as Alert, type AlertVariant } from './Alert.svelte';
+export { dismissAlert, enhanceAlerts } from './alert.ts';
 export { default as Tabs, type TabItem } from './Tabs.svelte';
 export { enhanceAllTabs, enhanceTabs } from './tabs.ts';

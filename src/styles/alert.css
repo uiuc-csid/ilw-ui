@@ -1,0 +1,156 @@
+/* Alerts (E1): notices and messages. No toolkit equivalent; the look follows
+   the toolkit's surfaces. Markup:
+
+     <div class="ilw-alert ilw-alert--error" role="alert">
+       <svg class="ilw-icon ilw-alert-icon" aria-hidden="true" …>…</svg>
+       <div class="ilw-alert-body">
+         <span class="ilw-visually-hidden">Error:</span>
+         <p class="ilw-alert-title">Your changes weren't saved</p>
+         <p>The server didn't answer.</p>
+         <div class="ilw-alert-actions"><button type="button" class="ilw-button">Try again</button></div>
+       </div>
+       <button type="button" class="ilw-alert-dismiss" aria-label="Dismiss" hidden>…</button>
+     </div>
+
+   Variants: --info, --success, --warning, --error. The card is always the
+   white palette (it redeclares the neutral --ilw-color--* properties), so it
+   reads as a light card on the blue and orange themes, a dark one in dark
+   mode, and its buttons and links follow. The variant's accent colours the
+   left stripe and the icon, each at least 3:1 against the card (WCAG 1.4.11).
+   The accents' dark values live in the two dark-mode blocks below, which must
+   stay identical, as in tokens.css. */
+
+:root {
+  --ilw-alert--info: var(--il-industrial, #1d58a7);
+  --ilw-alert--success: var(--il-prairie, #006230);
+  --ilw-alert--warning-stripe: var(--il-harvest, #fcb316);
+  --ilw-alert--warning: var(--il-earth, #7d3e13);
+  --ilw-alert--error: var(--il-altgeld, #c84113);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ilw-alert--info: var(--il-industrial-lighter-2, #759bd1);
+    --ilw-alert--success: color-mix(in srgb, var(--il-prairie, #006230) 40%, var(--il-white, #ffffff));
+    --ilw-alert--warning: var(--il-harvest, #fcb316);
+    --ilw-alert--error: var(--il-orange, #ff5f05);
+  }
+}
+
+:root[data-theme='dark'] {
+  --ilw-alert--info: var(--il-industrial-lighter-2, #759bd1);
+  --ilw-alert--success: color-mix(in srgb, var(--il-prairie, #006230) 40%, var(--il-white, #ffffff));
+  --ilw-alert--warning: var(--il-harvest, #fcb316);
+  --ilw-alert--error: var(--il-orange, #ff5f05);
+}
+
+.ilw-alert {
+  --ilw-alert--accent: var(--ilw-alert--info);
+  --ilw-alert--stripe: var(--ilw-alert--accent);
+  --ilw-color--background: var(--ilw-color--white--background);
+  --ilw-color--text: var(--ilw-color--white--text);
+  --ilw-color--border: var(--ilw-color--white--border);
+  --ilw-color--border-light: var(--ilw-color--white--border-light);
+  --ilw-color--link: var(--ilw-color--white--link);
+  --ilw-color--link-hover: var(--ilw-color--white--link-hover);
+  --ilw-color--link-visited: var(--ilw-color--white--link-visited);
+  --ilw-color--heading: var(--ilw-color--white--heading);
+  --ilw-color--control: var(--ilw-color--white--control);
+  --ilw-color--control-text: var(--ilw-color--white--control-text);
+  --ilw-color--control-accent: var(--ilw-color--white--control-accent);
+  --ilw-color--control-accent-text: var(--ilw-color--white--control-accent-text);
+
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  box-sizing: border-box;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ilw-color--border-light);
+  border-left: 6px solid var(--ilw-alert--stripe);
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+  font: 1.125rem/1.5 var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-alert--success {
+  --ilw-alert--accent: var(--ilw-alert--success);
+}
+
+.ilw-alert--warning {
+  --ilw-alert--accent: var(--ilw-alert--warning);
+  --ilw-alert--stripe: var(--ilw-alert--warning-stripe);
+}
+
+.ilw-alert--error {
+  --ilw-alert--accent: var(--ilw-alert--error);
+}
+
+/* On the first line of text: 1.5rem tall in a 1.6875rem (1.125rem × 1.5) line. */
+.ilw-alert-icon {
+  flex-shrink: 0;
+  margin-top: 0.09375rem;
+  color: var(--ilw-alert--accent);
+  font-size: 1.5rem;
+  vertical-align: 0;
+}
+
+.ilw-alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* :where() so the prose rules' margins (format.css) don't apply, and a page's own rule still wins. */
+.ilw-alert-body > :where(p, ul, ol) {
+  margin: 0 0 0.5rem;
+}
+
+.ilw-alert-body > :where(:last-child) {
+  margin-bottom: 0;
+}
+
+.ilw-alert-title {
+  font-weight: 700;
+}
+
+.ilw-alert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* The Modal's round × button, smaller, in the card's top right. */
+.ilw-alert-dismiss {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.5rem 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ilw-color--control-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.ilw-alert-dismiss[hidden] {
+  display: none;
+}
+
+.ilw-alert-dismiss:hover {
+  color: var(--ilw-color--control-accent);
+}
+
+.ilw-alert-dismiss:focus-visible {
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  outline: 2px solid var(--ilw-color--focus--text);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ilw-color--focus--background);
+}
