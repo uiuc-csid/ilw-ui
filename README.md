@@ -6,8 +6,8 @@ WAI-ARIA Authoring Practices. The goal is a full replacement for the toolkit in
 Svelte apps: the same look without `toolkit.js` or `toolkit.css`, plus what the
 toolkit lacks. So far: a modal on native `<dialog>` with close reasons,
 focus return and a promise API, a filtering combobox, a free-text autocomplete,
-a client-side sortable, filterable, paged table, and link-based pagination
-for server-rendered lists. The roadmap is
+a client-side sortable, filterable, paged table, link-based pagination
+for server-rendered lists, and a copy button. The roadmap is
 [docs/plans/2026-10-20-toolkit-replacement.md](docs/plans/2026-10-20-toolkit-replacement.md),
 tracked in [#9](https://github.com/uiuc-csid/ilw-ui/issues/9).
 
@@ -40,7 +40,7 @@ to `Icon`, add `phosphor-svelte` to your own dependencies at the same version.
 ```js
 import { Autocomplete, Combobox, MultiCombobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
 import { createDataTable, DataTable, DataRows, TableSortTh, Pager, Pagination, setTableFilter } from 'ilw-ui/svelte';
-import { Page, Footer, Breadcrumbs, PageTitle, Icon, Field, RadioGroup } from 'ilw-ui/svelte';
+import { Page, Footer, Breadcrumbs, PageTitle, Icon, Field, RadioGroup, ChoiceChips } from 'ilw-ui/svelte';
 import { nextSort, filterItems, blurMatch, rowColumn, pageWindow, pageHref, announce, campusFooter, campusLink } from 'ilw-ui/core';
 import 'ilw-ui/styles.css';
 ```
@@ -66,6 +66,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `button.css`     | `.ilw-button`, `ul.ilw-buttons`, `ul.ilw-buttons-left`    |
 | `forms.css`      | `.ilw-input-entry*`, `.ilw-label-required`, `.ilw-input-alert`, `.ilw-fieldset` (A7) |
 | `switch.css`     | `input.ilw-switch` (A7)                                   |
+| `chips.css`      | `fieldset.ilw-chips`, `label.ilw-chip` (E5)               |
 | `table.css`      | `table.ilw-table`, tables in `.ilw-format`, stripes, `.ilw-table-responsive`, `.ilw-theme-table-*` |
 | `page.css`       | `.ilw-page` shell, `.ilw-skip-link`, links in `main` (B1) |
 | `page-title.css` | `.ilw-page-title` (B5)                                    |
@@ -1075,6 +1076,93 @@ first when none is), arrow keys move and check, skipping disabled options
 - Not carried over: `input[type=submit].ilw-button` (use a `<button
   class="ilw-button">`) and the `button[aria-pressed]` toggle-button script.
 
+### `ChoiceChips` and `.ilw-chips`
+
+Choice chips, which the toolkit doesn't have: native radios (pick one) or
+checkboxes (pick any) in a `fieldset` with a `legend`, each wrapped in a label
+drawn as a pill, from `chips.css`. No script: the inputs stay real form
+controls, so the keyboard, screen-reader output and form submission are
+native. Server templates write the markup; Svelte code can use `ChoiceChips`.
+
+```html
+<h2>Filter applicants</h2>
+<p>Fields marked * are required.</p>
+
+<!-- Pick one: radios. role="radiogroup" keeps the legend as its name and allows aria-invalid. -->
+<fieldset class="ilw-chips" id="country" role="radiogroup"
+          aria-describedby="country-description country-error" aria-invalid="true">
+  <legend class="ilw-label-required">Country</legend>
+  <label class="ilw-chip"><input type="radio" name="country" value="us" required>United States</label>
+  <label class="ilw-chip"><input type="radio" name="country" value="ca" required>Canada</label>
+  <label class="ilw-chip"><input type="radio" name="country" value="kr" required disabled>South Korea</label>
+  <p class="ilw-input-description" id="country-description">Applicants are counted by home country.</p>
+  <p class="ilw-input-alert" id="country-error">Choose a country.</p>
+</fieldset>
+
+<!-- Pick any: checkboxes. A plain group can't take aria-invalid, so each checkbox does. -->
+<fieldset class="ilw-chips" id="schemas" aria-describedby="schemas-description">
+  <legend>Tables to export</legend>
+  <label class="ilw-chip"><input type="checkbox" name="schemas" value="course" checked>Courses</label>
+  <label class="ilw-chip"><input type="checkbox" name="schemas" value="section">Sections</label>
+  <p class="ilw-input-description" id="schemas-description">Each table is a separate CSV file.</p>
+</fieldset>
+```
+
+- **Wiring** follows `RadioGroup`: the fieldset lists its help text, then its
+  error, in `aria-describedby`; `aria-invalid="true"` only while an error is
+  shown, on the `radiogroup` or on each checkbox. Each input's name is its
+  label's text.
+- **Required:** native `required` on each radio, and `.ilw-label-required` on
+  the legend. A checkbox group has no native "at least one": the legend gets
+  the marker and the app validates.
+- **States are never colour alone.** The input stays visible as the chip's
+  indicator (a circle for a radio, a square for a checkbox) and fills with a
+  dot or a tick when checked; the checked chip also inverts to the control
+  text colour, as the switch does. Focus is a 3 px ring around the chip; an
+  invalid group's chips get a 2 px ring. Colours are `--ilw-color--control*`,
+  `--ilw-color--focus--*` and `--ilw-color--link-hover`, so themes and dark
+  mode follow. The label type is the button's (700, 19 px): large text, so the
+  orange theme's white on orange still passes. A disabled chip is dimmed.
+- **Focus ring:** radios ring on `:focus`, checkboxes on `:focus-visible`:
+  WebKit stops matching `:focus-visible` once an arrow key moves focus within
+  a radio group. So in Chromium a clicked radio chip shows the ring too.
+- **Forced colours:** the native input comes back inside the chip's border.
+- **Behaviour:** native. Radios are one tab stop (the checked chip, the first
+  when none is); arrow keys move and check, skipping disabled chips (Chromium
+  wraps at the ends, WebKit doesn't). Each checkbox is a tab stop; Space
+  toggles it.
+
+```svelte
+<script>
+  import { ChoiceChips } from 'ilw-ui/svelte';
+  let country = $state();
+  let schemas = $state(['course']);
+</script>
+
+<ChoiceChips legend="Country" name="country" bind:value={country} required error={errors.country}
+  options={[{ value: 'us', label: 'United States' }, { value: 'ca', label: 'Canada' }]} />
+<ChoiceChips legend="Tables to export" name="schemas" multiple bind:value={schemas}
+  options={[{ value: 'course', label: 'Courses' }, { value: 'section', label: 'Sections' }]} />
+```
+
+DOM contract: exactly the markup above: `fieldset.ilw-chips` (with
+`role="radiogroup"` unless `multiple`) holding the `legend`, then one
+`label.ilw-chip > input` per option (the label's text after the input, no ids),
+then `p.ilw-input-description` and `p.ilw-input-alert`.
+
+| Prop            | Type                          |                                                                    |
+| --------------- | ----------------------------- | ------------------------------------------------------------------ |
+| `legend`        | `string \| Snippet`           | the group's name                                                   |
+| `name`          | `string`                      | the inputs' `name`                                                 |
+| `options`       | `ChipOption[]`                | `{ value, label, disabled? }`                                      |
+| `multiple`      | `boolean`                     | checkboxes instead of radios                                       |
+| `value`         | `string \| string[]` (bindable) | the checked value (radios; undefined for none) or values (checkboxes) |
+| `onchange`      | `(value: string \| string[]) => void` | called with the new value when the user changes it          |
+| `description`, `error`, `class` | | as `RadioGroup`                                                                      |
+| `required`      | `boolean`                     | the legend's marker; native `required` on radios only              |
+| `id`            | `string`                      | the fieldset's id; default `nextId('ilw-chips')`                   |
+| `descriptionId`, `errorId` | `string`           | default `<id>-description`, `<id>-error`                           |
+
 ### `Icon` and `.ilw-icon`
 
 The replacement for `<ilw-icon>`: a [Phosphor](https://phosphoricons.com) icon
@@ -1763,6 +1851,71 @@ DOM contract:
 ```html
 <div role="status" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="polite">3 results</div>
 <div role="alert" aria-atomic="true" class="ilw-visually-hidden" data-ilw-announce="assertive"></div>
+```
+
+### `CopyButton` and `copyText`
+
+Copies a value, or the text of an element, and says so through
+[`announce`](#announce). No toolkit equivalent.
+
+```svelte
+<script>
+  import { CopyButton } from 'ilw-ui/svelte';
+</script>
+
+<!-- An input's value, or an element's text, by id -->
+<label for="share-link">Course link</label>
+<input id="share-link" readonly value="https://tam.cs.illinois.edu/courses/cs-225/fa26" />
+<CopyButton target="share-link" label="Copy link" />
+
+<!-- A literal, icon only (the label is still the button's name) -->
+{row.netid} <CopyButton value={row.netid} label="Copy netid of {row.name}" hideLabel size="small" />
+
+<!-- Built when clicked, from the rows as they are then -->
+<CopyButton value={() => confirmed.map((r) => r.netid).join(', ')} label="Copy netids of confirmed students" />
+```
+
+```js
+import { copyText } from 'ilw-ui/core';
+
+// For a button you render yourself: announces "Copied" or the error, resolves true or false.
+if (!(await copyText(tsv))) showFallback();
+```
+
+- Props: `value` (a string, or a function called on each click) or `target`
+  (an element id: an `<input>` or `<textarea>` gives its value, anything else
+  its trimmed `textContent`); `label` ("Copy"), `copiedLabel` ("Copied"),
+  `failedLabel` ("Copy failed"), `failedMessage` ("Could not copy to the
+  clipboard"), `hideLabel`, `resetAfter` (ms, 1500), `oncopy(text)`,
+  `onfail()`, `Button`'s `size`, `theme`, `disabled` and `class`, and any
+  other `<button>` attribute.
+- After a click the icon becomes a check and the label `copiedLabel`, and
+  `copiedLabel` is announced in the polite `role="status"` region; after
+  `resetAfter` the button goes back. A refusal (permission denied, no
+  `navigator.clipboard` on a plain-http page, a `value` function that throws,
+  a missing `target`) shows a warning icon and `failedLabel`, and announces
+  `failedMessage` in the assertive `role="alert"` region. Focus stays on the
+  button throughout.
+- The label swap is for sighted users; the announcement is what a screen
+  reader hears, since a focused button's changed name is not reliably read.
+- `copyText(text, { copied?, failed? })` is the same write and announcement
+  without the button. `text` may be a function.
+- Needs JavaScript: there is no script-free form. On a server-rendered page,
+  mount it as an island.
+
+DOM contract (`data-state` is `idle`, `copied` or `failed`):
+
+```html
+<button type="button" class="ilw-button ilw-copy-button" data-state="idle">
+  <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+  <span class="ilw-copy-button-label">Copy link</span>
+</button>
+
+<!-- hideLabel -->
+<button type="button" class="ilw-button ilw-button-small ilw-copy-button" data-state="copied">
+  <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+  <span class="ilw-visually-hidden">Copied</span>
+</button>
 ```
 
 ## Tests

@@ -13,6 +13,7 @@
 @import './styles/button.css';
 @import './styles/forms.css';
 @import './styles/switch.css';
+@import './styles/chips.css';
 @import './styles/table.css';
 @import './styles/page.css';
 @import './styles/page-title.css';
@@ -25,4 +26,5 @@
 @import './styles/icon.css';
 @import './styles/modal.css';
 @import './styles/dark-mode-toggle.css';
+@import './styles/copy-button.css';
 @import './styles/components.css';
