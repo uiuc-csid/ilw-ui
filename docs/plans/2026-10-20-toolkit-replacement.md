@@ -98,7 +98,7 @@ Some of these are done: `SortableTh`, `Combobox`, `Autocomplete` (E2, #8), `Data
 | - | ---- | ---- | ------- |
 | E1 | `Alert` / messages | Dismissible notices. `role="status"` for info and success, `role="alert"` only for errors. Optional actions (retry, log in again). | Django `messages` partials; ta-manager save-error banner |
 | E2 | `Autocomplete` (done, #8) | Free text with suggestions from a local list. Uses Zag with `allowCustomValue`. Async suggestions are part of E3. | ta-manager professor, course and thesis pickers; opportunities Select2 |
-| E3 | Async sources + `Combobox` multi | An async (debounced, abortable) source for both `Combobox` and `Autocomplete`, multi-select tokens, and hidden inputs for a multi-select form field. | opportunities `ModelSelect2Multiple` |
+| E3 | Async sources + `MultiCombobox` (done) | An async (debounced, abortable) source for both `Combobox` and `Autocomplete`, multi-select tokens, and hidden inputs for a multi-select form field. | opportunities `ModelSelect2Multiple` |
 | E4 | `ToggleGroup` | Filter buttons with `aria-pressed`, single- or multi-select, in a labelled group. | ta-manager (about 60 instances) |
 | E5 | Choice chips | Native radios or checkboxes in a `fieldset` with a `legend`, styled as chips. | ngpa country/schema |
 | E6 | `CopyButton` | Copies a value or an element's text and announces it through A9. | ta-manager (5+ modules) |

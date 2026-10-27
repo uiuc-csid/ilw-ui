@@ -5,12 +5,15 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import { type AutocompleteItem, filterItems } from '../core/index.ts';
+  import { AsyncSearch, type AsyncSource, statusText } from './async-search.svelte.ts';
   import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
     popupId = `${id}-popup`,
-    items,
+    items = [],
+    source,
+    debounce = 250,
     value = $bindable(''),
     oninput,
     onselect,
@@ -23,6 +26,8 @@
     invalid = false,
     required = false,
     labelId,
+    loadingText = 'Loading…',
+    errorText = "Couldn't load suggestions",
     class: inputClass,
     ...attrs
   }: {
@@ -30,7 +35,11 @@
     id: string;
     /** The listbox's id. */
     popupId?: string;
-    items: AutocompleteItem[];
+    items?: AutocompleteItem[];
+    /** Fetches the suggestions for the typed text, in place of filtering `items`. */
+    source?: AsyncSource<AutocompleteItem>;
+    /** With `source`: milliseconds to wait after the last keystroke before searching. */
+    debounce?: number;
     /** The input's text (bindable). It is the value: any text is allowed. */
     value?: string;
     /** Called on each keystroke with the new text. */
@@ -50,12 +59,41 @@
     required?: boolean;
     /** The id of the `<label>` for the input; it also labels the listbox. */
     labelId?: string;
+    /** With `source`: the list's row (and the status message) while a search runs. */
+    loadingText?: string;
+    /** With `source`: the list's row (and the status message) when the source fails. */
+    errorText?: string;
     /** Extra classes on the input. */
     class?: string;
   } & Omit<HTMLInputAttributes, 'value' | 'id' | 'oninput' | 'onselect' | 'type' | 'role'> = $props();
 
   let query = $state('');
-  const shown = $derived(filterItems(items, query, max).shown);
+  // Where to put the highlight when results arrive for an ArrowDown/Up search.
+  let arrowed: 'first' | 'last' | null = null;
+  const search = new AsyncSearch<AutocompleteItem>(
+    () => source!,
+    () => debounce,
+    (_, results) => {
+      if (!api.open) return;
+      // Nothing to show and no emptyText: close, as typing does with items.
+      if (!results.length && emptyText == null) api.setOpen(false);
+      else if (arrowed && results.length) {
+        const shownNow = results.slice(0, max);
+        api.setHighlightValue((arrowed === 'first' ? shownNow[0] : shownNow[shownNow.length - 1]).value);
+      }
+      arrowed = null;
+    },
+  );
+  $effect(() => () => search.cancel());
+
+  const shown = $derived(
+    source ? (search.status === 'done' ? search.results.slice(0, max) : []) : filterItems(items, query, max).shown,
+  );
+  const status = $derived(
+    source
+      ? statusText(search.status, search.results.length, { loadingText, emptyText: emptyText ?? 'No suggestions', errorText })
+      : '',
+  );
   const collection = $derived(
     combobox.collection({
       items: shown,
@@ -115,8 +153,14 @@
       value = inputValue;
       query = inputValue;
       oninput?.(inputValue);
-      const open = inputValue.trim().length >= minChars && (shown.length > 0 || emptyText != null);
-      api.setOpen(open);
+      const long = inputValue.trim().length >= minChars;
+      if (source) {
+        arrowed = null;
+        if (long) search.search(inputValue);
+        else search.cancel();
+      }
+      // With a source the list opens on "Loading…" and closes if nothing comes back.
+      api.setOpen(long && (source != null || shown.length > 0 || emptyText != null));
       // Typing never highlights: Enter and Tab keep the typed text.
       api.clearHighlightValue();
     },
@@ -141,7 +185,12 @@
     mergeProps(zagInputProps, attrs, {
       onkeydown(event: KeyboardEvent) {
         // ArrowDown/Up on a closed list opens it on the current text.
-        if (!api.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) query = value;
+        if (api.open || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
+        query = value;
+        if (source) {
+          arrowed = event.altKey ? null : event.key === 'ArrowDown' ? 'first' : 'last';
+          search.search(value, true);
+        }
       },
       onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLInputElement }) {
         if (!focusLeft(root, event)) return;
@@ -150,6 +199,7 @@
         if (highlighted) choose(highlighted);
         // Close the way zag's own dismissal does, without pulling focus back.
         if (api.open) service.send({ type: 'LAYER.INTERACT_OUTSIDE', src: 'interact-outside', restoreFocus: false });
+        search.cancel();
         zagFocusout?.(event);
       },
     }),
@@ -182,8 +232,15 @@
     {#each shown as item (item.value)}
       <div {...api.getItemProps({ item })}>{item.label}</div>
     {/each}
-    {#if !shown.length && emptyText != null}
+    {#if source && search.status === 'loading'}
+      <div class="autocomplete-loading" role="option" aria-disabled="true" aria-selected="false">{loadingText}</div>
+    {:else if source && search.status === 'error'}
+      <div class="autocomplete-error" role="option" aria-disabled="true" aria-selected="false">{errorText}</div>
+    {:else if !shown.length && emptyText != null && (!source || search.status === 'done')}
       <div class="autocomplete-empty" role="option" aria-disabled="true" aria-selected="false">{emptyText}</div>
     {/if}
   </div>
+  {#if source}
+    <span class="ilw-visually-hidden" role="status">{status}</span>
+  {/if}
 </span>
