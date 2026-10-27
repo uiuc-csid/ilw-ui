@@ -46,3 +46,4 @@ The first tagged release. Until now consumers pinned a commit. ta-manager pins `
 ### Fixed
 
 - `Combobox`, `Autocomplete`: a window switch no longer counts as a blur (#39).
+- `Combobox`, `Autocomplete`, `MultiCombobox`: ArrowDown and ArrowUp set their highlight at once, not a frame later. Keys typed in that frame could lose a lone-match highlight, or get a guess highlighted that Enter or Tab would take (#75).
