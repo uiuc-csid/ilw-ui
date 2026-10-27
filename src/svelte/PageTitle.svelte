@@ -6,10 +6,13 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import type { LayoutWidth } from './layout.ts';
+
   let {
     theme,
     fade = false,
     image,
+    width,
     class: className = '',
     children,
   }: {
@@ -19,6 +22,8 @@
     fade?: boolean;
     /** The background image's URL. It is decorative (`alt=""`): the heading carries the content. */
     image?: string;
+    /** `full` spans the page; `auto` and `page` span it with the text at the side margin (the toolkit treats them alike). */
+    width?: LayoutWidth;
     /** More classes on the outer element. */
     class?: string;
     /** The heading text, rendered inside the `<h1>`. */
@@ -26,7 +31,15 @@
   } = $props();
 </script>
 
-<div class={['ilw-page-title', theme && `ilw-page-title--${theme}`, fade && 'ilw-page-title--fade', className]}>
+<div
+  class={[
+    'ilw-page-title',
+    theme && `ilw-page-title--${theme}`,
+    fade && 'ilw-page-title--fade',
+    width && (width === 'full' ? 'ilw-width-full' : 'ilw-width-auto'),
+    className,
+  ]}
+>
   {#if image}
     <img class="ilw-page-title-background" src={image} alt="" />
   {/if}

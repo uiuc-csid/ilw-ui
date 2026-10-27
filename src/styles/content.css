@@ -1,0 +1,131 @@
+/* Content (A5), the CSS form of <ilw-content>: a box of prose. Markup:
+
+     <div class="ilw-content ilw-format">
+       <div class="ilw-content-inner">
+         <h2>Programs</h2>
+         <p>…</p>
+       </div>
+     </div>
+
+   The prose rules are .ilw-format's (format.css); this adds the box and the
+   toolkit's attributes as modifiers: .ilw-content--introduction, --lede,
+   --inset (`mode`), .ilw-content--center, --right (`align`),
+   .ilw-content--decoration, .ilw-content--transparent, .ilw-width-* (`width`),
+   and a theme attribute (`theme`). .ilw-content-inner is the toolkit's
+   content-inner and content-padding parts in one. */
+
+.ilw-content {
+  --ilw-content--narrow-max-width: calc(1000px + 3.75rem);
+  --ilw-content--narrow-padding: 0 1.875rem;
+  --ilw-content--inset-padding: 3rem 6rem;
+  display: block;
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+  font: 400 1.125rem/1.667rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-content.ilw-content--transparent {
+  --ilw-color--background: transparent;
+}
+
+/* <ilw-content>'s h1 has a smaller bottom margin than ilw-page's. Zero
+   specificity, like the prose rules it adjusts. */
+:where(.ilw-content) :where(h1) {
+  margin-bottom: 1.3125rem;
+}
+
+.ilw-content-inner {
+  box-sizing: border-box;
+}
+
+.ilw-content--center > .ilw-content-inner {
+  text-align: center;
+}
+
+.ilw-content--right > .ilw-content-inner {
+  text-align: right;
+}
+
+.ilw-content:is(.ilw-content--center, .ilw-content--right) :where(ul, ol) {
+  list-style-position: inside;
+}
+
+/* Introduction and lede: a narrower, centred column of larger text. */
+.ilw-content:is(.ilw-content--introduction, .ilw-content--lede) > .ilw-content-inner {
+  max-width: var(--ilw-content--narrow-max-width);
+  margin-inline: auto;
+  padding: var(--ilw-content--narrow-padding);
+}
+
+.ilw-content--introduction :where(p, div:not(.ilw-content-inner)) {
+  font-size: 1.375rem;
+  line-height: 2.2rem;
+}
+
+.ilw-content--introduction :where(em) {
+  font-size: 2.25rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.ilw-content--introduction :where(.ilw-buttons) {
+  justify-content: flex-start;
+}
+
+.ilw-content--lede :where(p, div:not(.ilw-content-inner)) {
+  font-size: 1.375rem;
+  font-style: italic;
+  line-height: 2.2rem;
+}
+
+/* The lede's decoration: a bar on the side the text starts from, or a short
+   rule under centred text. */
+.ilw-content--lede.ilw-content--decoration > .ilw-content-inner {
+  border-left: 6px solid var(--ilw-color--control-accent);
+}
+
+.ilw-content--lede.ilw-content--decoration.ilw-content--right > .ilw-content-inner {
+  border-right: 6px solid var(--ilw-color--control-accent);
+  border-left: none;
+}
+
+.ilw-content--lede.ilw-content--decoration.ilw-content--center > .ilw-content-inner {
+  border-left: none;
+}
+
+.ilw-content--lede.ilw-content--decoration.ilw-content--center > .ilw-content-inner::after {
+  content: '';
+  display: block;
+  width: 150px;
+  margin: 0 auto;
+  padding-top: 10px;
+  border-bottom: 6px solid var(--ilw-color--control-accent);
+}
+
+/* Inset: big padding and smaller headings, for a call to action or feature. */
+.ilw-content--inset > .ilw-content-inner {
+  padding: var(--ilw-content--inset-padding);
+}
+
+.ilw-content--inset :where(h2, h3, h4, h5, h6, .ilw-heading) {
+  font-size: 1.813rem;
+  line-height: 2.175rem;
+}
+
+@media (max-width: 1450px) {
+  .ilw-content {
+    --ilw-content--inset-padding: 3rem 2.2vw;
+  }
+}
+
+@media (max-width: 1000px) {
+  .ilw-content {
+    --ilw-content--inset-padding: 1.875rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .ilw-content {
+    --ilw-content--inset-padding: 1.875rem 1.25rem;
+  }
+}

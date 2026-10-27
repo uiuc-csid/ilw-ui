@@ -1,0 +1,49 @@
+/* Grid (A5), the CSS form of <ilw-grid> and the toolkit's CSS-only
+   ul.ilw-grid. Markup:
+
+     <ul class="ilw-grid">
+       <li>…</li>
+       <li>…</li>
+     </ul>
+
+   A <div> works too. As many columns of at least --ilw-grid--item-width (the
+   toolkit's `innerwidth`, 250px) as fit, or --ilw-grid--template-columns for
+   your own; gap --ilw-grid--gap (10px). Modifiers: .ilw-fixed (side margins,
+   as upstream), .ilw-width-*, a theme attribute (paints the background). */
+
+.ilw-grid {
+  display: grid;
+  grid-template-columns: var(
+    --ilw-grid--template-columns,
+    repeat(auto-fit, minmax(min(var(--ilw-grid--item-width, 250px), 100%), 1fr))
+  );
+  gap: var(--ilw-grid--gap, 10px);
+}
+
+/* The list resets weigh nothing, so a width class's margin or padding wins. */
+:where(.ilw-grid) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Items fill their row's height, and so does their content (a card). */
+.ilw-grid > * {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  list-style: none;
+}
+
+.ilw-grid > * > :only-child {
+  flex-grow: 1;
+}
+
+.ilw-grid.ilw-fixed {
+  margin-inline: var(--ilw-margin--side, max(1.875rem, calc(50cqw - 35.625rem)));
+}
+
+.ilw-grid[theme] {
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}

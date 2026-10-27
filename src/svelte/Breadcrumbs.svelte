@@ -11,10 +11,13 @@
 </script>
 
 <script lang="ts">
+  import { type LayoutWidth, widthClass } from './layout.ts';
+
   let {
     items,
     current,
     label = 'Breadcrumbs',
+    width,
     class: className = '',
   }: {
     /** The trail from the site's home page, all linked. */
@@ -23,12 +26,14 @@
     current: string;
     /** The navigation landmark's accessible name. */
     label?: string;
+    /** Breaks out of the page margins (`full`, `auto`), or keeps to them (`page`). */
+    width?: LayoutWidth;
     /** More classes on the nav, e.g. a theme class. */
     class?: string;
   } = $props();
 </script>
 
-<nav class={['ilw-breadcrumbs', className]} aria-label={label}>
+<nav class={['ilw-breadcrumbs', widthClass(width), className]} aria-label={label}>
   <ol>
     {#each items as item, i (i)}
       <li><a href={item.href}>{item.label}</a></li>

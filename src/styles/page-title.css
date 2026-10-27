@@ -9,7 +9,8 @@
      </div>
 
    Modifiers, as the toolkit's attributes: .ilw-page-title--blue, --orange,
-   --white (`theme`), .ilw-page-title--fade (`fade`). */
+   --white (`theme`), .ilw-page-title--fade (`fade`), and a width class from
+   width.css (`width`). */
 
 .ilw-page-title {
   --ilw-page-title--text-color: var(--ilw-color--background);
@@ -18,7 +19,6 @@
   position: relative;
   display: block;
   box-sizing: border-box;
-  width: 100%;
   overflow: hidden;
   container-type: inline-size;
 }
@@ -99,6 +99,17 @@
   /* The toolkit's title inherits .ilw-format's h1 line height (2.875rem at 2.5rem). */
   line-height: 1.15;
   text-align: left;
+}
+
+/* `auto` (and the toolkit's `page`): the box spans the page, the text keeps
+   the page margin. Upstream puts the margin on the text, not the box, allowing
+   for the plate's padding. */
+.ilw-page-title.ilw-width-auto {
+  padding-inline: 0;
+}
+
+.ilw-page-title.ilw-width-auto .ilw-page-title-text {
+  margin: var(--ilw-page-title--main-margin);
 }
 
 @media (max-width: 1200px) {
