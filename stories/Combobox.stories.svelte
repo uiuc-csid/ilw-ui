@@ -20,6 +20,7 @@
 
   const { Story } = defineMeta({
     title: 'Combobox',
+    parameters: { styles: 'ilw-ui' },
     // The Docs page lists every story with its review notes (the comment above it).
     tags: ['autodocs'],
     component: ComboboxDemo,
@@ -285,6 +286,8 @@
 <!--
   `block` adds `cb-block`, so the field fills its container.
 
+  **Why:** `block` is a class contract (`combobox cb-block`); the play function checks the class, and the full width comes from `styles.css`.
+
   **Review:** the input and the popup both span the full width of the form row.
 -->
 <Story
@@ -342,11 +345,15 @@
 <!--
   Has no `play` function: it is the starting page for `tests/e2e/combobox.spec.ts` and `combobox-csp.spec.ts`, which drive it with a real keyboard.
 
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
   **Review:** use it to try the component by hand. Try Alt+ArrowDown, Enter with nothing highlighted (it must not submit the form), and Tab and Shift+Tab between Before, Person and After. Focus should never drop to `<body>`.
 -->
 <Story name="Fixture" />
 <!--
   `Fixture` with `cclark` selected, for the Playwright test "ArrowDown on a selected value opens the whole list at the selection".
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
 
   **Review:** focus the field and press ArrowDown. Every option shows, and Casey Clark is highlighted.
 -->

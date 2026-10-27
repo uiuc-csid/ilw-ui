@@ -260,17 +260,23 @@
 <!--
   Has no `play` function: it is the starting page for the Playwright test "Enter and Space on a TableSortTh sort and keep focus on its button".
 
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
   **Review:** tab to a heading and press Enter or Space. The sort changes and focus stays on the button.
 -->
 <Story name="Fixture" args={{ count: 30 }} />
 <!--
   `Fixture` with paging, for the Playwright tests on paging by keyboard and on sorting back to page 1.
 
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
   **Review:** tab into a pager and press Next repeatedly. Both pagers advance, and on the last page, where Next is disabled, focus moves to the current page button instead of dropping to `<body>`.
 -->
 <Story name="Fixture paged" args={{ count: 131, pageSize: 25 }} />
 <!--
   `Fixture paged` with `legacy`, for the Playwright test "the legacy pager keeps focus too".
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
 
   **Review:** same as `Fixture paged`, with the legacy markup.
 -->

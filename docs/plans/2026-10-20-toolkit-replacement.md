@@ -26,6 +26,8 @@ The inventory below is the toolkit's full component list (the active `web-illino
 - **The layering rule changes.** AGENTS.md's "Illinois toolkit first, native HTML second, ilw-ui third" becomes "native HTML first, ilw-ui second; the toolkit is the visual reference". The README's "host page must load the toolkit" goes away step by step, as each component stops needing it. The first PR under this plan updates both files.
 - **DOM contracts move on purpose.** ta-manager's tests select on `ilw-modal[open] .ilw-button` and on the `.ilw-pager*` and `picker-*` markup. Swapping the modal's internals is a breaking change. It gets a release note and a coordinated ta-manager PR.
 - **The bar stays the same.** Each component gets the three test layers in AGENTS.md (play-function DOM and ARIA checks, Playwright keyboard and focus, and axe), a README contract, an at-smoke checklist, and a parity story if it replaces a toolkit component. Each gets its own plan in `docs/plans/` when work starts.
+- **Stories explain themselves and look like a page.** Every story carries the AGENTS.md "Stories" description (summary, **Why:** what is under test, **Review:** what should be seen) and renders with `styles.css` only, inside the page shell, with the surrounding content it will have in an app (labels, neighbouring fields, prose, realistic data). A component plan's test section lists its stories with that context.
+- **No flaky tests.** Tests follow AGENTS.md "No flaky tests": wait on conditions, not time; no retries; deterministic data, theme, viewport and fonts; each story and spec passes alone and in any order. A new spec is run with `--repeat-each 20` before its PR merges.
 
 ## Inventory
 

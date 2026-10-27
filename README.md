@@ -1672,6 +1672,14 @@ A node Vitest project also covers `core/` and the guard below, and
 `tests/unit/tokens.test.ts` checks `tokens.css` against the vendored
 `toolkit.css`: every palette colour and every theme rule.
 
+**Story descriptions.** Every story has a comment above it, shown as its
+description on the Docs page: a one-line summary, **Why:** (what is under test:
+what the play function checks, or which spec the story backs) and **Review:**
+(what a reviewer should see and try by hand). Every component story renders
+with `styles.css` only, inside the page shell, with the context it will have on
+a real page (labels and neighbouring fields, surrounding prose, realistic data),
+so it shows how the component will look.
+
 **Parity stories.** Each story picks its stylesheets with `parameters.styles`:
 `'toolkit'` (`toolkit.css` only, inside `<ilw-page class="ilw-format">`),
 `'ilw-ui'` (`styles.css` only, inside `<Page format>`: skip link, then

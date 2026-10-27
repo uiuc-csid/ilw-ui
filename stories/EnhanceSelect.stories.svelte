@@ -5,12 +5,23 @@
   import { enhanceSelect, enhanceSelects } from '../src/svelte/enhance-select.ts';
   import EnhanceSelectDemo from './EnhanceSelectDemo.svelte';
 
-  const { Story } = defineMeta({ title: 'EnhanceSelect', component: EnhanceSelectDemo });
+  const { Story } = defineMeta({
+    title: 'EnhanceSelect',
+    component: EnhanceSelectDemo,
+    parameters: { styles: 'ilw-ui' },
+  });
 
   const person = (root: HTMLElement) => root.querySelector<HTMLSelectElement>('#person')!;
   const input = (select: HTMLSelectElement) => select.nextElementSibling!.querySelector<HTMLInputElement>('input')!;
 </script>
 
+<!--
+  `enhanceSelects()` on a server-rendered form: a `<select data-combobox>` with a `<label for>` and optgroups, and a second select with no id.
+
+  **Why:** the play function checks the markup ta-manager selects on: the select stays (hidden, `data-comboboxed="1"`) as the value source, the `combobox cb-block` wrapper is its next sibling, the label now points at `#person-cb`, the popup is `#person-popup` labelled by the label, a select with no id gets a generated `combobox-N` input, and enhancing again adds nothing.
+
+  **Review:** "Person" over a full-width field showing the select's first option as its placeholder, between the Before and After fields; below it, the "+ add…" field. No native select is visible.
+-->
 <Story
   name="Contract"
   play={async ({ canvas, canvasElement }) => {
@@ -44,6 +55,13 @@
   }}
 />
 
+<!--
+  Choosing an option writes it back to the select.
+
+  **Why:** the page's form reads the select, so a commit must set `select.value` and fire one bubbling `change`, and only when the value changes. Text that matches nothing stays in the field and clears the select without a `change`.
+
+  **Review:** type `drew` and press Enter. The field reads "Drew Adams (dadams)" and "Changes" reads `person=dadams`. Type `newnetid` and Tab away: the text stays and "Changes" doesn't grow.
+-->
 <Story
   name="Commit"
   play={async ({ canvas, canvasElement, userEvent }) => {
@@ -77,6 +95,13 @@
   }}
 />
 
+<!--
+  Page code that drives the select directly, as ta-manager's scripts do.
+
+  **Why:** a `change` dispatched on the select updates the input at once; a value set with no event is cleared by an unmatched blur; text written to `input.value` survives a click elsewhere; options added later are searchable.
+
+  **Review:** nothing to do by hand: the play function sets the values. Check the Interactions panel.
+-->
 <Story
   name="Page code"
   play={async ({ canvasElement, userEvent }) => {
@@ -111,6 +136,13 @@
   }}
 />
 
+<!--
+  `enhanceSelect` as a Svelte attachment, and clean-up when a select leaves the page.
+
+  **Why:** `{@attach enhanceSelect}` must remove its combobox on cleanup, and `enhanceSelects()` must remove the combobox of a select that is no longer in the document, so nothing is left behind.
+
+  **Review:** after the play function, the "+ add…" field is gone. Check the Interactions panel.
+-->
 <Story
   name="Attachment"
   play={async ({ canvasElement }) => {
@@ -136,7 +168,13 @@
   }}
 />
 
-<!-- Left open with a highlighted option so axe scans the open listbox. -->
+<!--
+  Left open with an option highlighted.
+
+  **Why:** axe only checks what is rendered, and the other stories end with the list closed.
+
+  **Review:** the popup floats over the After field, its group headings (FACULTY, STUDENTS) stand apart from the options, and the highlight is easy to see. The a11y panel should show no violations.
+-->
 <Story
   name="Open"
   play={async ({ canvas, userEvent }) => {
@@ -149,5 +187,11 @@
   }}
 />
 
-<!-- Fixture for the Playwright keyboard spec: no play function. -->
+<!--
+  Has no `play` function: the page for trying the enhancer by hand, and the starting page for a keyboard spec (there is none yet; `tests/e2e/combobox.spec.ts` covers the widget).
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
+  **Review:** use it to try the enhancer by hand. Tab and Shift+Tab move between Before, Person and After, and focus never drops to `<body>`.
+-->
 <Story name="Fixture" />

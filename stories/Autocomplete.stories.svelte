@@ -18,6 +18,7 @@
 
   const { Story } = defineMeta({
     title: 'Autocomplete',
+    parameters: { styles: 'ilw-ui' },
     component: AutocompleteDemo,
     args: { items: faculty, placeholder: 'Name or NetID' },
     // The Docs page lists every story with its review notes (the comment above it).
@@ -356,6 +357,8 @@
 <!--
   `block` adds `ac-block`, so the field fills its container.
 
+  **Why:** `block` is a class contract (`autocomplete ac-block`); the play function checks the class, and the full width comes from `styles.css`.
+
   **Review:** the input and the popup both span the full width of the form row.
 -->
 <Story
@@ -388,6 +391,8 @@
 <!--
   Left open on the "No matches" row, so axe checks the disabled option.
 
+  **Why:** axe only checks what is rendered: this is the only story that ends with the disabled "No matches" option on screen.
+
   **Review:** the a11y panel is clean, and the row reads as a message, not as a choice you can pick.
 -->
 <Story
@@ -404,11 +409,15 @@
 <!--
   Has no `play` function: it is the starting page for `tests/e2e/autocomplete.spec.ts`, which drives it with a real keyboard.
 
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
+
   **Review:** use it to try the component by hand. Expect Tab and Shift+Tab to move between Before, Professor and After, and focus never to drop to `<body>`.
 -->
 <Story name="Fixture" />
 <!--
   `Fixture` with `emptyText`, for the Playwright "No matches is not selectable" test.
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
 
   **Review:** like `Fixture`, but a search with no matches shows the "No matches" row.
 -->

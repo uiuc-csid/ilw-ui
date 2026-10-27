@@ -8,6 +8,7 @@
 
   const { Story } = defineMeta({
     title: 'mountIslands',
+    parameters: { styles: 'ilw-ui' },
     // The Docs page lists every story with its review notes (the comment above it).
     tags: ['autodocs'],
     component: IslandsDemo,

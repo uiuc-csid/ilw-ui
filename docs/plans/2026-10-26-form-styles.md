@@ -103,4 +103,5 @@ What upstream does, in short:
 - **axe** on every story, including the error state, in light and dark.
 - **Parity pair** `stories/parity/Field.parity.stories.svelte`: upstream's `variations.html` sample inside `<ilw-content>` against ours.
 - **Unformatted:** a `Field` outside `.ilw-format` keeps Source Sans.
+- **Story descriptions and page context:** every story has the AGENTS.md "Stories" comment (summary, **Why:**, **Review:**) and renders with `styles.css` only, inside the page shell, with each field in a form among its neighbours (a heading, other fields, a submit button) as an app would lay it out.
 - **AT smoke:** a `Field` section in `docs/at-smoke.md`.

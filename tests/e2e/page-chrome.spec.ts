@@ -150,8 +150,15 @@ test.describe('back to top', () => {
     await openStory(page, 'page-chrome-back-to-top--fixture');
     const link = page.getByRole('link', { name: 'Back to top' });
     await page.mouse.move(400, 300);
-    await page.mouse.wheel(0, 3000);
-    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
+    // Past one screen (the reveal range) but short of the end: a wheel that hits the end can leave
+    // WebKit rubber-banded past it, where every hit test lands on <html> and the click never arrives.
+    const { screen, end } = await page.evaluate(() => ({
+      screen: window.innerHeight,
+      end: document.scrollingElement!.scrollHeight - window.innerHeight,
+    }));
+    expect(end).toBeGreaterThan(screen * 2);
+    await page.mouse.wheel(0, Math.round(screen * 1.5));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThanOrEqual(screen);
     await expect(link).toHaveCSS('opacity', '1');
     await link.click();
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
