@@ -222,6 +222,7 @@
 -->
 <Story
   name="Table"
+  tags={['framework-neutral']}
   play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('table caption, table th, table td'))}
 >
   <TableSample variant="stripe" />

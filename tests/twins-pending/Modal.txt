@@ -1,0 +1,27 @@
+# Modal (R4 modal): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Modal
+export openModal
+export alert
+export confirm
+export CloseReason
+export ModalButton
+export ModalOptions
+export ModalSize
+
+# stories/Modal.stories.svelte
+modal--alert
+modal--confirm
+modal--custom-buttons
+modal--rich-body
+modal--form-body
+modal--close-reasons
+modal--names
+modal--open
+modal--trigger
+modal--form-trigger
+
+# stories/parity/Modal.parity.stories.svelte
+parity-modal--ilw-ui

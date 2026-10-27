@@ -1,9 +1,9 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect } from 'storybook/test';
 
   import Footer from '../src/svelte/Footer.svelte';
   import Page from '../src/svelte/Page.svelte';
+  import * as plays from './plays/back-to-top.ts';
 
   // Back to top (B7) on a long page; each story renders its own shell, since the link targets it.
   const { Story } = defineMeta({
@@ -56,27 +56,5 @@
 <Story
   name="Long page"
   template={page}
-  play={async ({ canvas, canvasElement }) => {
-    const shell = canvasElement.querySelector('.ilw-page')!;
-    const link = canvas.getByRole('link', { name: 'Back to top' });
-    await expect(link).toHaveClass('ilw-back-to-top');
-    await expect(shell.lastElementChild).toBe(link);
-    await expect(link).toHaveAttribute('href', `#${shell.id}`);
-    // Focusable by script only, so following the link moves focus there.
-    await expect(shell).toHaveAttribute('tabindex', '-1');
-    await expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
-    const style = getComputedStyle(link);
-    await expect(style.position).toBe('fixed');
-    await expect(style.display).not.toBe('none');
-    await expect(style.visibility).toBe('visible');
-
-    // Hidden at the top of the page is the keyboard spec's check: the test runner's frame doesn't
-    // drive the scroll timeline at scroll position 0. Fully shown once scrolled to the end, everywhere.
-    const scroller = document.scrollingElement!;
-    scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'instant' });
-    await new Promise(requestAnimationFrame);
-    await new Promise(requestAnimationFrame);
-    await expect(Number(getComputedStyle(link).opacity)).toBe(1);
-    scroller.scrollTo({ top: 0, behavior: 'instant' });
-  }}
+  play={plays.longPage}
 />

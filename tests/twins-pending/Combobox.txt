@@ -1,0 +1,27 @@
+# Combobox (R6 Zag): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Combobox
+
+# stories/Combobox.stories.svelte
+combobox--grouped
+combobox--preselected
+combobox--basic
+combobox--many
+combobox--free-text
+combobox--window-switch
+combobox--disabled
+combobox--invalid
+combobox--block
+combobox--live-region
+combobox--open
+combobox--fixture
+combobox--fixture-preselected
+combobox--async
+combobox--async-loading
+combobox--async-error
+combobox--async-open
+combobox--async-preselected
+combobox--fixture-async
+combobox--fixture-async-manual

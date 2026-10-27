@@ -10,6 +10,8 @@
     title: 'Themes',
     component: ThemeGrid,
     parameters: { styles: 'ilw-ui' },
+    // framework-neutral: markup and CSS only, so the React build has no twin.
+    tags: ['framework-neutral'],
   });
 
   const swatch = (canvasElement: HTMLElement, id: string) => canvasElement.querySelector<HTMLElement>(`[data-theme-id="${id}"]`)!;

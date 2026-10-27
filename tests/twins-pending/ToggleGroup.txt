@@ -1,0 +1,16 @@
+# ToggleGroup (R12 toggle group): no React twin yet. Needs Button's types (R1).
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export ToggleGroup
+export ToggleOption
+
+# stories/ToggleGroup.stories.svelte
+components-togglegroup--default
+components-togglegroup--allow-none
+components-togglegroup--dark
+components-togglegroup--themes
+components-togglegroup--fixture
+
+# stories/Unformatted.stories.svelte
+unformatted--toggle-group

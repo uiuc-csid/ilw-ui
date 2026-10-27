@@ -2,7 +2,7 @@
   "name": "ilw-ui",
   "version": "0.2.0",
   "private": true,
-  "description": "Accessible Svelte components that look and behave like the Illinois Web Toolkit",
+  "description": "Accessible Svelte and React components that look and behave like the Illinois Web Toolkit",
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@12.15.0",
@@ -16,6 +16,10 @@
       "svelte": "./src/svelte/index.ts",
       "default": "./src/svelte/index.ts"
     },
+    "./react": {
+      "types": "./src/react/index.ts",
+      "default": "./src/react/index.ts"
+    },
     "./styles.css": "./src/styles.css",
     "./styles/*": "./src/styles/*"
   },
@@ -23,11 +27,14 @@
     "src"
   ],
   "scripts": {
-    "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+    "check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings && tsc -p tsconfig.react.json && eslint --max-warnings 0 src/react stories/react .storybook-react",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
+    "storybook:react": "storybook dev -p 6008 -c .storybook-react",
     "build-storybook": "storybook build",
+    "build-storybook:react": "storybook build -c .storybook-react -o storybook-static-react",
+    "compare-index": "node scripts/compare-index.mjs",
     "chromatic": "chromatic"
   },
   "peerDependencies": {
@@ -78,17 +85,24 @@
     "@storybook/addon-mcp": "10.6.4",
     "@storybook/addon-svelte-csf": "^5.1.5",
     "@storybook/addon-vitest": "10.6.4",
+    "@storybook/react-vite": "10.6.4",
     "@storybook/svelte-vite": "10.6.4",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tanstack/react-table": "9.3.1",
     "@tanstack/svelte-table": "9.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
     "@vitest/browser": "5.0.5",
     "@vitest/browser-playwright": "5.0.5",
     "@zag-js/react": "1.46.0",
     "@zag-js/svelte": "1.46.0",
     "chromatic": "18.13.3",
+    "eslint": "9.39.5",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
     "phosphor-svelte": "3.1.1",
     "playwright": "1.64.1",
     "react": "19.3.1",
@@ -97,6 +111,7 @@
     "svelte": "^5.57.2",
     "svelte-check": "^4.7.6",
     "typescript": "^5.9.3",
+    "typescript-eslint": "8.72.1",
     "vite": "^8.3.5",
     "vitest": "5.0.5"
   },

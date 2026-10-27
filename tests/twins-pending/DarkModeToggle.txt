@@ -1,0 +1,14 @@
+# DarkModeToggle (R3 islands and header): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export DarkModeToggle
+
+# stories/DarkModeToggle.stories.svelte
+page-chrome-dark-mode-toggle--default
+page-chrome-dark-mode-toggle--dark
+page-chrome-dark-mode-toggle--island
+page-chrome-dark-mode-toggle--fixture
+
+# stories/parity/DarkModeToggle.parity.stories.svelte
+parity-dark-mode-toggle--ilw-ui

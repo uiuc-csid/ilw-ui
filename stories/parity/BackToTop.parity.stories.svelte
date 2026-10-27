@@ -1,22 +1,15 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect, waitFor } from 'storybook/test';
 
   import BackToTop from '../../src/svelte/BackToTop.svelte';
+  import * as plays from '../plays/back-to-top.ts';
   import SideBySide from './SideBySide.svelte';
 
   // No autodocs: a Docs page renders every story in one document, and the two
   // sides of a pair need different stylesheets.
   const { Story } = defineMeta({ title: 'Parity/BackToTop' });
 
-  const paragraphs = Array.from({ length: 30 }, (_, i) => i + 1);
-
-  // Both sides start hidden at the top of the page; scroll to the bottom and wait until `shown`.
-  async function scrollDown(shown: () => boolean) {
-    const scroller = document.scrollingElement!;
-    scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'instant' });
-    await waitFor(() => expect(shown()).toBe(true));
-  }
+  const paragraphs = Array.from({ length: 60 }, (_, i) => i + 1);
 
   // The toolkit's scroll listener drops `top-of-page` from its shadow button once it re-renders.
   function toolkitShown(root: HTMLElement): boolean {
@@ -36,7 +29,7 @@
 
   **Review:** compare with **IlwUi** or **Side By Side**: a round arrow at the bottom right.
 -->
-<Story name="Toolkit" parameters={{ styles: 'toolkit', a11y: { test: 'off' } }} play={({ canvasElement }) => scrollDown(() => toolkitShown(canvasElement))}>
+<Story name="Toolkit" parameters={{ styles: 'toolkit', a11y: { test: 'off' } }} play={({ canvasElement }) => plays.scrollDown(() => toolkitShown(canvasElement))}>
   {@render filler()}
   <ilw-back-to-top></ilw-back-to-top>
 </Story>
@@ -51,16 +44,7 @@
 <Story
   name="IlwUi"
   parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas }) => {
-    const link = canvas.getByRole('link', { name: 'Back to top' });
-    // The scroll timeline has caught up once the fade-in is complete.
-    await scrollDown(() => getComputedStyle(link).opacity === '1');
-    const style = getComputedStyle(link);
-    await expect([style.width, style.height, style.borderRadius, style.borderTopWidth]).toEqual(['48px', '48px', '50%', '2px']);
-    await expect([style.right, style.bottom]).toEqual(['40px', '40px']);
-    await expect(style.backgroundColor).toBe('rgb(19, 41, 75)');
-    await expect(getComputedStyle(link.querySelector('svg')!).width).toBe('36px');
-  }}
+  play={plays.parity}
 >
   {@render filler()}
   <BackToTop />

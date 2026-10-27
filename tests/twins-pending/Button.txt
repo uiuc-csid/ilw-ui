@@ -1,0 +1,20 @@
+# Button (R1 layout, Button, Icon, CopyButton): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Button
+export ButtonSize
+export ButtonTheme
+
+# stories/Button.stories.svelte
+button--fixture
+button--contract
+button--sizes-and-themes
+button--focus-rings
+button--focus-rings-dark
+
+# stories/Unformatted.stories.svelte
+unformatted--button
+
+# stories/parity/Button.parity.stories.svelte
+parity-button--ilw-ui

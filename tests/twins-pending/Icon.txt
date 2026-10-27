@@ -1,0 +1,11 @@
+# Icon (R1 layout, Button, Icon, CopyButton): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Icon
+
+# stories/Unformatted.stories.svelte
+unformatted--icon
+
+# stories/parity/Icon.parity.stories.svelte
+parity-icon--ilw-ui

@@ -9,8 +9,8 @@
   import Printer from 'phosphor-svelte/lib/Printer';
   import ShareNetwork from 'phosphor-svelte/lib/ShareNetwork';
 
+  import type { LayoutTheme } from '../src/core/layout.ts';
   import Icon from '../src/svelte/Icon.svelte';
-  import type { LayoutTheme } from '../src/svelte/layout.ts';
   import Tooltip, { type TooltipArrow } from '../src/svelte/Tooltip.svelte';
 
   import './TooltipDemo.css';

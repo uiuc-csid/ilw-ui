@@ -9,9 +9,13 @@ _.path = ['{{config_root}}/node_modules/.bin']
 description = "Run the Storybook workbench on :6006"
 run = "pnpm storybook"
 
+[tasks."storybook:react"]
+description = "Run the React Storybook workbench on :6008"
+run = "pnpm storybook:react"
+
 [tasks.test]
-description = "Unit + story tests, then build Storybook and run the Playwright keyboard specs"
-run = "pnpm test && pnpm build-storybook && pnpm test:e2e"
+description = "Unit + story tests (both frameworks), then build both Storybooks, run the Playwright keyboard specs and compare the builds' story ids"
+run = "pnpm test && pnpm build-storybook && pnpm build-storybook:react && pnpm test:e2e && pnpm compare-index"
 
 [tasks."vendor:toolkit"]
 description = "Refresh the vendored Illinois Web Toolkit (vendor/illinois-toolkit) from its CDN"

@@ -30,6 +30,7 @@
 -->
 <Story
   name="IlwUi"
+  tags={['framework-neutral']}
   parameters={{ styles: 'ilw-ui' }}
   play={async ({ canvas, canvasElement }) => {
     const [text] = canvas.getAllByRole('textbox', { name: 'Text Box' });

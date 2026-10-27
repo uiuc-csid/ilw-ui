@@ -1,10 +1,10 @@
 # Replacing the Illinois Web Toolkit with ilw-ui
 
-_A roadmap for making ilw-ui a full replacement for the [Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/) (`web-illinois/ilw-*`, v3), for Svelte apps. For now it covers what can work as an island in a statically rendered page. Tracking issue: [uiuc-csid/ilw-ui#9](https://github.com/uiuc-csid/ilw-ui/issues/9)._
+_A roadmap for making ilw-ui a full replacement for the [Illinois Web Toolkit](https://builder3.toolkit.illinois.edu/) (`web-illinois/ilw-*`, v3), for Svelte and React apps. For now it covers what can work as an island in a statically rendered page. Tracking issue: [uiuc-csid/ilw-ui#9](https://github.com/uiuc-csid/ilw-ui/issues/9)._
 
 ## Context
 
-ilw-ui began as a gap-filler that sat next to the toolkit: it wrapped `<ilw-modal>`, relied on `toolkit.css` and `<ilw-page class="ilw-format">`, and added only what the toolkit lacks. The goal now is for ilw-ui to replace it. A Svelte app should get the same look and behaviour from ilw-ui alone, without loading `toolkit.js` or `toolkit.css`, and with better accessibility and Svelte-native APIs (snippets, callbacks, bindable state).
+ilw-ui began as a gap-filler that sat next to the toolkit: it wrapped `<ilw-modal>`, relied on `toolkit.css` and `<ilw-page class="ilw-format">`, and added only what the toolkit lacks. The goal now is for ilw-ui to replace it. A Svelte or React app should get the same look and behaviour from ilw-ui alone, without loading `toolkit.js` or `toolkit.css`, and with better accessibility and framework-native APIs (Svelte snippets, callbacks and bindable state; React children, callbacks and controlled props).
 
 Scope for now: everything that works in a **statically rendered page**. That means:
 
@@ -16,23 +16,23 @@ The inventory below is the toolkit's full component list (the active `web-illino
 ## Decisions
 
 - **Replace, don't wrap.** The end state has no runtime dependency on `toolkit.js` or `toolkit.css`. The brand stylesheet (`cdn.brand.illinois.edu/illinois.css`) stays: it is the source of the `--il-*` tokens and the fonts, not part of the toolkit.
-- **Visual parity, better behaviour.** Each replacement matches the toolkit's look, including its theme variants and dark mode. A parity story renders the toolkit element next to the ilw-ui one, and Chromatic compares them. Behaviour follows the APG, not the toolkit. Where the two differ, the README records the difference.
+- **Visual parity, better behaviour.** Each replacement matches the toolkit's look, including its theme variants and dark mode. A parity story renders the toolkit element next to the ilw-ui one, and Chromatic compares them. The pairs and Chromatic live in the Svelte Storybook; the React Storybook carries each pair's `IlwUi` side, checked against the same DOM contract snapshot, so a React replacement matches the toolkit exactly when its Svelte twin does. Behaviour follows the APG, not the toolkit. Where the two differ, the README records the difference.
 - **Two delivery forms.**
-  - _Presentational components_ (card, hero, quote, footer, and so on) ship as documented markup and classes in `styles.css`, so a server template can use them without JavaScript. They also ship as a Svelte component that renders exactly that markup.
+  - _Presentational components_ (card, hero, quote, footer, and so on) ship as documented markup and classes in `styles.css`, so a server template can use them without JavaScript. They also ship as a Svelte and a React component that render exactly that markup.
   - _Interactive components_ are islands. Where possible they start from server markup that works without JavaScript (accordion from `<details>`, tabs that fall back to headed sections, filters that fall back to a GET form) and improve it once mounted.
-- **CSS before JS for page chrome.** Page chrome that needs no script to work ships as markup and classes only. Disclosure uses `<details>` (with `name` for one open at a time) or `popover` with `popovertarget`. Reveal-on-scroll uses scroll-driven animations, with an always-visible fallback. Script is added only where HTML can't do the job (today: the dark-mode toggle). Svelte pages still get a component that renders the same markup.
-- **Island-safe.** No SvelteKit imports, and no DOM access at module top level, so components also work when prerendered. Props come from `data-*` attributes or `json_script`, through a shared `mountIslands` helper.
+- **CSS before JS for page chrome.** Page chrome that needs no script to work ships as markup and classes only. Disclosure uses `<details>` (with `name` for one open at a time) or `popover` with `popovertarget`. Reveal-on-scroll uses scroll-driven animations, with an always-visible fallback. Script is added only where HTML can't do the job (today: the dark-mode toggle). Svelte and React pages still get a component that renders the same markup.
+- **Island-safe.** No SvelteKit or Next.js imports, and no DOM access at module top level (or, in React, during render), so components also work when prerendered. Props come from `data-*` attributes or `json_script`, through a shared `mountIslands` helper.
 - **Native first.** Native `<dialog>`, `<details>`, `popover`, form controls and `<table>` come before custom widgets. Zag or TanStack are used only where native elements fall short, and only inside ilw-ui.
 - **The layering rule changes.** AGENTS.md's "Illinois toolkit first, native HTML second, ilw-ui third" becomes "native HTML first, ilw-ui second; the toolkit is the visual reference". The README's "host page must load the toolkit" goes away step by step, as each component stops needing it. The first PR under this plan updates both files.
 - **DOM contracts move on purpose.** ta-manager's tests select on `ilw-modal[open] .ilw-button` and on the `.ilw-pager*` and `picker-*` markup. Swapping the modal's internals is a breaking change. It gets a release note and a coordinated ta-manager PR.
 - **The bar stays the same.** Each component gets the three test layers in AGENTS.md (play-function DOM and ARIA checks, Playwright keyboard and focus, and axe), a README contract, an at-smoke checklist, and a parity story if it replaces a toolkit component. Each gets its own plan in `docs/plans/` when work starts.
 - **Stories explain themselves and look like a page.** Every story carries the AGENTS.md "Stories" description (summary, **Why:** what is under test, **Review:** what should be seen) and renders with `styles.css` only, inside the page shell, with the surrounding content it will have in an app (labels, neighbouring fields, prose, realistic data). A component plan's test section lists its stories with that context.
-- **React too.** Every component also ships for React 19, as `ilw-ui/react`: the same markup, styles and tests, over a shared `core/`. Once the React toolchain lands, each row still open needs both frameworks in its PR. Plan: [docs/plans/2026-10-27-react-components.md](2026-10-27-react-components.md).
+- **React too.** Every component also ships for React 19, as `ilw-ui/react`: the same markup, styles and tests, over a shared `core/`. Since the React toolchain landed (R0d), each row still open needs both frameworks in its PR, and is done only when both pass. Plan: [docs/plans/2026-10-27-react-components.md](2026-10-27-react-components.md).
 - **No flaky tests.** Tests follow AGENTS.md "No flaky tests": wait on conditions, not time; no retries; deterministic data, theme, viewport and fonts; each story and spec passes alone and in any order. A new spec is run with `--repeat-each 20` before its PR merges.
 
 ## Inventory
 
-Delivery is one of: **CSS** (markup and classes), **Svelte** (component), or **Island** (interactive component).
+Delivery is one of: **CSS** (markup and classes), **Svelte** (component), or **Island** (interactive component). Every Svelte component and island has a React twin, written in the same PR from R0d on and ported by the [React plan](2026-10-27-react-components.md) before then.
 
 ### A. Foundations
 
@@ -135,7 +135,7 @@ Settled 2026-10-27.
 - **Following upstream.** A weekly workflow (`.github/workflows/upstream.yml`) reruns `vendor:toolkit` and `vendor:footer` and, when anything but the fetch dates changed, opens a pull request and runs CI and Chromatic on it. The parity stories in Chromatic show where the toolkit moved. README: "Following upstream".
 - **Footer content.** Brand owns it; `https://api.brand.illinois.edu/footer` is the source of truth. ilw-ui ships a copy (`campusFooter`), refreshed by the weekly job. An app that can't wait for a refresh passes its own content as `Footer`'s `campus` prop.
 - **Distribution.** A git dependency for now: consumers install `github:uiuc-csid/ilw-ui#vX.Y.Z`, and releases are tags on `main` with `package.json`'s `version` to match (starting at 0.1.0). The package stays `private`. Revisit GitHub Packages or npm when an app outside CSID wants it.
-- **Non-Svelte server pages.** Markup only: the README's markup contracts are the API for server templates, and `campusFooter`/`campusLink` in `ilw-ui/core` give them the footer data. No Jinja/Django macros until a non-Svelte consumer asks; they'd be a second implementation to keep in step.
+- **Server pages without Svelte or React.** Markup only: the README's markup contracts are the API for server templates, and `campusFooter`/`campusLink` in `ilw-ui/core` give them the footer data. No Jinja/Django macros until a non-Svelte consumer asks; they'd be a second implementation to keep in step.
 
 ## Done when
 

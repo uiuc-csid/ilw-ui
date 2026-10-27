@@ -1,0 +1,24 @@
+# Accordion (R10 accordion): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Accordion
+export AccordionPanel
+export AccordionAccent
+
+# stories/Accordion.stories.svelte
+accordion--fixture
+accordion--single-fixture
+accordion--open
+accordion--buttons
+accordion--single
+accordion--compact-groups
+accordion--accents
+accordion--plain-markup
+accordion--dark
+
+# stories/Unformatted.stories.svelte
+unformatted--accordion
+
+# stories/parity/Accordion.parity.stories.svelte
+parity-accordion--ilw-ui
