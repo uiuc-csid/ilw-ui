@@ -328,14 +328,14 @@ Each row is one PR. R0a–R0d run in order. After R0d, the ports can run in para
 - R6's twin of Format's "Components inside" needs R5 (it renders `DataTableDemo`);
 - R7 needs R6 (`SelectCombobox` renders `Combobox`).
 
-R2, R3, R4 and R8 are independent: `Header` imports only `DarkModeToggle`, `Modal` draws its own icon, and `Tabs` uses nothing but `layout.ts`. `CopyButton` renders `Button` and `Icon`, so it comes last in R1.
+R2, R3, R4, R8 and R9 are independent: `Header` imports only `DarkModeToggle`, `Modal` draws its own icon, `Tabs` uses nothing but `layout.ts`, and `Tooltip` uses only `nextId` and the layout types. `CopyButton` renders `Button` and `Icon`, so it comes last in R1.
 
 | # | PR | Contents |
 | - | -- | -------- |
 | R0a | Shared core | Move the logic in [Shared core](#shared-core) into internal `src/core` modules; Svelte unchanged. Update docs that name the moved files: AGENTS.md "Source Layout", README "Known issues", `docs/upstream-issues/zag.md`. Fix two stale README facts: Zag is pinned at 1.46.0, not 1.44.0, and `focusStaysPut` now works around the focus pull. |
 | R0b | Svelte test plumbing | No behaviour change. `.storybook/shared.ts`. Rename the Vitest project to `storybook-svelte` and the Playwright projects to `svelte-*`. The per-subtree guard, including the `src/react` list, `.tsx`/`.jsx` scanning and `dangerouslySetInnerHTML`. The contract normalizer and snapshots for every existing Svelte story. Story-helper styles into `.css` files. AGENTS.md test commands. |
 | R0c | Packaging (v0.2.0) | Optional exact peers for both frameworks, with the React devDependencies they need, the peer = devDependency test, Renovate rules, README "Install and use", the release note, and the ta-manager PR. |
-| R0d | React toolchain | The `./react` export and the build dependencies (`@vitejs/plugin-react`, `@storybook/react-vite`, ESLint and its plugins). `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. The toolkit-replacement roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
+| R0d | React toolchain | The `./react` export and the build dependencies (`@vitejs/plugin-react`, `@storybook/react-vite`, ESLint and its plugins). `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. Point `stories/TooltipDemo.svelte` at `src/core/layout.ts` and delete the type-only `src/svelte/layout.ts` that R0a left for it (R0a stayed out of the story files R0b was changing). AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. The toolkit-replacement roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
 | R1 | Presentational | `Button`, `Icon`, `Columns`, `Content`, `Grid`, `Spacer`, `Breadcrumbs`, `PageTitle`, `SectionNav`, `Footer`, `Pagination`, `SortableTh`, then `CopyButton`, with their Layout, Width and parity `IlwUi` twins and their own Unformatted stories (the other Unformatted stories land with their components). Re-exports `LayoutTheme` and `LayoutWidth`. Also finishes R0d's `Page` and `BackToTop`: their twin stories, README React API and at-smoke rows. May split into layout, Button, Icon and `CopyButton`, then page chrome. |
 | R2 | Forms | `Field`, `RadioGroup`, `ChoiceChips` (and `ChipOption`). |
 | R3 | Islands and header | React `mountIslands`, `DarkModeToggle`, `Header`, the Islands stories, and `islands.test.ts` over both adapters. |
@@ -344,6 +344,7 @@ R2, R3, R4 and R8 are independent: `Header` imports only `DarkModeToggle`, `Moda
 | R6 | Zag | The `AsyncSearch` adapter and `AsyncSource`, `Combobox`, `Autocomplete`, `MultiCombobox`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
 | R7 | Select enhancement | `SelectCombobox`, `enhanceSelect`, `enhanceSelects`. |
 | R8 | Tabs | `Tabs`, `TabItem`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
+| R9 | Tooltip | `Tooltip` (C4). It merged before R0d, so it needs its own port. Re-exports `TooltipArrow` and `TooltipAttrs`. |
 
 Every port PR includes:
 
@@ -358,7 +359,7 @@ Every port PR includes:
 
 ## The rest of the roadmap
 
-- Under the lockstep rule, every row of the [toolkit-replacement roadmap](2026-10-20-toolkit-replacement.md) still open when R0d merges needs both frameworks to be done. Rows merged before then, such as C3 `Tabs`, E3 `MultiCombobox`, E5 `ChoiceChips` and E6 `CopyButton`, are ported in R1–R8.
+- Under the lockstep rule, every row of the [toolkit-replacement roadmap](2026-10-20-toolkit-replacement.md) still open when R0d merges needs both frameworks to be done. Rows merged before then, such as C3 `Tabs`, C4 `Tooltip`, E3 `MultiCombobox`, E5 `ChoiceChips` and E6 `CopyButton`, are ported in R1–R9.
 - Component plans written from now on have a React section: the API mapping and the hard parts.
 - The pending `page-chrome`, `form-styles` and `layout` plans describe components that already exist. Once they're checked off, they move to `docs/old-plans/`. Their components are ported in R0d–R3, so lockstep doesn't apply to them.
 
