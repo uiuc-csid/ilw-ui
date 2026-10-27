@@ -3,6 +3,7 @@ export { default as Button, type ButtonSize, type ButtonTheme } from './Button.s
 export { type ColumnsMode, default as Columns } from './Columns.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as Content } from './Content.svelte';
+export { default as CopyButton } from './CopyButton.svelte';
 export { default as DarkModeToggle } from './DarkModeToggle.svelte';
 export { default as Field, type FieldAttrs } from './Field.svelte';
 export { default as RadioGroup, type RadioOption } from './RadioGroup.svelte';
@@ -26,6 +27,8 @@ export { default as Grid } from './Grid.svelte';
 export { default as Icon } from './Icon.svelte';
 export { type LayoutTheme, type LayoutWidth } from './layout.ts';
 export { default as Modal } from './Modal.svelte';
+export { default as MultiCombobox } from './MultiCombobox.svelte';
+export { type AsyncSource } from './async-search.svelte.ts';
 export {
   alert,
   type CloseReason,
@@ -54,3 +57,5 @@ export {
 export { default as BackToTop } from './BackToTop.svelte';
 export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';
 export { default as ToggleGroup, type ToggleOption } from './ToggleGroup.svelte';
+export { default as Tabs, type TabItem } from './Tabs.svelte';
+export { enhanceAllTabs, enhanceTabs } from './tabs.ts';

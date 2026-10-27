@@ -178,3 +178,22 @@ test('no live region is left on <body> while the list is in use', async ({ page 
   // Zag announces through it on macOS/iOS only; elsewhere there is none at all.
   await expect(page.locator('body > [data-live-announcer]')).toHaveCount(0);
 });
+
+test('async: suggestions arrive after a pause; Enter writes one; Tab moves on', async ({ page }) => {
+  await openStory(page, 'autocomplete--fixture-async');
+  const { input, after, chosen } = parts(page);
+
+  await input.focus();
+  await type(page, 'ad');
+  await expect(page.getByRole('option')).toHaveText(['A. Adams — Avery Adams (aadams)', 'D. Adams — Drew Adams (dadams)']);
+  await expect(input).not.toHaveAttribute('aria-activedescendant');
+  await expect(page.locator('.autocomplete > [role="status"]')).toHaveText('2 results');
+  await press(page, 'ArrowDown');
+  await expect(input).toHaveAttribute('aria-activedescendant', 'prof-popup-opt-aadams');
+  await press(page, 'Enter');
+  await expect(input).toHaveValue('A. Adams');
+  await expect(chosen).toHaveText('aadams');
+  await press(page, 'Tab');
+  await expect(after).toBeFocused();
+  await expect(input).toHaveValue('A. Adams');
+});

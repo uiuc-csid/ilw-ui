@@ -1,0 +1,190 @@
+/* Tabs (C3), the CSS form of <ilw-tabs>. Markup, as a server sends it:
+
+     <div class="ilw-tabs" data-labelledby="programs-heading">
+       <div class="ilw-tabs-container">
+         <section class="ilw-tabs-panel" id="degree">
+           <h3 class="ilw-tabs-heading">Degree Programs</h3>
+           <p>…</p>
+         </section>
+         <section class="ilw-tabs-panel" id="non-degree">…</section>
+       </div>
+     </div>
+
+   Without script that is a themed box of headed sections. Tabs (or
+   enhanceTabs) adds a div.ilw-tabs-list[role=tablist] of
+   button.ilw-tabs-tab before the first panel and marks the box
+   .ilw-tabs--ready: the tab list is a column at the left (upstream's default)
+   or, with .ilw-tabs--horizontal, a row over the panels; under 800px wide it
+   stacks full width above the panel. The headings stay in the outline,
+   visually hidden: the tab names the panel. The --ilw-tabs--* properties are
+   the toolkit's, with its values. Also takes a theme attribute and the
+   .ilw-width-* classes. */
+
+.ilw-tabs {
+  --ilw-tabs--tablist-width: 21.875rem;
+  --ilw-tabs--max-width: none;
+  --ilw-tabs--padding: 3.75rem 1.875rem 4.6875rem;
+  --ilw-tabs--gap: 3.75rem;
+  --ilw-tabs--border: 2px solid var(--ilw-color--control-text);
+  --ilw-tabs--font: var(--il-font-sans, 'Source Sans 3', sans-serif);
+
+  display: block;
+  position: relative;
+  container-type: inline-size;
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}
+
+.ilw-tabs-container {
+  box-sizing: border-box;
+  max-width: var(--ilw-tabs--max-width);
+  margin: 0 auto;
+  padding: var(--ilw-tabs--padding);
+}
+
+/* .ilw-width-auto already keeps the content at the side margin. */
+.ilw-tabs.ilw-width-auto > .ilw-tabs-container {
+  padding-inline: 0;
+}
+
+/* Upstream zeroes the top of every heading inside; without script the
+   sections need a gap between them instead. */
+.ilw-tabs :where(h2, h3, h4, h5, h6) {
+  margin-top: 0;
+  padding-top: 0;
+  color: var(--ilw-color--text);
+}
+
+/* Upstream's `ilw-tabs a { color: unset }`: links take the text colour (still
+   underlined). Not while focused, where the focus colours apply. */
+.ilw-tabs-panel :where(a:not(.ilw-button, :focus-visible)) {
+  color: inherit;
+}
+
+.ilw-tabs:not(.ilw-tabs--ready) .ilw-tabs-panel + .ilw-tabs-panel {
+  margin-top: 2.5rem;
+}
+
+/* Tabs: the list in column 1, every panel in column 2 (one shows). */
+.ilw-tabs--ready > .ilw-tabs-container {
+  display: grid;
+  grid-template-columns: var(--ilw-tabs--tablist-width) minmax(0, 1fr);
+  column-gap: var(--ilw-tabs--gap);
+  align-items: start;
+}
+
+.ilw-tabs--ready .ilw-tabs-panel {
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+}
+
+.ilw-tabs--ready .ilw-tabs-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ilw-tabs-panel:focus-visible {
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: 4px;
+}
+
+.ilw-tabs-list {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ilw-tabs-tab {
+  display: block;
+  margin: 0;
+  padding: 0.75em 1em;
+  border: none;
+  border-bottom: var(--ilw-tabs--border);
+  border-radius: 0;
+  background: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+  font: 700 1.1875rem / normal var(--ilw-tabs--font);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ilw-tabs-tab:first-child {
+  border-top: var(--ilw-tabs--border);
+}
+
+.ilw-tabs-tab:hover {
+  background: var(--ilw-color--control-text);
+  color: var(--ilw-color--control);
+}
+
+.ilw-tabs-tab[aria-selected='true'] {
+  background: var(--ilw-color--control-accent);
+  color: var(--ilw-color--control-accent-text);
+}
+
+/* Upstream's link focus colours, on :focus as upstream; the outline sits
+   inside the tab so neighbours don't hide it. */
+.ilw-tabs-tab:focus {
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+  outline: 2px solid var(--ilw-color--focus--outline);
+  outline-offset: -4px;
+}
+
+/* Horizontal: the list is a row over the panels, ruled underneath. */
+.ilw-tabs--ready.ilw-tabs--horizontal > .ilw-tabs-container {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ilw-tabs--horizontal .ilw-tabs-list {
+  flex-flow: row wrap;
+  margin-bottom: 1.25rem;
+  border-bottom: var(--ilw-tabs--border);
+}
+
+.ilw-tabs--ready.ilw-tabs--horizontal .ilw-tabs-panel {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.ilw-tabs--horizontal .ilw-tabs-tab {
+  border: none;
+}
+
+/* Narrow: the tabs stack full width above the panel, in either layout. */
+@container (width <= 800px) {
+  .ilw-tabs--ready > .ilw-tabs-container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ilw-tabs--ready .ilw-tabs-panel {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .ilw-tabs-list,
+  .ilw-tabs--horizontal .ilw-tabs-list {
+    flex-flow: column nowrap;
+    margin-bottom: 1.25rem;
+    border-bottom: none;
+  }
+
+  .ilw-tabs-tab,
+  .ilw-tabs--horizontal .ilw-tabs-tab {
+    border: none;
+    border-bottom: var(--ilw-tabs--border);
+  }
+
+  .ilw-tabs-tab:first-child,
+  .ilw-tabs--horizontal .ilw-tabs-tab:first-child {
+    border-top: var(--ilw-tabs--border);
+  }
+}
