@@ -6,18 +6,9 @@
   the rest. Styled by section-nav.css.
 -->
 <script module lang="ts">
-  export interface SectionNavItem {
-    label: string;
-    href: string;
-    /** This is the page being shown: `aria-current="page"`, and its ancestors start open. */
-    current?: boolean;
-    children?: SectionNavItem[];
-  }
+  import { holdsCurrent, type SectionNavItem } from '../core/section-nav.ts';
 
-  /** Whether `item` or one of its descendants is the current page. */
-  function holdsCurrent(item: SectionNavItem): boolean {
-    return !!item.current || (item.children ?? []).some(holdsCurrent);
-  }
+  export type { SectionNavItem };
 </script>
 
 <script lang="ts">

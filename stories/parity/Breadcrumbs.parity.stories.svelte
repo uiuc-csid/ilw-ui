@@ -1,8 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect } from 'storybook/test';
 
   import Breadcrumbs from '../../src/svelte/Breadcrumbs.svelte';
+  import * as plays from '../plays/breadcrumbs.ts';
   import SideBySide from './SideBySide.svelte';
 
   // No autodocs: a Docs page renders every story in one document, and the two
@@ -41,27 +41,7 @@
 
   **Review:** matches **Toolkit**: small links separated by `>` (Altgeld; orange on blue). Tab to a link: it gets the focus colours and a bottom border.
 -->
-<Story
-  name="IlwUi"
-  parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas }) => {
-    const nav = canvas.getByRole('navigation', { name: 'Breadcrumbs' });
-    const items = nav.querySelectorAll(':scope > ol > li');
-    await expect(items).toHaveLength(4);
-    const current = items[3].firstElementChild!;
-    await expect(current.tagName).toBe('SPAN');
-    await expect(current).toHaveAttribute('aria-current', 'page');
-    await expect(current).toHaveTextContent('Degree programs');
-    // The separator is generated text with empty alternative text.
-    const sep = getComputedStyle(items[1], '::before').content;
-    await expect(sep).toContain('>');
-    await expect(getComputedStyle(items[0], '::before').content).toBe('none');
-    // The blue theme turns the separator orange.
-    const blue = canvas.getByRole('navigation', { name: 'Breadcrumbs, blue' });
-    await expect(getComputedStyle(blue.querySelectorAll('li')[1], '::before').color).toBe('rgb(255, 95, 5)');
-    await expect(getComputedStyle(items[1], '::before').color).toBe('rgb(200, 65, 19)');
-  }}
->
+<Story name="IlwUi" parameters={{ styles: 'ilw-ui' }} play={plays.parity}>
   <Breadcrumbs items={trail} current="Degree programs" />
   <Breadcrumbs items={trail} current="Degree programs" label="Breadcrumbs, blue" class="ilw-theme-blue-1" />
 </Story>

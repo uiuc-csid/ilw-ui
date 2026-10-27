@@ -42,7 +42,7 @@ ships. The frameworks take any later minor.
 | Framework | Peers to install |
 | --------- | ---------------- |
 | Svelte (`ilw-ui/svelte`) | `svelte` ^5.57, `@zag-js/svelte` 1.46.0, `@tanstack/svelte-table` 9.3.1, `phosphor-svelte` 3.1.1 |
-| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): `Page` and `BackToTop` so far) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
+| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): a component's section shows its React API once it has one) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
 
 ```sh
 pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1
@@ -398,7 +398,8 @@ back-to-top replace `<ilw-page>`, `<ilw-header>` (with `<ilw-header-menu>` and
 `<ilw-header-megamenu>`), `<ilw-footer>`, `<ilw-breadcrumbs>`,
 `<ilw-page-title>`, `<ilw-section-nav>` and `<ilw-back-to-top>` with plain HTML
 and classes: no script, so a server template renders them as they are. Each
-also ships as a Svelte component that renders exactly this markup. The classes
+also ships as a Svelte component that renders exactly this markup, and all but
+the header and the dark-mode toggle as a React one that renders the same. The classes
 are named after the toolkit elements; their shadow-DOM parts are light-DOM
 children. The plan is
 [docs/plans/2026-10-20-page-chrome.md](docs/plans/2026-10-20-page-chrome.md).
@@ -423,6 +424,12 @@ children. The plan is
 </Page>
 ```
 
+```tsx
+<Page format header={<header>…</header>} footer={<Footer siteName={…}>…</Footer>}>
+  …the page content…
+</Page>
+```
+
 - The skip link comes first and is visible only when focused. Its `href`
   matches `main`'s `id`; `tabindex="-1"` makes following it move focus into
   `main`, so the next Tab continues from the content. Props: `skipLinkText`,
@@ -437,9 +444,11 @@ children. The plan is
   and `--ilw-color--text`, so it follows the theme and dark mode. Links in
   `main` outside `.ilw-format` get `--ilw-color--link*` at zero specificity;
   inside `.ilw-format`, the prose styles colour them.
-- Modifiers (props in Svelte): `ilw-format` (`format`), `ilw-margin` (`margin`:
-  side margins on `main`), `ilw-page--expanded` (`expanded`, the toolkit's
-  `expanded` attribute: top and bottom margin on `main`).
+- Modifiers (props in Svelte and React): `ilw-format` (`format`), `ilw-margin`
+  (`margin`: side margins on `main`), `ilw-page--expanded` (`expanded`, the
+  toolkit's `expanded` attribute: top and bottom margin on `main`).
+- React: the `header` and `footer` snippets are `ReactNode` props, the content
+  is `children`, and `class` is `className`.
 - Differs from `<ilw-page>`: the skip link (the toolkit has none) and the page
   colours (the toolkit leaves them to the host).
 
@@ -623,6 +632,21 @@ a button and a popover panel of columns:
 </Footer>
 ```
 
+```tsx
+<Footer
+  source="My_Site"
+  cookiesButton
+  legalLinks={[{ label: 'Terms', href: '/terms' }]}
+  siteName={<a href="/">My Site</a>}
+  address={<p>201 N Goodwin Ave<br />Urbana, IL 61801</p>}
+  social={<li><a href="…">Bluesky</a></li>}
+  primaryUnit={<a href="…">Primary Unit</a>}
+  actions={<a href="/give">Give</a>}
+>
+  <nav className="ilw-footer-menu" aria-labelledby="menu-1">…</nav>
+</Footer>
+```
+
 - **Campus content.** The campus sections and the privacy, copyright and
   accessibility links come from `campusFooter` in `ilw-ui/core`, a copy of
   `https://api.brand.illinois.edu/footer` (Brand owns it; that API is the
@@ -638,11 +662,12 @@ a button and a popover panel of columns:
 - **Cookies.** `<ilw-footer>` injects the OneTrust script and its "About
   Cookies" button. ilw-ui can't (no script; consumers run a same-origin CSP).
   A site that needs the consent banner loads OneTrust itself and renders the
-  button (`cookiesButton` in Svelte); OneTrust binds to
+  button (the `cookiesButton` prop); OneTrust binds to
   `.ot-sdk-show-settings`.
-- The site name and the slots are snippets, as the toolkit's slots are; the
-  social snippet gives the `<li>`s, and the component writes the `nav` and
-  `ul`.
+- The site name and the slots are snippets in Svelte and `ReactNode` props in
+  React (`siteName`, `primaryUnit`, `address`, `social`, `actions`; the content
+  area is `children`), as the toolkit's slots are. The social slot gives the
+  `<li>`s, and the component writes the `nav` and `ul`.
 - Phone links: the toolkit's README asks for an `aria-label` naming the
   destination. If you add one, start it with the visible number (WCAG 2.5.3,
   axe `label-content-name-mismatch`), or put the destination in the text.
@@ -666,6 +691,9 @@ a button and a popover panel of columns:
 ```svelte
 <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Academics', href: '/academics' }]} current="Degree programs" />
 ```
+
+The React `Breadcrumbs` takes the same props, with `className` for `class`;
+both export the `Crumb` type (`{ label, href }`).
 
 - The current page is last, unlinked, with `aria-current="page"` (the toolkit
   leaves it as a bare `span`).
@@ -697,7 +725,9 @@ a button and a popover panel of columns:
   text sits on a colour plate (85 % over the image, solid with `fade`), as
   upstream.
 - Props: `theme` (`'blue' | 'orange' | 'white'`; unset is white on the heading
-  colour), `fade`, `image` (URL), `width`, `class`.
+  colour), `fade`, `image` (URL), `width`, `class` (React: `className`). The
+  heading text is the children in both frameworks, so the call above is the
+  same in React.
 - `width="full"` adds `ilw-width-full`: the box spans the page. `auto` and
   `page` both add `ilw-width-auto` (the toolkit treats them alike): the box
   spans the page and the text keeps the page margin.
@@ -749,8 +779,11 @@ a button and a popover panel of columns:
   `label` (default "Pages In This Section": the nav's name and the narrow
   toggle's text), `open` (the narrow toggle starts open), `expanded` (every
   branch starts open), `root` (default true: the first item gets
-  `ilw-section-nav--root`), `id`, `class`. The toolkit's
-  `--ilw-section-nav--*` properties apply.
+  `ilw-section-nav--root`), `id` (the label's id prefix; defaults to
+  `$props.id()` in Svelte, `useId()` in React), `class` (React: `className`).
+  The toolkit's `--ilw-section-nav--*` properties apply. The React
+  `SectionNav` takes the same `items`, so the call above is the same in React;
+  both export the `SectionNavItem` type.
 - Differs from `<ilw-section-nav>`: branches collapse (upstream always shows
   every level and has no branch toggles); the toggles are `summary`s, not
   scripted buttons; no `collapse="true|false"` attribute (no forced or
@@ -779,7 +812,8 @@ a button and a popover panel of columns:
   scrolling; elsewhere, and on a page too short to scroll, it is always shown.
   When focused from the keyboard it is always fully shown. It is never
   `display: none` or `visibility: hidden`, so screen-reader users can reach it.
-- Props: `target` (default `top`), `label` (default "Back to top").
+- Props: `target` (default `top`), `label` (default "Back to top"), the same in
+  React (`<Page backToTop>` or `<BackToTop target="top" />`).
 - Differs from `<ilw-back-to-top>`: a link, not a button; no stepped scroll;
   focus goes to the shell rather than the first focusable element (the next
   Tab reaches it).
@@ -1352,6 +1386,14 @@ direction, another key starts ascending.
 
 ```svelte
 <SortableTh key="name" label="Name" {sort} onsort={(k) => (sort = nextSort(sort, k))} />
+```
+
+React: the same props, except that `key` is `sortKey` (React keeps `key` for
+itself and never passes it on) and `onsort` is `onSort`.
+
+```tsx
+const [sort, setSort] = useState<Sort>({ key: 'name', dir: 1 });
+<SortableTh sortKey="name" label="Name" sort={sort} onSort={(k) => setSort(nextSort(sort, k))} />
 ```
 
 DOM contract (consumers' tests select on it). The heading sits in a
@@ -2075,6 +2117,9 @@ script. For a list paged in the browser, use `Pager` (above).
 <Pagination page={6} pages={12} href={(p) => `/courses/page/${p}`} />
 ```
 
+The React `Pagination` takes the same props, with `className` for `class`, so
+these calls are the same in React.
+
 **DOM contract** (page 6 of 12, `url="?term=fa26"`). Server templates render
 the same markup with `pagination.css` and no script:
 
@@ -2105,7 +2150,8 @@ the same markup with `pagination.css` and no script:
   links are just a query, relative to the current page), `parameter` (default
   `"page"`), `href` (a function from the 1-based page to its link; replaces
   `url` and `parameter`), `label` (default `"Pages"`; give two paginations on
-  one page distinct labels), `hidePageCount`, `class` (e.g. a theme class).
+  one page distinct labels), `hidePageCount`, `class` (e.g. a theme class;
+  React: `className`).
 - `pageHref(url, page, parameter = 'page')` (`ilw-ui/core`) builds each link:
   it sets `parameter` in `url`'s query and keeps the other values and the
   fragment. Server code can do the same.

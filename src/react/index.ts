@@ -11,6 +11,12 @@ export { Page } from './Page.tsx';
 // Grid, Spacer, LayoutTheme, LayoutWidth, CopyButton
 
 // R1 page chrome: Breadcrumbs, Crumb, PageTitle, SectionNav, SectionNavItem, Footer, Pagination, SortableTh
+export { Breadcrumbs, type Crumb } from './Breadcrumbs.tsx';
+export { Footer } from './Footer.tsx';
+export { PageTitle } from './PageTitle.tsx';
+export { Pagination } from './Pagination.tsx';
+export { SectionNav, type SectionNavItem } from './SectionNav.tsx';
+export { SortableTh } from './SortableTh.tsx';
 
 // R2 forms: Field, FieldAttrs, RadioGroup, RadioOption, ChoiceChips, ChipOption
 
