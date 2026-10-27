@@ -77,3 +77,5 @@ export {
 } from './campus-footer.ts';
 
 export { tabbables } from './tabbable.ts';
+
+export { copyText, type CopyTextOptions } from './clipboard.ts';

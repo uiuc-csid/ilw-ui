@@ -1,0 +1,33 @@
+/* CopyButton (E6): a .ilw-button with a Phosphor icon and a label. Markup:
+
+     <button type="button" class="ilw-button ilw-copy-button" data-state="idle">
+       <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+       <span class="ilw-copy-button-label">Copy link</span>
+     </button>
+
+   data-state is idle, copied or failed. Icon only: the label span has
+   .ilw-visually-hidden instead. */
+
+.ilw-copy-button:where(button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+}
+
+/* Icon only: square, and centred on the text beside it (with no visible
+   text of its own, its baseline would be its bottom edge). */
+.ilw-copy-button:where(button):has(> .ilw-visually-hidden) {
+  padding-inline: 12px;
+  margin-block: 0;
+  vertical-align: middle;
+}
+
+.ilw-copy-button:where(button):where(.ilw-button-small):has(> .ilw-visually-hidden) {
+  padding-inline: 6px;
+}
+
+.ilw-copy-button > .ilw-icon {
+  width: 1.15em;
+  height: 1.15em;
+}
