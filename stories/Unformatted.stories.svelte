@@ -4,6 +4,7 @@
   import { expect } from 'storybook/test';
 
   import {
+    Alert,
     Breadcrumbs,
     Button,
     ChoiceChips,
@@ -258,4 +259,24 @@
     ]}
     value="phd"
   />
+</Story>
+
+<!--
+  `Alert`, a warning with a title, a message and an action, outside `.ilw-format`.
+
+  **Why:** the card sets its own font, so the play function checks the title, the message and the action are in Source Sans without the prose styles, and the paragraphs keep the card's own margins.
+
+  **Review:** the same type and spacing as on **Components → Alert → Warning**.
+-->
+<Story
+  name="Alert"
+  play={async ({ canvasElement }) => {
+    await brandSans(canvasElement.querySelectorAll('.ilw-alert-title, .ilw-alert-body > p, .ilw-alert-actions .ilw-button'));
+    await expect(getComputedStyle(canvasElement.querySelector('.ilw-alert-title')!).marginTop).toBe('0px');
+  }}
+>
+  <Alert variant="warning" title="Applications close Friday at 5 p.m.">
+    <p>Your application is missing a course preference.</p>
+    {#snippet actions()}<Button href="#review">Review application</Button>{/snippet}
+  </Alert>
 </Story>
