@@ -44,5 +44,11 @@ export { default as Breadcrumbs, type Crumb } from './Breadcrumbs.svelte';
 export { default as Footer } from './Footer.svelte';
 export { default as Page } from './Page.svelte';
 export { default as PageTitle } from './PageTitle.svelte';
+export {
+  default as Header,
+  type HeaderLink,
+  type HeaderNavItem,
+  type HeaderSearch,
+} from './Header.svelte';
 export { default as BackToTop } from './BackToTop.svelte';
 export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';

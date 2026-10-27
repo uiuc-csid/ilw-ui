@@ -83,6 +83,21 @@ Status: **pending human run.**
 - [ ] Page title: the heading is read as heading level 1; the background image is not announced.
 - [ ] Footer: the wordmark link reads "University of Illinois Urbana-Champaign, link" once, not twice (no extra "Illinois" image); the campus sections are level-3 headings under it; the legal links are a list.
 
+## Header (stories: Page Chrome → Header → Fixture, Fixture Megamenu)
+
+Status: **pending human run.** Run each item wide (990 px or more) and narrow (under 990 px).
+
+- [ ] The landmarks list has one banner, the "Utility" and "Main" navigations and a search landmark, in that order.
+- [ ] The wordmark reads "University of Illinois Urbana-Champaign, link" once (no "Block I" or second name).
+- [ ] The search field reads "Search, search field" (named by its button); the button reads "Search, button".
+- [ ] A section toggle reads as a button with its state: "Start Here, button, collapsed" (NVDA + Firefox); VoiceOver + Safari may say "collapsed, disclosure triangle" or "summary". Enter or Space opens it, the state changes to expanded, and the next Tab reaches its first link.
+- [ ] A linked section reads "Information, link", then "Subpages of Information, button, collapsed".
+- [ ] Opening another section collapses the first, and the first's toggle announces "collapsed" when revisited.
+- [ ] The current page reads as current ("Philosophy, current page, link").
+- [ ] Narrow: "Menu, button, collapsed"; Enter opens the menu, the state reads "expanded", and the next Tab reaches the first utility link. Escape closes it and focus is back on "Menu".
+- [ ] Megamenu: "Admissions, button, collapsed"; Enter opens the panel ("expanded"), the next Tab reaches its first link, and Escape closes it with focus back on "Admissions".
+- [ ] Fixture Megamenu: after the nav, Tab reaches "Dark mode, switch".
+
 ## Section nav (story: Page Chrome → Section nav → Fixture)
 
 Status: **pending human run.**
