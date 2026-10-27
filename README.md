@@ -29,7 +29,8 @@ pnpm add github:uiuc-csid/ilw-ui#v0.2.0
 The repository is private, so the installing machine (and its CI) needs read
 access to it, e.g. a token in `.npmrc` or a deploy key. Releases are tags on
 `main` (`vX.Y.Z`, with `version` in `package.json` bumped to match); there is no
-build step, so the tag is the release.
+build step, so the tag is the release. Release notes are in
+[CHANGELOG.md](CHANGELOG.md) and on each GitHub release.
 
 The package ships source (`.svelte`/`.ts`); your Vite build compiles it. Its
 own dependencies are the headless engines, pinned exactly: `@zag-js/combobox`
