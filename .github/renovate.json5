@@ -27,6 +27,12 @@
     { groupName: 'TanStack Table', matchPackageNames: ['@tanstack/*'], separateMajorMinor: false },
     { groupName: 'React', matchPackageNames: ['react', 'react-dom', '@types/react', '@types/react-dom'], separateMajorMinor: false },
     {
+      // eslint-plugin-jsx-a11y 6.10.2 supports ESLint up to 9 (its peer
+      // range); move to 10 once it does.
+      matchPackageNames: ['eslint'],
+      allowedVersions: '<10',
+    },
+    {
       // The framework adapters are optional peers, exact or caret like their
       // devDependencies. Renovate widens peer ranges by default; bump them
       // instead, in the same PR as the devDependency

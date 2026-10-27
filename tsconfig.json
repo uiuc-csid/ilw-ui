@@ -9,7 +9,11 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": ["node"],
+    // For tests/unit/react-ssr.test.ts, which imports both adapters.
+    "jsx": "react-jsx"
   },
-  "include": ["src", "stories", "tests", ".storybook", "*.ts", "*.js"]
+  "include": ["src", "stories", "tests", ".storybook", "*.ts", "*.js"],
+  // The React paths: tsconfig.react.json checks them (tsc, in `pnpm check`).
+  "exclude": ["src/react", "stories/react"]
 }

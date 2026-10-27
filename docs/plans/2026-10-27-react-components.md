@@ -234,11 +234,11 @@ A story can opt out with `parameters.contract = false`, which needs a comment wi
 
 #### Twins check: `tests/unit/twins.test.ts`
 
-- Every `*.stories.svelte` has a React twin with the same title, story names, tags and descriptions. Svelte comments are read with a regex, React ones with `loadCsf` from `storybook/internal/csf-tools`.
+- Every `*.stories.svelte` has a React twin with the same title, story names, tags (`play-fn` included, so both twins have a play function or neither does) and descriptions. Svelte stories are read with `svelte/compiler`'s `parse` (the comment node before each `<Story>`), React ones with `loadCsf` and `extractDescription` from `storybook/internal/csf-tools`.
 - The check skips:
   - stories tagged `framework-neutral`, which render only markup and CSS or call only `core/`: Announce, Themes, Format (except "Components inside"), Unformatted's Table, and the `IlwUi` stories of the Table, Format, Themes and Field parity pairs;
   - parity `Toolkit` and `Side By Side` stories.
-- A `twins-pending` allow-list holds stories not yet ported, and shrinks with each port.
+- `tests/twins-pending/` holds what isn't ported yet: one `<Component>.txt` per component, listing its story ids (grouped by story file, Unformatted and parity stories included) and its `ilw-ui/svelte` exports (`export <Name>`). A port deletes its components' files, so ports running side by side never edit the same lines. The check fails on a line a twin has made stale.
 - It also compares the export names of `src/svelte/index.ts` and `src/react/index.ts`, type exports included, using the TypeScript compiler API and a rename map (`createDataTable` → `useDataTable`).
 - After both builds, `scripts/compare-index.mjs` checks that the React build's story ids are the Svelte build's minus the skipped and `twins-pending` stories.
 
@@ -252,7 +252,7 @@ A story can opt out with `parameters.contract = false`, which needs a comment wi
 
 - `playwright.config.ts` gets four projects: `svelte-chromium`, `svelte-webkit`, `react-chromium`, `react-webkit`.
 - Its `webServer` list comes from `ILW_FW=svelte|react|both` (default `both`). Playwright starts every server before it filters projects, so a run without the React build would otherwise fail.
-- Spec files don't change.
+- Spec files don't change. `openStory` skips the test on `react-*` while its story is in `tests/twins-pending/`, so each spec turns on for React as its twins land.
 - A test that applies to one framework only uses `test.skip` with a reason and an issue link.
 
 #### axe
@@ -328,14 +328,16 @@ Each row is one PR. R0a–R0d run in order. After R0d, the ports can run in para
 - R6's twin of Format's "Components inside" needs R5 (it renders `DataTableDemo`);
 - R7 needs R6 (`SelectCombobox` renders `Combobox`).
 
-R2, R3, R4, R8 and R9 are independent: `Header` imports only `DarkModeToggle`, `Modal` draws its own icon, `Tabs` uses nothing but `layout.ts`, and `Tooltip` uses only `nextId` and the layout types. `CopyButton` renders `Button` and `Icon`, so it comes last in R1.
+- R11 needs R1 (`Alert` renders `Icon`), and R12 needs R1 (`ToggleGroup` takes `Button`'s size and theme types).
+
+R2, R3, R4, R8, R9 and R10 are independent: `Header` imports only `DarkModeToggle`, `Modal` draws its own icon, `Tabs` uses nothing but `layout.ts`, `Tooltip` uses only `nextId` and the layout types, and `Accordion` only its own context. `CopyButton` renders `Button` and `Icon`, so it comes last in R1.
 
 | # | PR | Contents |
 | - | -- | -------- |
 | R0a | Shared core | Move the logic in [Shared core](#shared-core) into internal `src/core` modules; Svelte unchanged. Update docs that name the moved files: AGENTS.md "Source Layout", README "Known issues", `docs/upstream-issues/zag.md`. Fix two stale README facts: Zag is pinned at 1.46.0, not 1.44.0, and `focusStaysPut` now works around the focus pull. |
 | R0b | Svelte test plumbing | No behaviour change. `.storybook/shared.ts`. Rename the Vitest project to `storybook-svelte` and the Playwright projects to `svelte-*`. The per-subtree guard, including the `src/react` list, `.tsx`/`.jsx` scanning and `dangerouslySetInnerHTML`. The contract normalizer and snapshots for every existing Svelte story. Story-helper styles into `.css` files. AGENTS.md test commands. |
 | R0c | Packaging (v0.2.0) | Optional exact peers for both frameworks, with the React devDependencies they need, the peer = devDependency test, Renovate rules, README "Install and use", the release note, and the ta-manager PR. |
-| R0d | React toolchain | The `./react` export and the build dependencies (`@vitejs/plugin-react`, `@storybook/react-vite`, ESLint and its plugins). `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. Point `stories/TooltipDemo.svelte` at `src/core/layout.ts` and delete the type-only `src/svelte/layout.ts` that R0a left for it (R0a stayed out of the story files R0b was changing). AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. The toolkit-replacement roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
+| R0d | React toolchain | The `./react` export and the build dependencies (`@vitejs/plugin-react`, `@storybook/react-vite`, ESLint and its plugins). `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. A `Page` "Shell only" story (the shell with the app's own header and footer, and back to top) needs neither, so it and the `IlwUi` sides of the Page and BackToTop parity pairs prove the toolchain on all three layers. Point `stories/TooltipDemo.svelte` at `src/core/layout.ts` and delete the type-only `src/svelte/layout.ts` that R0a left for it (R0a stayed out of the story files R0b was changing). AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. The toolkit-replacement roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
 | R1 | Presentational | `Button`, `Icon`, `Columns`, `Content`, `Grid`, `Spacer`, `Breadcrumbs`, `PageTitle`, `SectionNav`, `Footer`, `Pagination`, `SortableTh`, then `CopyButton`, with their Layout, Width and parity `IlwUi` twins and their own Unformatted stories (the other Unformatted stories land with their components). Re-exports `LayoutTheme` and `LayoutWidth`. Also finishes R0d's `Page` and `BackToTop`: their twin stories, README React API and at-smoke rows. May split into layout, Button, Icon and `CopyButton`, then page chrome. |
 | R2 | Forms | `Field`, `RadioGroup`, `ChoiceChips` (and `ChipOption`). |
 | R3 | Islands and header | React `mountIslands`, `DarkModeToggle`, `Header`, the Islands stories, and `islands.test.ts` over both adapters. |
@@ -345,6 +347,9 @@ R2, R3, R4, R8 and R9 are independent: `Header` imports only `DarkModeToggle`, `
 | R7 | Select enhancement | `SelectCombobox`, `enhanceSelect`, `enhanceSelects`. |
 | R8 | Tabs | `Tabs`, `TabItem`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
 | R9 | Tooltip | `Tooltip` (C4). It merged before R0d, so it needs its own port. Re-exports `TooltipArrow` and `TooltipAttrs`. |
+| R10 | Accordion | `Accordion`, `AccordionPanel` (C2). Merged before R0d. Re-exports `AccordionAccent`. |
+| R11 | Alert | `Alert`, `dismissAlert`, `enhanceAlerts` (E1). Merged before R0d. Re-exports `AlertVariant`. |
+| R12 | Toggle group | `ToggleGroup` (E4). Merged before R0d. Re-exports `ToggleOption`. |
 
 Every port PR includes:
 

@@ -34,6 +34,7 @@
 -->
 <Story
   name="IlwUi"
+  tags={['framework-neutral']}
   parameters={{ styles: 'ilw-ui' }}
   play={async ({ args, canvas, canvasElement }) => {
     // Side By Side loads this story once per variant; the checks need them all.

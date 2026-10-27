@@ -1,8 +1,18 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
-/** Opens a story from the static Storybook build. */
-export async function openStory(page: Page, id: string): Promise<void> {
-  await page.goto(`/iframe.html?id=${id}&viewMode=story`);
+import { readPending } from '../twins.ts';
+
+const pending = readPending().stories;
+
+/**
+ * Opens a story from the static Storybook build, at `hash` if given. On the React build
+ * (the react-* projects) a story whose twin isn't written yet (tests/twins-pending/) skips
+ * the test, so every spec runs on both builds as their twins land.
+ */
+export async function openStory(page: Page, id: string, hash = ''): Promise<void> {
+  const list = pending.get(id);
+  test.skip(!!list && test.info().project.name.startsWith('react-'), `${id} has no React twin yet (tests/twins-pending/${list})`);
+  await page.goto(`/iframe.html?id=${id}&viewMode=story${hash}`);
   await page.locator('#storybook-root > *').first().waitFor();
 }
 

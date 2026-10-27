@@ -1,0 +1,6 @@
+# BackToTop (R1 page chrome): no React twin yet. The component is ported (R0d); these stories need Footer.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# stories/BackToTop.stories.svelte
+page-chrome-back-to-top--fixture
+page-chrome-back-to-top--long-page

@@ -1,8 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect } from 'storybook/test';
 
   import Page from '../../src/svelte/Page.svelte';
+  import * as plays from '../plays/page.ts';
   import SideBySide from './SideBySide.svelte';
 
   // No autodocs: a Docs page renders every story in one document, and the two
@@ -44,27 +44,7 @@
 <Story
   name="IlwUi"
   parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas, canvasElement }) => {
-    const shell = canvasElement.querySelector('.ilw-page')!;
-    await expect(shell).toHaveAttribute('id', 'top');
-    const skip = canvas.getByRole('link', { name: 'Skip to main content' });
-    const main = canvas.getByRole('main');
-    await expect(skip).toHaveAttribute('href', `#${main.id}`);
-    await expect(main).toHaveAttribute('id', 'main-content');
-    await expect(main).toHaveAttribute('tabindex', '-1');
-    // The skip link is the shell's first element, and the landmarks are its children.
-    await expect(shell.firstElementChild).toBe(skip);
-    await expect(canvas.getByRole('banner').parentElement).toBe(shell);
-    await expect(canvas.getByRole('contentinfo').parentElement).toBe(shell);
-    // Off screen until focused, then on screen.
-    await expect(skip.getBoundingClientRect().bottom).toBeLessThanOrEqual(0);
-    skip.focus();
-    await expect(skip.getBoundingClientRect().top).toBeGreaterThanOrEqual(0);
-    // Following it (Enter, then focus in main) is in tests/e2e/page-chrome.spec.ts:
-    // a fragment link would navigate the test runner's frame.
-    // The page colours come from the theme.
-    await expect(getComputedStyle(shell).backgroundColor).toBe('rgb(255, 255, 255)');
-  }}
+  play={plays.parity}
 >
   <Page format>
     {#snippet header()}<header><p style:margin="0">Header</p></header>{/snippet}

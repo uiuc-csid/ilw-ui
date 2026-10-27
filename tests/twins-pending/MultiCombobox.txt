@@ -1,0 +1,16 @@
+# MultiCombobox (R6 Zag): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export MultiCombobox
+
+# stories/MultiCombobox.stories.svelte
+multicombobox--basic
+multicombobox--in-a-form
+multicombobox--required
+multicombobox--async
+multicombobox--open
+multicombobox--disabled
+multicombobox--fixture
+multicombobox--fixture-preselected
+multicombobox--fixture-async

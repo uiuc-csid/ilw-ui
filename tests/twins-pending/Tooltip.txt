@@ -1,0 +1,17 @@
+# Tooltip (R9 tooltip): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Tooltip
+export TooltipArrow
+export TooltipAttrs
+
+# stories/Tooltip.stories.svelte
+overlays-tooltip--fixture
+overlays-tooltip--open
+overlays-tooltip--hover-and-focus
+overlays-tooltip--blue
+overlays-tooltip--placements
+
+# stories/parity/Tooltip.parity.stories.svelte
+parity-tooltip--ilw-ui

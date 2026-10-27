@@ -1,0 +1,13 @@
+# RadioGroup (R2 forms): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export RadioGroup
+export RadioOption
+
+# stories/RadioGroup.stories.svelte
+forms-radiogroup--default
+forms-radiogroup--error
+forms-radiogroup--error-dark
+forms-radiogroup--layouts
+forms-radiogroup--fixture

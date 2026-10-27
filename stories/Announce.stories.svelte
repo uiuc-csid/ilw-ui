@@ -8,7 +8,8 @@
     title: 'announce',
     parameters: { styles: 'ilw-ui' },
     // The Docs page lists every story with its review notes (the comment above it).
-    tags: ['autodocs'],
+    // framework-neutral: it calls only core's announce(), so the React build has no twin.
+    tags: ['autodocs', 'framework-neutral'],
   });
 
   // The regions live on <body>, outside the story's canvas.

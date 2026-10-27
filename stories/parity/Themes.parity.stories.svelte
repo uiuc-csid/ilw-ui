@@ -31,7 +31,7 @@
 
   **Review:** every swatch matches **Toolkit**: background, text, heading, link and control colours. The two gradients use the same stops.
 -->
-<Story name="IlwUi" parameters={{ styles: 'ilw-ui' }} />
+<Story name="IlwUi" tags={['framework-neutral']} parameters={{ styles: 'ilw-ui' }} />
 
 <!--
   Both sides, one row per theme, each in its own iframe.

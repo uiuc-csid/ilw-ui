@@ -39,6 +39,37 @@ test('Tab walks the breadcrumbs, the content and the footer in order, never stop
   }
 });
 
+test('the shell alone: skip link, main, its content and footer, back to top, then the skip link again', async ({ page }) => {
+  await openStory(page, 'page-chrome-page--shell-only');
+  const skip = page.getByRole('link', { name: 'Skip to main content' });
+  const main = page.getByRole('main');
+  const backToTop = page.getByRole('link', { name: 'Back to top' });
+
+  await press(page, 'Tab');
+  await expect(skip).toBeFocused();
+  await press(page, 'Enter');
+  await expect(main).toBeFocused();
+
+  // From main: its link, the footer's, then back to top, the shell's last child.
+  await press(page, 'Tab');
+  await expect(main.getByRole('link', { name: 'the staffing policy' })).toBeFocused();
+  await press(page, 'Tab');
+  await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Contact the department' })).toBeFocused();
+  await press(page, 'Tab');
+  await expect(backToTop).toBeFocused();
+  await expect(backToTop).toBeInViewport();
+
+  // Following it scrolls up and moves focus to the shell; the next Tab is the skip link. The page
+  // scrolls smoothly (back-to-top.css), so first end the scroll that focusing the footer started:
+  // still running, it can leave the scroll up short of the top.
+  await page.evaluate(() => window.scrollTo({ top: document.scrollingElement!.scrollHeight, behavior: 'instant' }));
+  await press(page, 'Enter');
+  await expect(page.locator('.ilw-page#top')).toBeFocused();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await press(page, 'Tab');
+  await expect(skip).toBeFocused();
+});
+
 test.describe('section nav', () => {
   test('Tab reaches a branch link, then its toggle; Enter and Space toggle it', async ({ page }) => {
     await openStory(page, 'page-chrome-section-nav--fixture');

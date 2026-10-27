@@ -1,0 +1,7 @@
+{
+  // The React side, checked by `tsc -p tsconfig.react.json` in `pnpm check`;
+  // svelte-check covers the rest (tsconfig.json).
+  "extends": "./tsconfig.json",
+  "include": ["src/core", "src/react", "stories/react", "stories/plays", ".storybook-react/*.ts", ".storybook-react/*.tsx"],
+  "exclude": []
+}

@@ -1,0 +1,13 @@
+# CopyButton (R1 layout, Button, Icon, CopyButton): no React twin yet. Needs Button and Icon.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export CopyButton
+
+# stories/CopyButton.stories.svelte
+copybutton--fixture
+copybutton--contract
+copybutton--copies
+copybutton--copied-state
+copybutton--denied
+copybutton--no-clipboard

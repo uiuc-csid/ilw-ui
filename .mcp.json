@@ -9,6 +9,10 @@
       "type": "http",
       "url": "http://localhost:6006/mcp"
     },
+    "storybook-react": {
+      "type": "http",
+      "url": "http://localhost:6008/mcp"
+    },
     "playwright": {
       "type": "stdio",
       "command": "pnpm",

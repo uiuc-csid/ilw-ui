@@ -1,0 +1,32 @@
+# DataTable (R5 data): no React twin yet. Needs SortableTh (R1).
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export createDataTable
+export DataTable
+export DataRows
+export TableSortTh
+export Pager
+export isPaged
+export setTableFilter
+export ilwPagerClasses
+export legacyPagerClasses
+export AnyDataTable
+export DataTableInstance
+export DataTableOptions
+export PagedDataTableInstance
+export PagerClasses
+
+# stories/DataTable.stories.svelte
+datatable--sortable
+datatable--keyed-rows
+datatable--filtered
+datatable--paged-legacy
+datatable--paged
+datatable--pager-classes
+datatable--fixture
+datatable--fixture-paged
+datatable--fixture-paged-legacy
+
+# stories/Unformatted.stories.svelte
+unformatted--data-table
