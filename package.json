@@ -5,7 +5,7 @@
   "description": "Accessible Svelte components that look and behave like the Illinois Web Toolkit",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.15.0",
   "exports": {
     "./core": {
       "types": "./src/core/index.ts",
@@ -35,31 +35,31 @@
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "@storybook/addon-a11y": "10.6.2",
-    "@storybook/addon-docs": "10.6.2",
-    "@storybook/addon-mcp": "10.6.2",
+    "@storybook/addon-a11y": "10.6.4",
+    "@storybook/addon-docs": "10.6.4",
+    "@storybook/addon-mcp": "10.6.4",
     "@storybook/addon-svelte-csf": "^5.1.5",
-    "@storybook/addon-vitest": "10.6.2",
-    "@storybook/svelte-vite": "10.6.2",
+    "@storybook/addon-vitest": "10.6.4",
+    "@storybook/svelte-vite": "10.6.4",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.19.2",
     "@vitest/browser": "5.0.5",
     "@vitest/browser-playwright": "5.0.5",
-    "chromatic": "18.12.2",
+    "chromatic": "18.13.3",
     "playwright": "1.64.1",
-    "storybook": "10.6.2",
+    "storybook": "10.6.4",
     "svelte": "^5.57.2",
     "svelte-check": "^4.7.6",
     "typescript": "^5.9.3",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vitest": "5.0.5"
   },
   "dependencies": {
     "@tanstack/svelte-table": "9.3.1",
     "@tanstack/table-core": "9.3.1",
-    "@zag-js/combobox": "1.44.0",
-    "@zag-js/svelte": "1.44.0",
+    "@zag-js/combobox": "1.46.0",
+    "@zag-js/svelte": "1.46.0",
     "phosphor-svelte": "3.1.1"
   }
 }
