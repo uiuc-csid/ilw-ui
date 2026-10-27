@@ -14,7 +14,7 @@ The first tagged release. Until now consumers pinned a commit. ta-manager pins `
   pnpm add @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1
   ```
 
-  This is needed even if the app imports none of them: `ilw-ui/svelte`'s index imports components that do, so Vite must resolve them. A Svelte app never installs React, and a React app will never install Svelte. The headless engines (`@zag-js/combobox`, `@tanstack/table-core`) stay ilw-ui's own dependencies.
+  This is needed even if the app imports none of them: `ilw-ui/svelte`'s index imports components that do, so Vite must resolve them. A Svelte app never installs React, and a React app never installs Svelte. The headless engines (`@zag-js/combobox`, `@tanstack/table-core`) stay ilw-ui's own dependencies.
 - **`Modal` is a native `<dialog>`** in place of the `ilw-modal` wrapper (C1, #31). Same `openModal`/`alert`/`confirm` API; the DOM contract changes:
 
   | Before | After |
@@ -29,6 +29,7 @@ The first tagged release. Until now consumers pinned a commit. ta-manager pins `
 
 ### Added
 
+- **`ilw-ui/react`**, the start of React 19 versions of every component (#72): `Page` and `BackToTop` so far, with the same markup and `styles.css` as their Svelte twins. Install the React peers listed in [Install and use](README.md#install-and-use). From now on every new component ships in both frameworks; the [React plan](docs/plans/2026-10-27-react-components.md) ports the rest.
 - Layout: `Content`, `Columns`, `Grid`, `Spacer` and the width classes (A5, #42).
 - `Icon`: Phosphor icons in place of `ilw-icon` (A6, #27).
 - Form styles: `forms.css`, `switch.css`, `Field` and `RadioGroup` (A7, #41).
@@ -40,6 +41,7 @@ The first tagged release. Until now consumers pinned a commit. ta-manager pins `
 
 - Zag 1.46.0 (#50).
 - Framework-neutral logic moved into internal `src/core/` modules, ready for `ilw-ui/react` (#67). `ilw-ui/core` and `ilw-ui/svelte` export the same names, and every component renders the same markup.
+- Every story's DOM is checked in under `stories/contracts/` and compared on every test run, for both frameworks (#71, #72). A change to a DOM contract now shows up as a diff to those files.
 
 ### Fixed
 
