@@ -1,8 +1,9 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect } from 'storybook/test';
 
   import { Columns, Content, Grid, Spacer } from '../../src/svelte/index.ts';
+  import * as plays from '../plays/layout.ts';
+  import { parityItems as items } from '../plays/layout.ts';
   import { attrs } from './attrs.ts';
   import SideBySide from './SideBySide.svelte';
 
@@ -11,8 +12,6 @@
   // No autodocs: a Docs page renders every story in one document, and the two
   // sides of a pair need different stylesheets.
   const { Story } = defineMeta({ title: 'Parity/Layout' });
-
-  const items = [1, 2, 3, 4, 5, 6];
 </script>
 
 <!--
@@ -53,15 +52,7 @@
 <Story
   name="IlwUi"
   parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvasElement }) => {
-    await expect(canvasElement.querySelectorAll('.ilw-content.ilw-format > .ilw-content-inner')).toHaveLength(4);
-    await expect(canvasElement.querySelectorAll('.ilw-spacer[aria-hidden="true"]')).toHaveLength(3);
-    const [split, sidebar] = canvasElement.querySelectorAll('.ilw-columns');
-    await expect(split).toHaveClass('ilw-2x1');
-    await expect(sidebar).toHaveClass('ilw-columns--sidebar-left');
-    await expect(sidebar).toHaveAttribute('theme', 'blue');
-    await expect(canvasElement.querySelectorAll('ul.ilw-grid > li')).toHaveLength(items.length);
-  }}
+  play={plays.parity}
 >
   <Content theme="gray"><h2>Programs</h2><p>The college offers <a href="#programs">programs of study</a>.</p></Content>
   <Content mode="introduction"><p><em>Discover your path.</em></p><p>No matter what path brought you here, we're glad you're here.</p></Content>

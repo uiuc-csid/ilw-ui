@@ -1,0 +1,10 @@
+# Layout widths (R1, after both halves): no React twin yet. These stories render Breadcrumbs and PageTitle
+# (R1 page chrome) with Content and Columns (R1 layout, Button, Icon), so they need both halves merged.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# stories/Layout.stories.svelte
+layout--widths
+layout--page-width
+
+# stories/parity/Width.parity.stories.svelte
+parity-width--ilw-ui

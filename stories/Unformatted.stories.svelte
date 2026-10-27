@@ -1,7 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import Envelope from 'phosphor-svelte/lib/Envelope';
-  import { expect } from 'storybook/test';
 
   import {
     Alert,
@@ -21,6 +20,7 @@
   import AccordionPanel from '../src/svelte/AccordionPanel.svelte';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
+  import * as plays from './plays/unformatted.ts';
   import { programs } from './section-nav-data.ts';
 
   // The Page shell without .ilw-format (`format: false`): a component that
@@ -29,16 +29,6 @@
     title: 'Unformatted',
     parameters: { styles: 'ilw-ui', format: false },
   });
-
-  /** Checks each element's text is in the brand sans font (Source Sans), not the browser default. */
-  async function brandSans(elements: Iterable<Element>) {
-    const all = [...elements];
-    await expect(all.length).toBeGreaterThan(0);
-    await expect(document.querySelector('.ilw-format')).toBeNull();
-    for (const el of all) {
-      await expect(getComputedStyle(el).fontFamily, `font of ${el.textContent?.trim().slice(0, 30)}`).toMatch(/^"?Source Sans/);
-    }
-  }
 </script>
 
 <!--
@@ -48,7 +38,7 @@
 
   **Review:** the labels look the same as on **Button → Sizes And Themes**.
 -->
-<Story name="Button" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-button'))}>
+<Story name="Button" play={plays.button}>
   <p><Button href="#unformatted">Link button</Button> <Button>Plain button</Button></p>
 </Story>
 
@@ -59,11 +49,7 @@
 
   **Review:** the same type as on **Forms → Field → Error**.
 -->
-<Story
-  name="Field"
-  play={({ canvasElement }) =>
-    brandSans(canvasElement.querySelectorAll('.ilw-input-entry label, .ilw-input-entry input, .ilw-input-description, .ilw-input-alert'))}
->
+<Story name="Field" play={plays.field}>
   <Field label="Email" description="We only use it to reply." error="Enter an email address.">
     {#snippet children(attrs)}<input type="email" name="email" {...attrs} />{/snippet}
   </Field>
@@ -76,10 +62,7 @@
 
   **Review:** the same type as on **Forms → ChoiceChips → Error**.
 -->
-<Story
-  name="ChoiceChips"
-  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-chips legend, .ilw-chip, .ilw-input-description, .ilw-input-alert'))}
->
+<Story name="ChoiceChips" play={plays.choiceChips}>
   <ChoiceChips
     legend="Country"
     name="country"
@@ -100,17 +83,7 @@
 
   **Review:** the envelope sits beside its line, sized to the text.
 -->
-<Story
-  name="Icon"
-  play={async ({ canvasElement }) => {
-    await expect(document.querySelector('.ilw-format')).toBeNull();
-    const row = canvasElement.querySelector<HTMLElement>('.ilw-icon-row')!;
-    const svg = row.querySelector('svg')!;
-    await expect(svg).toHaveClass('ilw-icon');
-    await expect(svg.getBoundingClientRect().height).toBeCloseTo(parseFloat(getComputedStyle(row).fontSize), 0);
-    await expect(getComputedStyle(svg).fill).toBe(getComputedStyle(row).color);
-  }}
->
+<Story name="Icon" play={plays.icon}>
   <div class="ilw-icon-row">
     <Icon icon={Envelope} />
     <p>Email the department office.</p>
@@ -124,15 +97,7 @@
 
   **Review:** matches **Parity/Header → IlwUi**.
 -->
-<Story
-  name="Header"
-  play={({ canvasElement }) =>
-    brandSans(
-      canvasElement.querySelectorAll(
-        '.ilw-header :is(.ilw-header-parent-unit, .ilw-header-site-name, .ilw-header-toggle, .ilw-header-links a, .ilw-header-search input, .ilw-header-search button, .ilw-header-nav a, .ilw-header-nav summary)',
-      ),
-    )}
->
+<Story name="Header" play={plays.header}>
   <Header
     siteName="Sample Site"
     siteHref="#home"
@@ -153,7 +118,7 @@
 
   **Review:** matches **Parity/Breadcrumbs → IlwUi**.
 -->
-<Story name="Breadcrumbs" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-breadcrumbs li > *'))}>
+<Story name="Breadcrumbs" play={plays.breadcrumbs}>
   <Breadcrumbs items={[{ label: 'Home', href: '#home' }]} current="Degree programs" />
 </Story>
 
@@ -164,10 +129,7 @@
 
   **Review:** matches **Parity/Pagination → IlwUi**, default theme.
 -->
-<Story
-  name="Pagination"
-  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-pagination li > *, .ilw-pagination-count'))}
->
+<Story name="Pagination" play={plays.pagination}>
   <Pagination page={1} pages={8} href={(p) => `#page-${p}`} />
 </Story>
 
@@ -178,7 +140,7 @@
 
   **Review:** matches **Parity/PageTitle → IlwUi**, default theme.
 -->
-<Story name="Page Title" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-page-title h1'))}>
+<Story name="Page Title" play={plays.pageTitle}>
   <PageTitle>Graduate Programs</PageTitle>
 </Story>
 
@@ -189,7 +151,7 @@
 
   **Review:** matches **Parity/SectionNav → IlwUi**.
 -->
-<Story name="Section Nav" play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-section-nav a'))}>
+<Story name="Section Nav" play={plays.sectionNav}>
   <div style:max-width="20rem">
     <SectionNav items={programs} expanded />
   </div>
@@ -202,12 +164,7 @@
 
   **Review:** matches **Parity/Footer → Site Name Only**.
 -->
-<Story
-  name="Footer"
-  parameters={{ shell: false }}
-  play={({ canvasElement }) =>
-    brandSans(canvasElement.querySelectorAll('.ilw-footer-site-name, .ilw-footer-campus h3, .ilw-footer-legal li'))}
->
+<Story name="Footer" parameters={{ shell: false }} play={plays.footer}>
   <Footer>
     {#snippet siteName()}Sample Site{/snippet}
   </Footer>
@@ -220,11 +177,7 @@
 
   **Review:** matches the striped table on **Parity/Table → IlwUi**.
 -->
-<Story
-  name="Table"
-  tags={['framework-neutral']}
-  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('table caption, table th, table td'))}
->
+<Story name="Table" tags={['framework-neutral']} play={plays.table}>
   <TableSample variant="stripe" />
 </Story>
 
@@ -235,11 +188,7 @@
 
   **Review:** matches **DataTable → Paged**.
 -->
-<Story
-  name="Data Table"
-  play={({ canvasElement }) =>
-    brandSans(canvasElement.querySelectorAll('.th-sort, table td, .ilw-pager-btn, .ilw-pager-count'))}
->
+<Story name="Data Table" play={plays.dataTable}>
   <DataTableDemo count={8} pageSize={3} />
 </Story>
 
@@ -250,10 +199,7 @@
 
   **Review:** matches **Components/ToggleGroup → Default**.
 -->
-<Story
-  name="Toggle Group"
-  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-toggle-group-label, .ilw-toggle-group button'))}
->
+<Story name="Toggle Group" play={plays.toggleGroup}>
   <ToggleGroup
     label="Degree"
     options={[
@@ -271,11 +217,7 @@
 
   **Review:** matches **Accordion → Fixture** and **Compact groups**, apart from the body's paragraph margins.
 -->
-<Story
-  name="Accordion"
-  play={({ canvasElement }) =>
-    brandSans(canvasElement.querySelectorAll('.ilw-accordion-buttons button, .ilw-accordion-heading, .ilw-accordion-body p'))}
->
+<Story name="Accordion" play={plays.accordion}>
   <Accordion buttons label="Library hours">
     <AccordionPanel heading="Main Library" open><p>Open 8 a.m. to midnight on weekdays.</p></AccordionPanel>
     <AccordionPanel heading="Grainger Engineering Library"><p>Open 24 hours during the semester.</p></AccordionPanel>
@@ -292,13 +234,7 @@
 
   **Review:** the same type and spacing as on **Components → Alert → Warning**.
 -->
-<Story
-  name="Alert"
-  play={async ({ canvasElement }) => {
-    await brandSans(canvasElement.querySelectorAll('.ilw-alert-title, .ilw-alert-body > p, .ilw-alert-actions .ilw-button'));
-    await expect(getComputedStyle(canvasElement.querySelector('.ilw-alert-title')!).marginTop).toBe('0px');
-  }}
->
+<Story name="Alert" play={plays.alert}>
   <Alert variant="warning" title="Applications close Friday at 5 p.m.">
     <p>Your application is missing a course preference.</p>
     {#snippet actions()}<Button href="#review">Review application</Button>{/snippet}
