@@ -42,7 +42,7 @@ ships. The frameworks take any later minor.
 | Framework | Peers to install |
 | --------- | ---------------- |
 | Svelte (`ilw-ui/svelte`) | `svelte` ^5.57, `@zag-js/svelte` 1.46.0, `@tanstack/svelte-table` 9.3.1, `phosphor-svelte` 3.1.1 |
-| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): a component's section shows its React API once it has one) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
+| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): the components with a React section below) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
 
 ```sh
 pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1

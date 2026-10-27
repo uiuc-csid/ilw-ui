@@ -15,19 +15,15 @@ import { describe, expect, it } from 'vitest';
 import * as react from '../../src/react/index.ts';
 import * as svelte from '../../src/svelte/index.ts';
 
-/**
- * Server markup without Svelte's hydration comments, React's image preload hints (a page's render
- * hoists them into <head>) and the whitespace between tags.
- */
-const markup = (html: string) =>
-  html
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<link rel="preload" as="image"[^>]*>/g, '')
-    .replace(/>\s+</g, '><')
-    .trim();
+/** Server markup without Svelte's hydration comments and the whitespace between tags. */
+const markup = (html: string) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+</g, '><').trim();
 
 /** A Svelte snippet of fixed markup, the twin of a JSX child. */
 const snippet = (html: string) => createRawSnippet(() => ({ render: () => html }));
+
+/** React's server markup without the image preload hints it writes before an `<img>` (a page's render hoists them into <head>). */
+const reactMarkup = (element: ReactElement) =>
+  renderToStaticMarkup(element).replace(/<link rel="preload" as="image"[^>]*>/g, '');
 
 /** A Svelte component's server markup, with its props type-checked. */
 const ssr = <Props extends Record<string, unknown>>(component: Component<Props>, props: Props) => () =>
@@ -273,6 +269,6 @@ const cases: Case[] = [
 
 describe('presentational components render on the server like their Svelte twins', () => {
   it.each(cases)('$name', ({ react: element, svelte: twin }) => {
-    expect(markup(renderToStaticMarkup(element))).toBe(markup(twin()));
+    expect(markup(reactMarkup(element))).toBe(markup(twin()));
   });
 });
