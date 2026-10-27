@@ -146,6 +146,16 @@ Status: **pending human run.**
 - [ ] Tabbing reads "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
 - [ ] On the first page (Pagination → Ends), "Previous" is read as text, not a link.
 
+## Tabs (stories: Tabs → Fixture, Automatic Fixture, No Script)
+
+Status: **pending human run.**
+
+- [ ] Tabbing into the list reads "Programs, tab list" (or similar), then "Degree Programs, tab, selected, 1 of 4".
+- [ ] In Fixture, the arrows move and announce each tab as "not selected"; Enter or Space selects it and the new state is announced. In Automatic Fixture each arrow selects.
+- [ ] Tab from the list reaches the panel, read as "Degree Programs, tab panel" (or similar), then its link.
+- [ ] Heading navigation (VoiceOver rotor, NVDA H) finds the open panel's hidden heading, and not the closed panels' headings.
+- [ ] In No Script, the three sections are read as level-3 headings with their text, and there is no tab list.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |
