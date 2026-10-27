@@ -75,6 +75,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
+| `tabs.css`       | `.ilw-tabs` headed sections and the tab list (C3)         |
 | `dark-mode-toggle.css` | `.ilw-dark-mode-toggle`'s layout; needs `switch.css` (B1) |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Combobox, Autocomplete, Pager |
 
@@ -1336,6 +1337,136 @@ reach its own toolbar) need `Modal`.
 `<form>`, with `.ilw-modal-body` before it); `h2[slot=title]` becomes
 `h2.ilw-modal-title`; the × button's name is "Close". The page no longer has
 `inert` set on `<body>`'s children: check inertness with `dialog:modal`.
+
+### `Tabs`, `enhanceTabs` and `.ilw-tabs`
+
+The replacement for `<ilw-tabs>`: APG tabs over a box of headed sections.
+The sections are the markup a server sends, and what a browser without script
+shows; `Tabs` (or `enhanceTabs`, on a server page) adds the tab list and turns
+the sections into tab panels. Styled by `tabs.css`.
+
+```svelte
+<script>
+  import { Tabs } from 'ilw-ui/svelte';
+
+  let selected = $state('degree');
+</script>
+
+{#snippet degree()}<p>Choose from more than 150 undergraduate majors.</p>{/snippet}
+{#snippet classroom()}<p>Small discussion sections and hands-on labs.</p>{/snippet}
+
+<h2 id="programs-heading">Programs</h2>
+<Tabs
+  labelledby="programs-heading"
+  tabs={[
+    { id: 'degree', label: 'Degree Programs', content: degree },
+    { id: 'classroom', label: 'Classroom Experience', content: classroom },
+  ]}
+  bind:selected
+/>
+```
+
+`Tabs` props: `tabs` (`{ id, label, content }[]`, `content` a snippet),
+`selected` (bindable panel id; the first tab when unset), `automatic`, `hash`,
+`horizontal`, `level` (the panels' heading level, default 3), `label` or
+`labelledby` (the tab list's name), `theme`, `width`, `id`, `class` and
+`onchange(id)`.
+
+DOM contract, as the server sends it (and `Tabs` renders before it mounts):
+
+```html
+<h2 id="programs-heading">Programs</h2>
+<div class="ilw-tabs" data-labelledby="programs-heading">   <!-- + theme="blue", .ilw-width-*, .ilw-tabs--horizontal -->
+  <div class="ilw-tabs-container">
+    <section class="ilw-tabs-panel" id="degree">
+      <h3 class="ilw-tabs-heading">Degree Programs</h3>
+      <p>Choose from more than 150 undergraduate majors.</p>
+    </section>
+    <section class="ilw-tabs-panel" id="classroom">
+      <h3 class="ilw-tabs-heading">Classroom Experience</h3>
+      <p>Small discussion sections and hands-on labs.</p>
+    </section>
+  </div>
+</div>
+```
+
+Once enhanced:
+
+```html
+<div class="ilw-tabs ilw-tabs--ready" data-labelledby="programs-heading">
+  <div class="ilw-tabs-container">
+    <div class="ilw-tabs-list" role="tablist" aria-labelledby="programs-heading" aria-orientation="vertical">
+      <button type="button" class="ilw-tabs-tab" role="tab" id="degree-tab" aria-controls="degree"
+              aria-selected="true" tabindex="0">Degree Programs</button>
+      <button type="button" class="ilw-tabs-tab" role="tab" id="classroom-tab" aria-controls="classroom"
+              aria-selected="false" tabindex="-1">Classroom Experience</button>
+    </div>
+    <section class="ilw-tabs-panel" id="degree" role="tabpanel" aria-labelledby="degree-tab" tabindex="0">…</section>
+    <section class="ilw-tabs-panel" id="classroom" role="tabpanel" aria-labelledby="classroom-tab" tabindex="0" hidden>…</section>
+  </div>
+</div>
+```
+
+- A tab's id is `<panel id>-tab`; its text is the panel's `.ilw-tabs-heading`.
+  The headings stay in the document, visually hidden, so heading navigation
+  still finds the open panel.
+- `aria-orientation` is `vertical` (the default column at the left) or
+  `horizontal` (`.ilw-tabs--horizontal`, a row over the panels). Under 800px
+  wide (a container query) both stack the tabs full width above the panel.
+- **Keys (APG):** Tab enters the list on the selected tab and leaves it for
+  the open panel. The arrows move focus to the previous or next tab, wrapping
+  at the ends (all four, in either orientation, since the list can stack);
+  Home and End go to the first and last. Enter, Space or a click selects. With
+  `automatic`, a tab is selected as soon as the arrows reach it.
+- **Hash links:** a URL fragment naming a panel, or anything inside one,
+  selects that tab, on load and on every `hashchange`, so an in-page link
+  `<a href="#classroom">` opens it. With `hash`, choosing a tab also writes
+  `#<panel id>` to the URL with `history.replaceState` (no history entry per
+  tab).
+- Destroying `Tabs`' tab list, or calling `enhanceTabs`' cleanup, puts the
+  sections back exactly as served.
+
+**Without Svelte:** write the markup above in a server template and enhance it
+from the page's script. Options are `data-*` attributes on `.ilw-tabs`:
+`data-label` or `data-labelledby`, `data-selected="<panel id>"`,
+`data-automatic`, `data-hash`. Each selection fires a bubbling
+`ilw-tabs-change` event with `detail.id`.
+
+```js
+import { enhanceAllTabs, enhanceTabs } from 'ilw-ui/svelte';
+import 'ilw-ui/styles.css';
+
+enhanceAllTabs(); // every .ilw-tabs in the document not yet enhanced
+document.addEventListener('ilw-tabs-change', (e) => console.log(e.detail.id));
+```
+
+```svelte
+<!-- Server-written markup inside a Svelte component; the cleanup restores the sections. -->
+<div class="ilw-tabs" {@attach enhanceTabs}>…</div>
+```
+
+`enhanceAllTabs(root?, selector?)` also removes the tab lists of boxes that
+have left the document, so it is safe to call after a fragment swap. A box
+already enhanced, or rendered by `Tabs`, is skipped.
+
+**Differences from `<ilw-tabs>`:**
+
+- Manual activation by default (APG): the arrows move focus, and Enter or
+  Space selects. Upstream selects on every arrow (`automatic` restores that).
+- The arrows wrap, and Home and End work; upstream stops at the ends and has
+  neither.
+- The panels are `tabpanel`s named by their tab, with `tabindex="0"`;
+  upstream's panels have no role or name.
+- Without script the content is readable as headed sections; upstream shows
+  nothing but unstyled buttons and every panel.
+- The tab list is generated from the panels' headings, not written by hand
+  (`slot="tabs"`). `default` becomes `selected` (`data-selected`).
+- Hash links are new.
+- Not carried over: `rounded` (not in upstream's docs; its colours aren't the
+  theme's) and upstream's mutation observer (call `enhanceAllTabs` again
+  after changing server markup; `Tabs` re-renders on its own).
+- Links in a panel take the text colour, as upstream (`color: unset`), except
+  while focused.
 
 ### `Combobox`
 
