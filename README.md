@@ -72,6 +72,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `page-title.css` | `.ilw-page-title` (B5)                                    |
 | `breadcrumbs.css`| `.ilw-breadcrumbs` (B4)                                   |
 | `pagination.css` | `.ilw-pagination` (C5)                                    |
+| `toggle-group.css` | `.ilw-toggle-group`, `.ilw-toggle-group-label`, pressed `.ilw-button`s (E4) |
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `alert.css`      | `.ilw-alert` and its parts, the variants' accents (E1); needs `icon.css` |
@@ -2097,6 +2098,95 @@ the same markup with `pagination.css` and no script:
   pass `href={(p) => pageHref(url, p - 1)}`.
 - Not yet: the toolkit's `width` and `padding`; they come with the layout
   utilities (A5).
+
+### `ToggleGroup` and `.ilw-toggle-group`
+
+Filter buttons with `aria-pressed` in a labelled group: pick one (single-select,
+the default) or any number (`multiple`). No toolkit equivalent; the buttons are
+`.ilw-button` buttons, so sizes and themes come from `button.css`. Styled by
+`toggle-group.css`. Server templates render the markup below and set
+`aria-pressed` in their own click handler.
+
+```svelte
+<script>
+  import { ToggleGroup } from 'ilw-ui/svelte';
+
+  let level = $state('all');
+  let terms = $state(['fa', 'sp']);
+</script>
+
+<h2>Courses needing TAs</h2>
+<ToggleGroup
+  label="Level"
+  options={[
+    { value: 'all', label: 'All' },
+    { value: '100', label: '100–299' },
+    { value: '300', label: '300–499' },
+  ]}
+  bind:value={level}
+/>
+<ToggleGroup
+  label="Offered"
+  multiple
+  options={[
+    { value: 'fa', label: 'Fall' },
+    { value: 'sp', label: 'Spring' },
+    { value: 'su', label: 'Summer', disabled: true },
+  ]}
+  bind:value={terms}
+  onchange={(v) => refilter(v)}
+/>
+<!-- the table these filter -->
+```
+
+**DOM contract** (consumers' tests select on it), for the Level group above
+with `id="level"`:
+
+```html
+<div class="ilw-toggle-group" id="level" role="group" aria-labelledby="level-label">
+  <span class="ilw-toggle-group-label" id="level-label">Level</span>
+  <button type="button" class="ilw-button ilw-button-small" aria-pressed="true" data-value="all">All</button>
+  <button type="button" class="ilw-button ilw-button-small" aria-pressed="false" data-value="100">100–299</button>
+  <button type="button" class="ilw-button ilw-button-small" aria-pressed="false" data-value="300">300–499</button>
+</div>
+```
+
+- Without `label`, there is no label span: pass `aria-label` or
+  `aria-labelledby` (other attributes pass through to the group). Every group
+  needs one of the three.
+- `aria-pressed` is always `"true"` or `"false"`; select a pressed option with
+  `[data-value="300"][aria-pressed="true"]`. A disabled option is a native
+  `disabled` button.
+- Ids default to `ilw-toggle-group-<n>`; the label's is `<id>-label`.
+
+| Prop        | Type                                                   |                                                                       |
+| ----------- | ------------------------------------------------------ | --------------------------------------------------------------------- |
+| `options`   | `ToggleOption[]`: `{ value, label, disabled? }`        | the buttons, in order                                                 |
+| `label`     | `string \| Snippet`                                    | visible label that names the group                                    |
+| `multiple`  | `boolean`                                              | default `false`                                                       |
+| `value`     | `string \| undefined`; with `multiple`, `string[]`     | bindable; a `multiple` value is kept in option order                  |
+| `allowNone` | `boolean` (single only)                                | pressing the pressed button releases it (`value` becomes `undefined`) |
+| `onchange`  | `(value) => void`                                      | called when the user changes the value, not when it stays the same    |
+| `size`      | `'small' \| 'medium' \| 'large'`                       | default `'small'`                                                     |
+| `theme`     | `ButtonTheme`                                          | on each button, as on `Button`                                        |
+| `id`, `class` | `string`                                             | on the group                                                          |
+
+TypeScript can't infer `onchange`'s parameter through the single/multiple
+union; annotate it (`(v: string | undefined) => …`).
+
+**Behaviour:** every enabled button is its own Tab stop (no roving focus: the
+rows are short, and Tab reaches every option); Space and Enter toggle the
+focused button natively, and focus stays on it. In single mode pressing
+another button moves the press; pressing the pressed one does nothing unless
+`allowNone`. When the choice is a form field, use `RadioGroup` instead.
+
+**Pressed look:** filled (the button's hover colours) and a check mark before
+the label (`::before` with empty alternative text, so screen readers read only
+the pressed state), so it isn't colour alone and survives forced colours.
+Within a group, hover only underlines, so an unpressed button never looks
+pressed; a focused pressed button keeps its fill under the two-tone ring. With
+a filled theme (`blue-solid`, …) the fill inverts: pressed buttons turn light,
+and the check mark carries the state.
 
 ### `Accordion`, `AccordionPanel` and `.ilw-accordion`
 

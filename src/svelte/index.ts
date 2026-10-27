@@ -57,6 +57,7 @@ export {
 export { default as BackToTop } from './BackToTop.svelte';
 export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';
 export { default as Tooltip, type TooltipArrow, type TooltipAttrs } from './Tooltip.svelte';
+export { default as ToggleGroup, type ToggleOption } from './ToggleGroup.svelte';
 export { default as Accordion } from './Accordion.svelte';
 export { default as AccordionPanel } from './AccordionPanel.svelte';
 export { type AccordionAccent } from './accordion.ts';
