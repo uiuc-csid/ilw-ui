@@ -4,6 +4,8 @@
   import { expect } from 'storybook/test';
 
   import { Alert, Breadcrumbs, Button, ChoiceChips, Field, Footer, Header, Icon, PageTitle, Pagination, SectionNav } from '../src/svelte/index.ts';
+  import Accordion from '../src/svelte/Accordion.svelte';
+  import AccordionPanel from '../src/svelte/AccordionPanel.svelte';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
   import { programs } from './section-nav-data.ts';
@@ -225,6 +227,27 @@
     brandSans(canvasElement.querySelectorAll('.th-sort, table td, .ilw-pager-btn, .ilw-pager-count'))}
 >
   <DataTableDemo count={8} pageSize={3} />
+</Story>
+
+<!--
+  `Accordion` with its buttons and one open panel, then a compact one, outside `.ilw-format`.
+
+  **Why:** the play function checks the buttons, the headings and the panel body are in Source Sans without the prose styles.
+
+  **Review:** matches **Accordion → Fixture** and **Compact groups**, apart from the body's paragraph margins.
+-->
+<Story
+  name="Accordion"
+  play={({ canvasElement }) =>
+    brandSans(canvasElement.querySelectorAll('.ilw-accordion-buttons button, .ilw-accordion-heading, .ilw-accordion-body p'))}
+>
+  <Accordion buttons label="Library hours">
+    <AccordionPanel heading="Main Library" open><p>Open 8 a.m. to midnight on weekdays.</p></AccordionPanel>
+    <AccordionPanel heading="Grainger Engineering Library"><p>Open 24 hours during the semester.</p></AccordionPanel>
+  </Accordion>
+  <Accordion compact buttons label="Branch hours">
+    <AccordionPanel heading="Funk ACES Library"><p>Open 8 a.m. to 10 p.m.</p></AccordionPanel>
+  </Accordion>
 </Story>
 
 <!--
