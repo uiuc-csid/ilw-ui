@@ -43,7 +43,7 @@
 <!--
   `Tabs` with the same content, styled by ilw-ui's `tabs.css` only.
 
-  **Why:** the play function checks the computed look against upstream's values: the 350px tab list, the box's 60/30/75px padding and 60px gap, the tabs' 19px bold type, `.75em 1em` padding and 2px rules, the selected tab's orange and the unselected tabs' white on blue text.
+  **Why:** the play function checks the computed look against upstream's values: the 350px tab list (full width under 800px, as in the Side By Side frames), the box's 60/30/75px padding and 60px gap, the tabs' 19px bold type, `.75em 1em` padding and 2px rules, the selected tab's orange and the unselected tabs' white on blue text.
 
   **Review:** matches **Toolkit**. The panel keeps its own heading in the outline (visually hidden), where upstream's README duplicates it visibly.
 -->
@@ -56,7 +56,11 @@
     const box = getComputedStyle(container);
     await expect([box.paddingTop, box.paddingRight, box.paddingBottom, box.paddingLeft]).toEqual(['60px', '30px', '75px', '30px']);
     await expect(box.columnGap).toBe('60px');
-    await expect(canvas.getByRole('tablist').getBoundingClientRect().width).toBe(350);
+    // The 350px column needs a box over 800px wide; in a narrower frame (Side
+    // By Side) the list stacks full width, as upstream's does.
+    const list = canvas.getByRole('tablist').getBoundingClientRect().width;
+    const inner = container.clientWidth - 60;
+    await expect(list).toBe(canvasElement.querySelector('.ilw-tabs')!.clientWidth > 800 ? 350 : inner);
 
     const [selected, other] = canvas.getAllByRole('tab').map((t) => getComputedStyle(t));
     await expect(selected.fontSize).toBe('19px');
