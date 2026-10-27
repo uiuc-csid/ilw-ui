@@ -13,6 +13,8 @@
   import type { LayoutTheme } from '../src/svelte/layout.ts';
   import Tooltip, { type TooltipArrow } from '../src/svelte/Tooltip.svelte';
 
+  import './TooltipDemo.css';
+
   let {
     open = false,
     // The toolbar is at the page's left edge, so its bubbles start at the button and extend right.
@@ -28,7 +30,7 @@
 <h1>CS 225: Grade book</h1>
 <p>Grades for every section you assist with. Use the toolbar to take a copy of the table.</p>
 
-<div class="toolbar">
+<div class="tooltip-demo-toolbar">
   <Tooltip id="tip-export" text="Download the grades as a CSV file" {arrow} {theme} bind:open={first}>
     {#snippet children(attrs)}
       <button type="button" class="ilw-button" {...attrs}><Icon icon={DownloadSimple} alt="Export" /></button>
@@ -59,12 +61,3 @@
     </Tooltip>
   </p>
 </div>
-
-<style>
-  /* Room above the toolbar for the bubbles, as the page heading's margin gives on a real page. */
-  .toolbar {
-    display: flex;
-    gap: 0.5rem;
-    margin-block: 4rem 2rem;
-  }
-</style>

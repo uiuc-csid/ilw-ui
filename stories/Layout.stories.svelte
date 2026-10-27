@@ -4,6 +4,8 @@
 
   import { Breadcrumbs, Columns, type ColumnsMode, Content, Grid, Page, PageTitle, Spacer } from '../src/svelte/index.ts';
 
+  import './Layout.stories.css';
+
   // A5: content, columns, grid, spacer and the width classes, ilw-ui's styles only.
   const { Story } = defineMeta({ title: 'Layout', parameters: { styles: 'ilw-ui' } });
 
@@ -134,14 +136,14 @@
     <h3>{mode}</h3>
     <Columns {mode}>
       {#each mode === '1x1' || mode === '1x2x1' ? [1, 2, 3, 4].slice(0, mode === '1x1' ? 3 : 4) : [1, 2] as n (n)}
-        <div class="sample">Column {n}</div>
+        <div class="layout-sample">Column {n}</div>
       {/each}
     </Columns>
   {/each}
   <h3>1x1, reversed</h3>
   <Columns reverse>
-    <div class="sample">First in the DOM</div>
-    <div class="sample">Second in the DOM</div>
+    <div class="layout-sample">First in the DOM</div>
+    <div class="layout-sample">Second in the DOM</div>
   </Columns>
 </Story>
 
@@ -165,14 +167,14 @@
 >
   <div class="ilw-container" style:max-width="600px">
     <Columns>
-      <div class="sample">In 600 px</div>
-      <div class="sample">Stacked</div>
+      <div class="layout-sample">In 600 px</div>
+      <div class="layout-sample">Stacked</div>
     </Columns>
   </div>
   <div class="ilw-container" style:max-width="900px">
     <Columns>
-      <div class="sample">In 900 px</div>
-      <div class="sample">Side by side on a wide window</div>
+      <div class="layout-sample">In 900 px</div>
+      <div class="layout-sample">Side by side on a wide window</div>
     </Columns>
   </div>
   <Columns theme="blue" gap="40px">
@@ -205,13 +207,13 @@
 >
   <Grid itemWidth="120px">
     {#each [1, 2, 3, 4, 5, 6, 7, 8] as n (n)}
-      <li><div class="sample">Item {n}{n === 3 ? ', with more text that wraps onto a second line' : ''}</div></li>
+      <li><div class="layout-sample">Item {n}{n === 3 ? ', with more text that wraps onto a second line' : ''}</div></li>
     {/each}
   </Grid>
   <Spacer />
   <Grid as="div" gap="20px">
-    <div class="sample">A</div>
-    <div class="sample">B</div>
+    <div class="layout-sample">A</div>
+    <div class="layout-sample">B</div>
   </Grid>
 </Story>
 
@@ -308,19 +310,8 @@
     <PageTitle width="page">Page title, width page</PageTitle>
     <Content width="page"><p>Content at the page margin.</p></Content>
     <Grid width="page" itemWidth="120px">
-      <li><div class="sample">Grid</div></li>
-      <li><div class="sample">at the margin</div></li>
+      <li><div class="layout-sample">Grid</div></li>
+      <li><div class="layout-sample">at the margin</div></li>
     </Grid>
   </Page>
 </Story>
-
-<style>
-  .sample {
-    box-sizing: border-box;
-    height: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--ilw-color--border, currentcolor);
-    background: var(--ilw-color--background);
-    color: var(--ilw-color--text);
-  }
-</style>

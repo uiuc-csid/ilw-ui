@@ -1,0 +1,10 @@
+/* Story-only styles for ThemeGrid.svelte, in a plain file so a React twin can share them. */
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}

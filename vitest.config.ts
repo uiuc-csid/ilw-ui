@@ -25,7 +25,14 @@ export default mergeConfig(
           extends: true,
           plugins: [storybookTest({ configDir: `${dirname}.storybook` })],
           test: {
-            name: 'storybook',
+            name: 'storybook-svelte',
+            // Writes or checks each story's DOM contract, stories/contracts/<story-id>.html.
+            setupFiles: ['tests/contracts/setup.ts'],
+            provide: { contractsDir: `${dirname}stories/contracts` },
+            // The contract files are written through the browser server's API, which
+            // @storybook/addon-vitest makes read-only unless this says otherwise. It
+            // listens on localhost only.
+            api: { allowWrite: true },
             browser: {
               enabled: true,
               headless: true,

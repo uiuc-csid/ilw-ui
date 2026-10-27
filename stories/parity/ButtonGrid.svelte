@@ -1,4 +1,6 @@
 <script module lang="ts">
+  import './ButtonGrid.css';
+
   // The theme classes the toolkit's button rules name ('none': no class, the
   // blue outline button). -2 and -inverse aren't button themes upstream. Ids
   // double as story args, which allow only letters, digits, '-' and '_'.
@@ -17,9 +19,9 @@
 
 <!-- One row per theme: every size, then both disabled forms. Rendered with the
      Button component on both sides of the pair: its markup is the toolkit's. -->
-<div class="grid">
+<div class="button-grid">
   {#each themes as t (t)}
-    <div class="row" data-theme-id={t}>
+    <div class="button-grid-row" data-theme-id={t}>
       <Button theme={themeOf(t)} size="small" href="#{t}-small">Small</Button>
       <Button theme={themeOf(t)}>Medium</Button>
       <Button theme={themeOf(t)} size="large" href="#{t}-large">Large</Button>
@@ -42,17 +44,3 @@
     </ul>
   {/if}
 </div>
-
-<style>
-  .grid {
-    padding: 0.5rem 1rem;
-    background: var(--ilw-color--background);
-  }
-
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0 1rem;
-  }
-</style>

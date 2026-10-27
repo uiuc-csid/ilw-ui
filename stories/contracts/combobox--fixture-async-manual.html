@@ -1,0 +1,21 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <form>
+      <p><label>Before <input name="before" type="text" .value=""></label></p>
+      <p>
+        <label for="person-cb" id="person-label">Person</label> <span class="combobox" data-part="root" data-scope="combobox" id="combobox:person-cb"><input aria-autocomplete="list" aria-controls="person-popup" aria-expanded="false" autocapitalize="none" autocomplete="off" autocorrect="off" class="combobox-input" data-part="input" data-scope="combobox" data-state="closed" id="person-cb" placeholder="Select faculty or type NetID" role="combobox" spellcheck="false" type="text" .value="">
+          <div aria-labelledby="person-label" class="combobox-popup" data-empty data-part="content" data-scope="combobox" data-state="closed" hidden id="person-popup" role="listbox" tabindex="-1"></div>
+          <span class="ilw-visually-hidden" role="status"></span>
+        </span>
+      </p>
+      <p><label>After <input name="after" type="text" .value=""></label></p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <p>Selected: <output data-testid="selected"></output> (<span data-testid="changes">0</span> changes, <span data-testid="submits">0</span> submits)</p>
+    <aside aria-labelledby="stub-server-heading" class="stub-server">
+      <h2 id="stub-server-heading">Test server (story only)</h2>
+      <p>No searches waiting.</p>
+    </aside>
+  </main>
+</div>

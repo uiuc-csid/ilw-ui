@@ -6,6 +6,8 @@
   import { attrs } from './attrs.ts';
   import SideBySide from './SideBySide.svelte';
 
+  import './Layout.parity.stories.css';
+
   // No autodocs: a Docs page renders every story in one document, and the two
   // sides of a pair need different stylesheets.
   const { Story } = defineMeta({ title: 'Parity/Layout' });
@@ -27,8 +29,8 @@
   <ilw-content {@attach attrs({ mode: 'inset', theme: 'blue' })}><h2>Apply today</h2><p>An inset normalises its headings.</p></ilw-content>
   <ilw-spacer height="30px"></ilw-spacer>
   <ilw-columns mode="2x1" gap="20px" padding="0">
-    <div class="sample">Two thirds</div>
-    <div class="sample">One third</div>
+    <div class="layout-parity-sample">Two thirds</div>
+    <div class="layout-parity-sample">One third</div>
   </ilw-columns>
   <ilw-spacer></ilw-spacer>
   <ilw-columns mode="sidebar-left" padding="0" {@attach attrs({ theme: 'blue' })}>
@@ -37,7 +39,7 @@
   </ilw-columns>
   <ilw-spacer></ilw-spacer>
   <ilw-grid innerwidth="180px" padding="0">
-    {#each items as n (n)}<div class="sample">Item {n}</div>{/each}
+    {#each items as n (n)}<div class="layout-parity-sample">Item {n}</div>{/each}
   </ilw-grid>
 </Story>
 
@@ -67,8 +69,8 @@
   <Content mode="inset" theme="blue"><h2>Apply today</h2><p>An inset normalises its headings.</p></Content>
   <Spacer height="30px" />
   <Columns mode="2x1">
-    <div class="sample">Two thirds</div>
-    <div class="sample">One third</div>
+    <div class="layout-parity-sample">Two thirds</div>
+    <div class="layout-parity-sample">One third</div>
   </Columns>
   <Spacer />
   <Columns mode="sidebar-left" theme="blue">
@@ -77,7 +79,7 @@
   </Columns>
   <Spacer />
   <Grid itemWidth="180px">
-    {#each items as n (n)}<li><div class="sample">Item {n}</div></li>{/each}
+    {#each items as n (n)}<li><div class="layout-parity-sample">Item {n}</div></li>{/each}
   </Grid>
 </Story>
 
@@ -93,12 +95,3 @@
     <SideBySide pair="parity-layout" theme={String(context.globals.theme ?? 'light')} height={1300} />
   {/snippet}
 </Story>
-
-<style>
-  .sample {
-    box-sizing: border-box;
-    height: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--ilw-color--border, currentcolor);
-  }
-</style>

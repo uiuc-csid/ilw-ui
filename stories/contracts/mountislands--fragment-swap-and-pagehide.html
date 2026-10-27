@@ -1,0 +1,13 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <div id="islands">
+      <div data-ilw-island="counter" data-ilw-mounted data-props="{&quot;label&quot;:&quot;Inline props&quot;,&quot;start&quot;:2}"><button class="island-counter" type="button">Inline props: 2</button></div>
+      <div data-ilw-island="counter" data-ilw-mounted data-props-id="island-props"><button class="island-counter" type="button">From json_script: 5</button></div>
+      <div data-ilw-island="counter" data-props="{&quot;label&quot;: oops}"></div>
+      <div data-ilw-island="missing"></div>
+      <script id="island-props" type="application/json">{"label":"From json_script","start":5}</script>
+      <div data-ilw-island="counter" data-ilw-mounted data-props="{&quot;label&quot;:&quot;Swapped in&quot;}"><button class="island-counter" type="button">Swapped in: 0</button></div>
+    </div>
+  </main>
+</div>

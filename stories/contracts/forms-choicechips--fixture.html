@@ -1,0 +1,37 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <fieldset class="ilw-chips" id="fixture-country" role="radiogroup">
+      <legend>Country</legend>
+      <label class="ilw-chip">
+        <input name="country" type="radio" .value="us">
+        United States</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="ca">
+        Canada</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="mx">
+        Mexico</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="in">
+        India</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="cn">
+        China</label><label class="ilw-chip">
+        <input disabled name="country" type="radio" .value="kr">
+        South Korea</label>
+    </fieldset>
+    <p>Chosen: <output data-testid="chosen">none</output> (changes: <span data-testid="changes"></span>)</p>
+    <fieldset class="ilw-chips" id="fixture-schemas">
+      <legend>Tables to export</legend>
+      <label class="ilw-chip">
+        <input name="schemas" type="checkbox" .value="course">
+        Courses</label><label class="ilw-chip">
+        <input name="schemas" type="checkbox" .value="section">
+        Sections</label><label class="ilw-chip">
+        <input name="schemas" type="checkbox" .value="instructor">
+        Instructors</label>
+    </fieldset>
+    <p>Chosen: <output data-testid="chosen">none</output> (changes: <span data-testid="changes"></span>)</p>
+    <div class="ilw-input-entry">
+      <label for="fixture-after">File name</label>
+      <input id="fixture-after" name="filename" type="text" .value="">
+    </div>
+  </main>
+</div>

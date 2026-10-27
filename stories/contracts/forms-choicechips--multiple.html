@@ -1,0 +1,23 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h2>Export data</h2>
+    <p>Download the term's records as a zip of CSV files.</p>
+    <fieldset aria-describedby="ilw-chips-{1}-description" class="ilw-chips" id="ilw-chips-{1}">
+      <legend>Tables to export</legend>
+      <label class="ilw-chip">
+        <input name="schemas" type="checkbox" .value="course">
+        Courses</label><label class="ilw-chip">
+        <input name="schemas" type="checkbox" .checked .value="section">
+        Sections</label><label class="ilw-chip">
+        <input name="schemas" type="checkbox" .value="instructor">
+        Instructors</label><label class="ilw-chip">
+        <input name="schemas" type="checkbox" .value="enrollment">
+        Enrollments</label><label class="ilw-chip">
+        <input disabled name="schemas" type="checkbox" .value="grade">
+        Grades</label>
+      <p class="ilw-input-description" id="ilw-chips-{1}-description">Each table is a separate CSV file in the download.</p>
+    </fieldset>
+    <p>Chosen: <output data-testid="chosen">section</output> (changes: <span data-testid="changes">[course section], [section]</span>)</p>
+  </main>
+</div>

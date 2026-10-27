@@ -1,0 +1,52 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <form>
+      <p><label>Before <input name="before" type="text" .value=""></label></p>
+      <p>
+        <label for="person-cb" id="person-label">Person</label>
+        <select data-combobox data-comboboxed="1" id="person" style="display: none" .value="">
+          <option value .selected>— Select a person or type a NetID —</option>
+          <optgroup label="Faculty">
+            <option data-search="Avery Adams aadams" value="aadams">Avery Adams (aadams)</option>
+            <option data-search="Blake Brown bbrown" value="bbrown">Blake Brown (bbrown)</option>
+          </optgroup>
+          <optgroup label="Students">
+            <option data-search="Casey Clark cclark" value="cclark">Casey Clark (cclark)</option>
+            <option data-search="Drew Adams dadams" value="dadams">Drew Adams (dadams)</option>
+          </optgroup>
+        </select>
+        <span class="combobox cb-block" data-part="root" data-scope="combobox" id="combobox:person-cb">
+          <input aria-autocomplete="list" aria-controls="person-popup" aria-expanded="false" autocapitalize="none" autocomplete="off" autocorrect="off" class="combobox-input" data-part="input" data-scope="combobox" data-state="closed" id="person-cb" placeholder="— Select a person or type a NetID —" role="combobox" spellcheck="false" type="text" .value="">
+          <div aria-labelledby="person-label" class="combobox-popup" data-part="content" data-scope="combobox" data-state="closed" hidden id="person-popup" role="listbox" tabindex="-1">
+            <div aria-labelledby="person-popup-group-Faculty-label" data-part="item-group" data-scope="combobox" id="person-popup-group-Faculty" role="group">
+              <div class="combobox-group-label" data-part="item-group-label" data-scope="combobox" id="person-popup-group-Faculty-label" role="presentation">Faculty</div>
+              <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="aadams" id="person-popup-opt-aadams" role="option" tabindex="-1">Avery Adams (aadams)</div>
+              <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="bbrown" id="person-popup-opt-bbrown" role="option" tabindex="-1">Blake Brown (bbrown)</div>
+            </div>
+            <div aria-labelledby="person-popup-group-Students-label" data-part="item-group" data-scope="combobox" id="person-popup-group-Students" role="group">
+              <div class="combobox-group-label" data-part="item-group-label" data-scope="combobox" id="person-popup-group-Students-label" role="presentation">Students</div>
+              <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="cclark" id="person-popup-opt-cclark" role="option" tabindex="-1">Casey Clark (cclark)</div>
+              <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="dadams" id="person-popup-opt-dadams" role="option" tabindex="-1">Drew Adams (dadams)</div>
+            </div>
+          </div>
+        </span>
+      </p>
+      <p><label>After <input name="after" type="text" .value=""></label></p>
+      <p>
+        <select class="row-add" data-combobox data-comboboxed="1" style="display: none" .value="">
+          <option value .selected>+ add…</option>
+          <option value="7">Prof X (px)</option>
+        </select>
+        <span class="combobox cb-block" data-part="root" data-scope="combobox" id="combobox:combobox-{1}">
+          <input aria-autocomplete="list" aria-controls="combobox-{1}-popup" aria-expanded="false" autocapitalize="none" autocomplete="off" autocorrect="off" class="combobox-input" data-part="input" data-scope="combobox" data-state="closed" id="combobox-{1}" placeholder="+ add…" role="combobox" spellcheck="false" type="text" .value="">
+          <div aria-label="+ add…" class="combobox-popup" data-part="content" data-scope="combobox" data-state="closed" hidden id="combobox-{1}-popup" role="listbox" tabindex="-1">
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="7" id="combobox-{1}-popup-opt-7" role="option" tabindex="-1">Prof X (px)</div>
+          </div>
+        </span>
+      </p>
+      <p><button type="button">Add</button></p>
+    </form>
+    <p>Changes: <output data-testid="changes"></output></p>
+  </main>
+</div>

@@ -1,0 +1,65 @@
+<div class="ilw-page" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <div class="ilw-format">
+      <h1>Assignments</h1>
+      <p class="intro">Choose a person, then review the roster below.</p>
+      <form>
+        <p><label>Before <input name="before" type="text" .value=""></label></p>
+        <p>
+          <label for="person-cb" id="person-label">Person</label> <span class="combobox" data-part="root" data-scope="combobox" id="combobox:person-cb"><input aria-autocomplete="list" aria-controls="person-popup" aria-expanded="true" autocapitalize="none" autocomplete="off" autocorrect="off" class="combobox-input" data-part="input" data-scope="combobox" data-state="open" id="person-cb" placeholder="Select a person" role="combobox" spellcheck="false" type="text" .value="ad">
+            <div aria-labelledby="person-label" class="combobox-popup" data-part="content" data-placement="bottom" data-scope="combobox" data-side="bottom" data-state="open" id="person-popup" role="listbox" style="--layer-index: 0; --nested-layer-count: 0; pointer-events: auto" tabindex="-1">
+              <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="aadams" id="person-popup-opt-aadams" role="option" tabindex="-1">Avery Adams</div>
+              <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="dadams" id="person-popup-opt-dadams" role="option" tabindex="-1">Drew Adams</div>
+            </div>
+          </span>
+        </p>
+        <p><label>After <input name="after" type="text" .value=""></label></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
+      <p>Selected: <output data-testid="selected"></output> (<span data-testid="changes">0</span> changes, <span data-testid="submits">0</span> submits)</p>
+      <h2>Roster</h2>
+      <p><label>Filter <input type="search" .value=""></label> <button type="button">Rename r1</button></p>
+      <nav aria-label="Pages, top" class="ilw-pager">
+        <span class="ilw-pager-label">Page:</span>
+        <button aria-label="Previous page" class="ilw-pager-btn" data-page="0" disabled type="button">‹</button>
+        <button aria-current="page" class="ilw-pager-btn on" data-page="1" type="button">1</button>
+        <button class="ilw-pager-btn" data-page="2" type="button">2</button>
+        <button class="ilw-pager-btn" data-page="3" type="button">3</button>
+        <button aria-label="Next page" class="ilw-pager-btn" data-page="2" type="button">›</button>
+        <span class="ilw-pager-count">1–3 of 8</span>
+      </nav>
+      <table aria-label="People" class="ilw-table">
+        <thead>
+          <tr>
+            <th aria-sort="ascending" scope="col"><button class="th-sort on" data-sort="name" type="button">Name<span aria-hidden="true">&nbsp;↑</span></button></th>
+            <th scope="col"><button class="th-sort" data-sort="group" type="button">Group</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-id="r0">
+            <td>Person 00</td>
+            <td>0</td>
+          </tr>
+          <tr data-id="r2">
+            <td>Person 01</td>
+            <td>2</td>
+          </tr>
+          <tr data-id="r4">
+            <td>Person 02</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+      <nav aria-label="Pages, bottom" class="ilw-pager">
+        <span class="ilw-pager-label">Page:</span>
+        <button aria-label="Previous page" class="ilw-pager-btn" data-page="0" disabled type="button">‹</button>
+        <button aria-current="page" class="ilw-pager-btn on" data-page="1" type="button">1</button>
+        <button class="ilw-pager-btn" data-page="2" type="button">2</button>
+        <button class="ilw-pager-btn" data-page="3" type="button">3</button>
+        <button aria-label="Next page" class="ilw-pager-btn" data-page="2" type="button">›</button>
+        <span class="ilw-pager-count">1–3 of 8</span>
+      </nav>
+    </div>
+  </main>
+</div>

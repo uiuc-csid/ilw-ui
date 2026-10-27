@@ -6,6 +6,8 @@
   import { attrs } from './attrs.ts';
   import SideBySide from './SideBySide.svelte';
 
+  import './Tooltip.parity.stories.css';
+
   // No autodocs: a Docs page renders every story in one document, and the two
   // sides of a pair need different stylesheets.
   const { Story } = defineMeta({ title: 'Parity/Tooltip' });
@@ -32,7 +34,7 @@
   **Review:** compare with **IlwUi** or **Side By Side**: a white and a blue bubble above their buttons, each with a downward arrow at its centre.
 -->
 <Story name="Toolkit" parameters={{ styles: 'toolkit', a11y: { test: 'off' } }} play={({ canvasElement }) => openToolkit(canvasElement)}>
-  <div class="row">
+  <div class="tooltip-parity-row">
     <ilw-tooltip>
       <button type="button" class="ilw-button" slot="trigger">Export</button>
       <span slot="content">{plain}</span>
@@ -76,7 +78,7 @@
     }
   }}
 >
-  <div class="row">
+  <div class="tooltip-parity-row">
     <Tooltip text={plain} open>
       {#snippet children(attrs)}<button type="button" class="ilw-button" {...attrs}>Export</button>{/snippet}
     </Tooltip>
@@ -98,12 +100,3 @@
     <SideBySide pair="parity-tooltip" theme={String(context.globals.theme ?? 'light')} height={220} />
   {/snippet}
 </Story>
-
-<style>
-  /* Room above for the bubbles, and apart so the two don't overlap. */
-  .row {
-    display: flex;
-    gap: 10rem;
-    padding: 6rem 6rem 1rem;
-  }
-</style>

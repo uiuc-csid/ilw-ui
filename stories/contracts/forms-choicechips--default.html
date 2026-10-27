@@ -1,0 +1,25 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h2>Filter applicants</h2>
+    <p>Narrow the applicant list to one home country. The list updates when you choose.</p>
+    <fieldset aria-describedby="ilw-chips-{1}-description" class="ilw-chips" id="ilw-chips-{1}" role="radiogroup">
+      <legend>Country</legend>
+      <label class="ilw-chip">
+        <input name="country" type="radio" .value="us">
+        United States</label><label class="ilw-chip">
+        <input name="country" type="radio" .checked .value="ca">
+        Canada</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="mx">
+        Mexico</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="in">
+        India</label><label class="ilw-chip">
+        <input name="country" type="radio" .value="cn">
+        China</label><label class="ilw-chip">
+        <input disabled name="country" type="radio" .value="kr">
+        South Korea</label>
+      <p class="ilw-input-description" id="ilw-chips-{1}-description">Students whose home country is any of these are counted.</p>
+    </fieldset>
+    <p>Chosen: <output data-testid="chosen">ca</output> (changes: <span data-testid="changes">ca</span>)</p>
+  </main>
+</div>

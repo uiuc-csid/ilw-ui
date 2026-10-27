@@ -1,0 +1,46 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h1>CS 225: Grade book</h1>
+    <p>Grades for every section you assist with. Use the toolbar to take a copy of the table.</p>
+    <div class="tooltip-demo-toolbar">
+      <span class="ilw-tooltip ilw-tooltip--top-left ilw-tooltip--anchored">
+        <button aria-describedby="tip-export" class="ilw-button" type="button">
+          <svg aria-label="Export" class="ilw-icon" fill="currentColor" height="1em" role="img" viewBox="0 0 256 256" width="1em" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="none" height="256" width="256"></rect>
+            <path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,168,96H136V32a8,8,0,0,0-16,0V96H88a8,8,0,0,0-5.66,13.66Z"></path>
+          </svg>
+        </button>
+        <span class="ilw-tooltip-bubble" id="tip-export" popover="manual" role="tooltip" theme="blue">Download the grades as a CSV file</span>
+      </span>
+      <span class="ilw-tooltip ilw-tooltip--top-left ilw-tooltip--anchored">
+        <button aria-describedby="tip-print" class="ilw-button" type="button">
+          <svg aria-label="Print" class="ilw-icon" fill="currentColor" height="1em" role="img" viewBox="0 0 256 256" width="1em" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="none" height="256" width="256"></rect>
+            <path d="M240,96v80a8,8,0,0,1-8,8H200v32a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V184H24a8,8,0,0,1-8-8V96c0-13.23,11.36-24,25.33-24H56V40a8,8,0,0,1,8-8H192a8,8,0,0,1,8,8V72h14.67C228.64,72,240,82.77,240,96ZM72,72H184V48H72Zm112,88H72v48H184Zm16-44a12,12,0,1,0-12,12A12,12,0,0,0,200,116Z"></path>
+          </svg>
+        </button>
+        <span class="ilw-tooltip-bubble" id="tip-print" popover="manual" role="tooltip" theme="blue">Print the table on one page per section</span>
+      </span>
+      <span class="ilw-tooltip ilw-tooltip--top-left ilw-tooltip--anchored">
+        <button aria-describedby="tip-share" class="ilw-button" type="button">
+          <svg aria-label="Share" class="ilw-icon" fill="currentColor" height="1em" role="img" viewBox="0 0 256 256" width="1em" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="none" height="256" width="256"></rect>
+            <path d="M212,200a36,36,0,1,1-69.85-12.25l-53-34.05a36,36,0,1,1,0-51.4l53-34a36.09,36.09,0,1,1,8.67,13.45l-53,34.05a36,36,0,0,1,0,24.5l53,34.05A36,36,0,0,1,212,200Z"></path>
+          </svg>
+        </button>
+        <span class="ilw-tooltip-bubble" id="tip-share" popover="manual" role="tooltip" theme="blue"><strong>Instructors only.</strong> Other TAs see the link but can't open it.</span>
+      </span>
+    </div>
+    <div class="ilw-input-entry">
+      <label for="drop-lowest">Drop the lowest quizzes</label>
+      <input id="drop-lowest" min="0" type="number" .value="2">
+      <p class="ilw-input-description">
+        How many quiz scores to ignore per student. <span class="ilw-tooltip ilw-tooltip--right ilw-tooltip--anchored">
+          <a aria-describedby="tip-quiz" href="#quizzes">Which scores?</a>
+          <span class="ilw-tooltip-bubble" id="tip-quiz" popover="manual" role="tooltip">Only quizzes count; exams and labs are always kept.</span>
+        </span>
+      </p>
+    </div>
+  </main>
+</div>

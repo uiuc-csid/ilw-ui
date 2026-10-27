@@ -1,0 +1,8 @@
+/* Story-only styles for Tooltip.parity.stories.svelte, in a plain file so a React twin can share them. */
+
+/* Room above for the bubbles, and apart so the two don't overlap. */
+.tooltip-parity-row {
+  display: flex;
+  gap: 10rem;
+  padding: 6rem 6rem 1rem;
+}

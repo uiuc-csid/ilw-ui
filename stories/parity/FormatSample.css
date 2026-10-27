@@ -1,0 +1,6 @@
+/* Story-only styles for FormatSample.svelte, in a plain file so a React twin can share them. */
+
+/* Story-only: room around the sample, so a painted .ilw-format background shows. */
+.format-sample {
+  padding: 0.5rem 1rem 1.5rem;
+}

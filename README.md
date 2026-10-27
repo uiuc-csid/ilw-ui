@@ -2420,6 +2420,19 @@ A node Vitest project also covers `core/` and the guard below, and
 `tests/unit/tokens.test.ts` checks `tokens.css` against the vendored
 `toolkit.css`: every palette colour and every theme rule.
 
+**DOM contract snapshots.** After each story's render and `play` function, the
+story tests normalize its DOM (`tests/contracts/normalize.ts`) and compare it
+with `stories/contracts/<story-id>.html`: the canvas, plus any modal, popover or
+live region it added to `<body>`. Chromium and WebKit compare against the same
+file, so these files are the checked-in DOM contract, and a change to one is a
+contract change. The normalizer drops what differs between equal markup
+(comments, whitespace beside block-level boxes, attribute order, Svelte's
+scoping classes, generated id numbers) and keeps what doesn't (a missing space
+between inline elements, a lost `&nbsp;`). New stories write their file on the
+first local run; CI only compares. Rewrite them deliberately with
+`pnpm vitest run --project storybook-svelte -u`, then run once more without
+`-u` to check both browsers agree.
+
 **Story descriptions.** Every story has a comment above it, shown as its
 description on the Docs page: a one-line summary, **Why:** (what is under test:
 what the play function checks, or which spec the story backs) and **Review:**
@@ -2450,6 +2463,10 @@ pnpm test             # unit + story tests (layers 1 and 3)
 pnpm build-storybook
 pnpm test:e2e         # layer 2, against storybook-static/
 ```
+
+The Vitest projects are `unit` and `storybook-svelte`; the Playwright projects
+are `svelte-chromium` and `svelte-webkit`. The Playwright specs serve
+`storybook-static/` on port 6007, or on `ILW_E2E_PORT` when it's set.
 
 `mise run test` runs the last three in order. `pnpm storybook` starts the
 workbench on <http://localhost:6006>.
@@ -2484,13 +2501,16 @@ change before merging. It can also be run by hand from the Actions tab.
 
 ## The import rule
 
-`src/` imports only `svelte`, `@zag-js/*`, `@tanstack/table-core`,
-`@tanstack/svelte-table` and `phosphor-svelte/lib/*` (each family pinned
-exactly, in lockstep; `phosphor-svelte` itself for types only) and its own
-files, and uses no HTML sinks
-(`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
-`eval`, `new Function`). `tests/unit/guard.test.ts` enforces this and reports
-each violation as file:line.
+Each part of `src/` has its own import allow-list. `src/svelte/` imports only
+`svelte`, `@zag-js/*`, `@tanstack/table-core`, `@tanstack/svelte-table` and
+`phosphor-svelte/lib/*` (each family pinned exactly, in lockstep;
+`phosphor-svelte` itself for types only); `src/core/` only
+`@tanstack/table-core`. Relative imports stay in the file's own folder,
+`src/core/` or `src/styles/`. Nothing in `src/` uses an HTML sink
+(`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`,
+`dangerouslySetInnerHTML`, `document.write`, `eval`, `new Function`).
+`tests/unit/guard.test.ts` enforces this and reports each violation as
+file:line.
 
 ## Known issues
 

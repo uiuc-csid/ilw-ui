@@ -1,4 +1,6 @@
 <script lang="ts">
+  import './SideBySide.css';
+
   type Row = { label: string; args?: Record<string, string> };
 
   let {
@@ -71,37 +73,12 @@
 <!-- Each side is its own document, so toolkit.css and ilw-ui's styles.css
      (same class names) never meet. For people; tests use the pair stories. -->
 <div class="side-by-side" {@attach holdFocusIn}>
-  <div class="head">Toolkit</div>
-  <div class="head">ilw-ui</div>
+  <div class="side-by-side-head">Toolkit</div>
+  <div class="side-by-side-head">ilw-ui</div>
   {#each rows as row (row.label)}
-    <div class="label">{row.label}</div>
+    <div class="side-by-side-label">{row.label}</div>
     {#each ['toolkit', 'ilw-ui'] as const as side (side)}
       <iframe title="{row.label}, {side}" src={src(side, row)} {height} loading="lazy"></iframe>
     {/each}
   {/each}
 </div>
-
-<style>
-  .side-by-side {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.25rem 1rem;
-    font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
-  }
-
-  .head {
-    font-weight: 700;
-    font-size: 1.25rem;
-  }
-
-  .label {
-    grid-column: 1 / -1;
-    margin-top: 0.75rem;
-    font-weight: 700;
-  }
-
-  iframe {
-    width: 100%;
-    border: 1px solid var(--il-storm-60, #8e9090);
-  }
-</style>

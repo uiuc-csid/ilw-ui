@@ -1,0 +1,16 @@
+/* Story-only styles for Icon.parity.stories.svelte, in a plain file so a React twin can share them. */
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.5rem 1rem;
+  padding: 0;
+  list-style: none;
+  font-size: 1.25rem;
+}
+.icon-grid li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 1.25rem;
+}

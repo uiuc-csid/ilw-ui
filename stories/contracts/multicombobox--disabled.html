@@ -1,0 +1,47 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h2>Post a research opportunity</h2>
+    <p>Undergraduates see the opportunity with its mentors' names. Add every faculty member who will supervise.</p>
+    <form>
+      <p><label>Title <input name="title" type="text" .value="Soil microbiome survey"></label></p>
+      <p>
+        <label for="mentors-cb" id="mentors-label">Faculty mentors</label><br> <span class="combobox combobox-multi" data-part="root" data-scope="combobox" id="combobox:mentors-cb">
+          <ul aria-labelledby="mentors-label" class="combobox-tokens">
+            <li class="combobox-token" data-value="aadams">
+              <span class="combobox-token-label">Avery Adams</span>
+              <button aria-label="Remove Avery Adams" class="combobox-token-remove" disabled type="button">
+                <span aria-hidden="true">×</span>
+              </button>
+            </li>
+            <li class="combobox-token" data-value="bbrown">
+              <span class="combobox-token-label">Blake Brown</span>
+              <button aria-label="Remove Blake Brown" class="combobox-token-remove" disabled type="button">
+                <span aria-hidden="true">×</span>
+              </button>
+            </li>
+          </ul>
+          <input aria-autocomplete="list" aria-controls="mentors-popup" aria-expanded="false" autocapitalize="none" autocomplete="off" autocorrect="off" class="combobox-input" data-part="input" data-scope="combobox" data-state="closed" disabled id="mentors-cb" placeholder="Type a name or NetID" role="combobox" spellcheck="false" type="text" .value="">
+          <div aria-labelledby="mentors-label" aria-multiselectable="true" class="combobox-popup" data-part="content" data-scope="combobox" data-state="closed" hidden id="mentors-popup" role="listbox" tabindex="-1">
+            <div aria-labelledby="mentors-popup-group-Crop%20Sciences-label" data-part="item-group" data-scope="combobox" id="mentors-popup-group-Crop%20Sciences" role="group">
+              <div class="combobox-group-label" data-part="item-group-label" data-scope="combobox" id="mentors-popup-group-Crop%20Sciences-label" role="presentation">Crop Sciences</div>
+              <div aria-disabled="true" aria-selected="true" data-disabled data-part="item" data-scope="combobox" data-state="checked" data-value="aadams" id="mentors-popup-opt-aadams" role="option" tabindex="-1">Avery Adams</div>
+              <div aria-disabled="true" aria-selected="true" data-disabled data-part="item" data-scope="combobox" data-state="checked" data-value="bbrown" id="mentors-popup-opt-bbrown" role="option" tabindex="-1">Blake Brown</div>
+            </div>
+            <div aria-labelledby="mentors-popup-group-Microbiology-label" data-part="item-group" data-scope="combobox" id="mentors-popup-group-Microbiology" role="group">
+              <div class="combobox-group-label" data-part="item-group-label" data-scope="combobox" id="mentors-popup-group-Microbiology-label" role="presentation">Microbiology</div>
+              <div aria-disabled="true" data-disabled data-part="item" data-scope="combobox" data-state="unchecked" data-value="cclark" id="mentors-popup-opt-cclark" role="option" tabindex="-1">Casey Clark</div>
+              <div aria-disabled="true" data-disabled data-part="item" data-scope="combobox" data-state="unchecked" data-value="dadams" id="mentors-popup-opt-dadams" role="option" tabindex="-1">Drew Adams</div>
+            </div>
+          </div>
+          <span class="ilw-visually-hidden" role="status"></span>
+          <input name="mentors" type="hidden" .value="aadams">
+          <input name="mentors" type="hidden" .value="bbrown">
+        </span>
+      </p>
+      <p><label>Notes <input name="notes" type="text" .value=""></label></p>
+      <p><button type="submit">Post opportunity</button></p>
+    </form>
+    <p>Selected: <output data-testid="selected">aadams bbrown</output> (<span data-testid="changes">0</span> changes). Posted: <output data-testid="posted"></output></p>
+  </main>
+</div>

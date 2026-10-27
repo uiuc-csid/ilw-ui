@@ -1,0 +1,8 @@
+/* Story-only styles for TooltipDemo.svelte, in a plain file so a React twin can share them. */
+
+/* Room above the toolbar for the bubbles, as the page heading's margin gives on a real page. */
+.tooltip-demo-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-block: 4rem 2rem;
+}

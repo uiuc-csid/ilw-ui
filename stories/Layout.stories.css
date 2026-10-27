@@ -1,0 +1,10 @@
+/* Story-only styles for Layout.stories.svelte, in a plain file so a React twin can share them. */
+
+.layout-sample {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--ilw-color--border, currentcolor);
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}

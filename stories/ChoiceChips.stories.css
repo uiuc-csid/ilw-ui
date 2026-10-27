@@ -1,0 +1,14 @@
+/* Story-only styles for ChoiceChips.stories.svelte, in a plain file so a React twin can share them. */
+
+.chips-surfaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* The theme only sets properties; paint the surface so the chips sit on it. */
+.chips-surface {
+  padding: 0 1.5rem;
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+}
