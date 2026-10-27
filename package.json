@@ -1,6 +1,6 @@
 {
   "name": "ilw-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Accessible Svelte components that look and behave like the Illinois Web Toolkit",
   "license": "MIT",
@@ -31,9 +31,47 @@
     "chromatic": "chromatic"
   },
   "peerDependencies": {
+    "@phosphor-icons/react": "2.1.10",
+    "@tanstack/react-table": "9.3.1",
+    "@tanstack/svelte-table": "9.3.1",
+    "@zag-js/react": "1.46.0",
+    "@zag-js/svelte": "1.46.0",
+    "phosphor-svelte": "3.1.1",
+    "react": "^19.3",
+    "react-dom": "^19.3",
     "svelte": "^5.57"
   },
+  "peerDependenciesMeta": {
+    "@phosphor-icons/react": {
+      "optional": true
+    },
+    "@tanstack/react-table": {
+      "optional": true
+    },
+    "@tanstack/svelte-table": {
+      "optional": true
+    },
+    "@zag-js/react": {
+      "optional": true
+    },
+    "@zag-js/svelte": {
+      "optional": true
+    },
+    "phosphor-svelte": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@phosphor-icons/react": "2.1.10",
     "@playwright/test": "1.64.1",
     "@storybook/addon-a11y": "10.6.4",
     "@storybook/addon-docs": "10.6.4",
@@ -42,12 +80,19 @@
     "@storybook/addon-vitest": "10.6.4",
     "@storybook/svelte-vite": "10.6.4",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tanstack/react-table": "9.3.1",
+    "@tanstack/svelte-table": "9.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.19.2",
     "@vitest/browser": "5.0.5",
     "@vitest/browser-playwright": "5.0.5",
+    "@zag-js/react": "1.46.0",
+    "@zag-js/svelte": "1.46.0",
     "chromatic": "18.13.3",
+    "phosphor-svelte": "3.1.1",
     "playwright": "1.64.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "storybook": "10.6.4",
     "svelte": "^5.57.2",
     "svelte-check": "^4.7.6",
@@ -56,10 +101,7 @@
     "vitest": "5.0.5"
   },
   "dependencies": {
-    "@tanstack/svelte-table": "9.3.1",
     "@tanstack/table-core": "9.3.1",
-    "@zag-js/combobox": "1.46.0",
-    "@zag-js/svelte": "1.46.0",
-    "phosphor-svelte": "3.1.1"
+    "@zag-js/combobox": "1.46.0"
   }
 }
