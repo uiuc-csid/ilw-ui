@@ -1,0 +1,20 @@
+# Field (R2 forms): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Field
+export FieldAttrs
+
+# stories/Field.stories.svelte
+forms-field--default
+forms-field--required
+forms-field--error
+forms-field--error-dark
+forms-field--compact
+forms-field--checkbox-and-switch
+forms-field--select-textarea-and-ids
+forms-field--markup
+forms-field--fixture
+
+# stories/Unformatted.stories.svelte
+unformatted--field

@@ -6,7 +6,9 @@ screen reader *announces* things sensibly, so a person runs this checklist with
 and after any change to a component's markup.
 
 Run it against `pnpm storybook` (open each story in its own tab via "Open canvas
-in new tab"), then add a row to the log below.
+in new tab"), then add a row to the log below. A component's React twin gets its
+own run, against `pnpm storybook:react` (the same story names), logged with
+Framework "React".
 
 ## SortableTh (story: SortableTh → Table)
 
@@ -189,5 +191,5 @@ Status: **pending human run.**
 
 ## Results log
 
-| Date | Tester | AT + browser (versions) | Component(s) | Result / notes |
-| ---- | ------ | ----------------------- | ------------ | -------------- |
+| Date | Tester | Framework | AT + browser (versions) | Component(s) | Result / notes |
+| ---- | ------ | --------- | ----------------------- | ------------ | -------------- |

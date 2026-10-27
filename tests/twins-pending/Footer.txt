@@ -1,0 +1,13 @@
+# Footer (R1 page chrome): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Footer
+
+# stories/Unformatted.stories.svelte
+unformatted--footer
+
+# stories/parity/Footer.parity.stories.svelte
+parity-footer--ilw-ui
+parity-footer--site-name-only
+parity-footer--campus-override

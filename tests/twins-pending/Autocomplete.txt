@@ -1,0 +1,28 @@
+# Autocomplete (R6 Zag): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Autocomplete
+export AsyncSource
+
+# stories/Autocomplete.stories.svelte
+autocomplete--basic
+autocomplete--free-text
+autocomplete--tab-takes-the-highlight
+autocomplete--window-switch
+autocomplete--empty-text
+autocomplete--many
+autocomplete--prefilled
+autocomplete--input-attributes
+autocomplete--live-region
+autocomplete--disabled
+autocomplete--invalid
+autocomplete--block
+autocomplete--open
+autocomplete--open-empty
+autocomplete--fixture
+autocomplete--fixture-empty-text
+autocomplete--async
+autocomplete--async-empty
+autocomplete--async-error
+autocomplete--fixture-async

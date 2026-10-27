@@ -42,7 +42,7 @@ ships. The frameworks take any later minor.
 | Framework | Peers to install |
 | --------- | ---------------- |
 | Svelte (`ilw-ui/svelte`) | `svelte` ^5.57, `@zag-js/svelte` 1.46.0, `@tanstack/svelte-table` 9.3.1, `phosphor-svelte` 3.1.1 |
-| React (`ilw-ui/react`, [planned](docs/plans/2026-10-27-react-components.md)) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
+| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): `Page` and `BackToTop` so far) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
 
 ```sh
 pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1
@@ -52,8 +52,9 @@ pnpm doesn't install optional peers for you. A missing one fails the build:
 Vite can't resolve the import. Pass icons to `Icon` from the same
 `phosphor-svelte`.
 
-**Next.js** (once `ilw-ui/react` ships): the package is `.tsx` source, so list
-it in `transpilePackages: ['ilw-ui']` in `next.config.js`.
+**React:** the package is `.tsx` source, so your Vite build needs
+`@vitejs/plugin-react` (Vite compiles `.tsx` inside `node_modules` too). With
+**Next.js**, list it in `transpilePackages: ['ilw-ui']` in `next.config.js`.
 
 ```js
 import { Autocomplete, Combobox, MultiCombobox, enhanceSelect, enhanceSelects, SortableTh, openModal, alert, confirm } from 'ilw-ui/svelte';
@@ -2422,12 +2423,15 @@ DOM contract (`data-state` is `idle`, `copied` or `failed`):
 ## Tests
 
 Accessibility is proven by tests. Each component has three layers, all driven by
-its Storybook stories, on Chromium and WebKit:
+its Storybook stories, on Chromium and WebKit, in both frameworks: the Svelte
+stories (`.storybook/`) and their React twins (`.storybook-react/`,
+`stories/react/`, rendered inside `<StrictMode>`), which have the same story ids
+and share their play functions (`stories/plays/`).
 
 1. **DOM contract + ARIA:** story `play` functions, run as Vitest browser tests by
    `@storybook/addon-vitest`.
 2. **Keyboard + focus (APG):** Playwright specs in `tests/e2e/` press real keys in
-   the static Storybook build and assert after every step that focus never falls
+   both static Storybook builds and assert after every step that focus never falls
    to `<body>`. They use stories with no `play` function, since Storybook runs
    `play` whenever a story loads.
 3. **axe:** `@storybook/addon-a11y` with `test: 'error'` (WCAG 2.0/2.1 A and AA)
@@ -2437,11 +2441,17 @@ its Storybook stories, on Chromium and WebKit:
 A node Vitest project also covers `core/` and the guard below, and
 `tests/unit/tokens.test.ts` checks `tokens.css` against the vendored
 `toolkit.css`: every palette colour and every theme rule.
+`tests/unit/react-ssr.test.ts` imports both adapters in node (so no module
+touches the DOM at its top level) and checks each React presentational
+component's server markup against its Svelte twin's.
+`tests/unit/twins.test.ts` checks every Svelte story has a React twin with the
+same title, name, tags and description, and that `ilw-ui/react` exports what
+`ilw-ui/svelte` does; what isn't ported yet is listed in `tests/twins-pending/`.
 
 **DOM contract snapshots.** After each story's render and `play` function, the
 story tests normalize its DOM (`tests/contracts/normalize.ts`) and compare it
 with `stories/contracts/<story-id>.html`: the canvas, plus any modal, popover or
-live region it added to `<body>`. Chromium and WebKit compare against the same
+live region it added to `<body>`. Both browsers and both frameworks compare against the same
 file, so these files are the checked-in DOM contract, and a change to one is a
 contract change. The normalizer drops what differs between equal markup
 (comments, whitespace beside block-level boxes, attribute order, Svelte's
@@ -2476,18 +2486,24 @@ System, which removes it).
 
 ```bash
 pnpm install
-pnpm check            # svelte-check, fails on warnings
-pnpm test             # unit + story tests (layers 1 and 3)
+pnpm check                  # svelte-check (fails on warnings), tsc -p tsconfig.react.json, eslint
+pnpm test                   # unit + story tests, both frameworks (layers 1 and 3)
 pnpm build-storybook
-pnpm test:e2e         # layer 2, against storybook-static/
+pnpm build-storybook:react
+pnpm test:e2e               # layer 2, against storybook-static/ and storybook-static-react/
+pnpm compare-index          # the React build's story ids = the Svelte build's, minus no-twin and pending
 ```
 
-The Vitest projects are `unit` and `storybook-svelte`; the Playwright projects
-are `svelte-chromium` and `svelte-webkit`. The Playwright specs serve
-`storybook-static/` on port 6007, or on `ILW_E2E_PORT` when it's set.
+The Vitest projects are `unit`, `storybook-svelte` and `storybook-react`; the
+Playwright projects are `svelte-chromium`, `svelte-webkit`, `react-chromium` and
+`react-webkit`. The Playwright specs serve `storybook-static/` on port 6007 and
+`storybook-static-react/` on 6009, or on `ILW_E2E_PORT` and
+`ILW_E2E_REACT_PORT` when they're set; `ILW_FW=svelte` or `react` serves (and
+tests) one build only.
 
-`mise run test` runs the last three in order. `pnpm storybook` starts the
-workbench on <http://localhost:6006>.
+`mise run test` runs the last five in order. `pnpm storybook` starts the Svelte
+workbench on <http://localhost:6006>, `pnpm storybook:react` the React one on
+<http://localhost:6008>.
 
 Every push publishes Storybook to [Chromatic](https://www.chromatic.com/) for
 visual review (`.github/workflows/chromatic.yml`, the official
@@ -2522,8 +2538,11 @@ change before merging. It can also be run by hand from the Actions tab.
 Each part of `src/` has its own import allow-list. `src/svelte/` imports only
 `svelte`, `@zag-js/*`, `@tanstack/table-core`, `@tanstack/svelte-table` and
 `phosphor-svelte/lib/*` (each family pinned exactly, in lockstep;
-`phosphor-svelte` itself for types only); `src/core/` only
-`@tanstack/table-core`. Relative imports stay in the file's own folder,
+`phosphor-svelte` itself for types only); `src/react/` only `react`,
+`react/jsx-runtime`, `react-dom`, `react-dom/client`, `@zag-js/*`,
+`@tanstack/table-core`, `@tanstack/react-table` and
+`@phosphor-icons/react/dist/ssr/*` (`@phosphor-icons/react` itself for types
+only); `src/core/` only `@tanstack/table-core`. Relative imports stay in the file's own folder,
 `src/core/` or `src/styles/`. Nothing in `src/` uses an HTML sink
 (`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`,
 `dangerouslySetInnerHTML`, `document.write`, `eval`, `new Function`).

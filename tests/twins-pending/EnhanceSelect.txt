@@ -1,0 +1,14 @@
+# EnhanceSelect (R7 select enhancement): no React twin yet. Needs Combobox (R6).
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export enhanceSelect
+export enhanceSelects
+
+# stories/EnhanceSelect.stories.svelte
+enhanceselect--contract
+enhanceselect--commit
+enhanceselect--page-code
+enhanceselect--attachment
+enhanceselect--open
+enhanceselect--fixture

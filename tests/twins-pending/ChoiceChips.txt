@@ -1,0 +1,17 @@
+# ChoiceChips (R2 forms): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export ChoiceChips
+export ChipOption
+
+# stories/ChoiceChips.stories.svelte
+forms-choicechips--default
+forms-choicechips--multiple
+forms-choicechips--error
+forms-choicechips--dark
+forms-choicechips--themes
+forms-choicechips--fixture
+
+# stories/Unformatted.stories.svelte
+unformatted--choice-chips

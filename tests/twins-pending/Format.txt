@@ -1,0 +1,5 @@
+# Format (R6 Zag): no React twin yet. "Components inside" renders the DataTable (R5) and Combobox (R6) demos.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# stories/Format.stories.svelte
+format--components-inside

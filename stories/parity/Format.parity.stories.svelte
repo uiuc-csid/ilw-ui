@@ -25,7 +25,7 @@
 
   **Review:** headings, paragraphs and lists line up with **Toolkit** (same sizes, same spacing). The Graduate College link ends in the link icon. Tab to a link: it gets the light-blue focus background and an outline.
 -->
-<Story name="IlwUi" parameters={{ styles: 'ilw-ui' }} />
+<Story name="IlwUi" tags={['framework-neutral']} parameters={{ styles: 'ilw-ui' }} />
 
 <!--
   Both sides, each in its own iframe.

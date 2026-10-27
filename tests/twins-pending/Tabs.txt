@@ -1,0 +1,26 @@
+# Tabs (R8 tabs): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Tabs
+export TabItem
+export enhanceTabs
+export enhanceAllTabs
+
+# stories/Tabs.stories.svelte
+tabs--fixture
+tabs--automatic-fixture
+tabs--default
+tabs--selected
+tabs--horizontal
+tabs--narrow
+tabs--hash
+tabs--hash-fixture
+tabs--enhanced-markup
+tabs--enhanced-then-restored
+tabs--no-script
+tabs--dark
+tabs--blue-theme
+
+# stories/parity/Tabs.parity.stories.svelte
+parity-tabs--ilw-ui

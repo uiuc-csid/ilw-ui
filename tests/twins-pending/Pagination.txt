@@ -1,0 +1,17 @@
+# Pagination (R1 page chrome): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Pagination
+
+# stories/Pagination.stories.svelte
+pagination--fixture
+pagination--ends
+pagination--links
+pagination--themes
+
+# stories/Unformatted.stories.svelte
+unformatted--pagination
+
+# stories/parity/Pagination.parity.stories.svelte
+parity-pagination--ilw-ui

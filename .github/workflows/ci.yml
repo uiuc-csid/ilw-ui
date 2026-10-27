@@ -26,9 +26,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      # Vitest projects unit, storybook-svelte and storybook-react.
       - run: pnpm test --reporter=default --reporter=junit --outputFile.junit=test-results/unit-junit.xml
       - run: pnpm build-storybook
+      - run: pnpm build-storybook:react
+      # Playwright projects svelte-* and react-*, against both builds.
       - run: pnpm test:e2e
+      # The React build's story ids are the Svelte build's, minus no-twin and pending stories.
+      - run: pnpm compare-index
       - name: Publish test reports
         if: ${{ !cancelled() }}
         uses: mikepenz/action-junit-report@6ef3fdcfcd5f0b5d14df3e659ef19b8c6820f93d # v6.6.1
@@ -40,3 +45,9 @@ jobs:
         with:
           name: storybook-static
           path: storybook-static
+      - name: Upload React Storybook
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: storybook-static-react
+          path: storybook-static-react

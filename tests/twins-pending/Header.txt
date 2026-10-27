@@ -1,0 +1,24 @@
+# Header (R3 islands and header): no React twin yet.
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Header
+export HeaderLink
+export HeaderNavItem
+export HeaderSearch
+
+# stories/Header.stories.svelte
+page-chrome-header--default
+page-chrome-header--fixture
+page-chrome-header--fixture-megamenu
+page-chrome-header--menu-open
+page-chrome-header--menu-open-narrow
+page-chrome-header--megamenu-open
+page-chrome-header--dark
+page-chrome-header--site-name-only
+
+# stories/Unformatted.stories.svelte
+unformatted--header
+
+# stories/parity/Header.parity.stories.svelte
+parity-header--ilw-ui

@@ -1,0 +1,24 @@
+# Alert (R11 alert): no React twin yet. Needs Icon (R1).
+# The port deletes this file; tests/unit/twins.test.ts fails on any line it has made stale.
+
+# src/svelte/index.ts
+export Alert
+export AlertVariant
+export dismissAlert
+export enhanceAlerts
+
+# stories/Alert.stories.svelte
+components-alert--info
+components-alert--success
+components-alert--warning
+components-alert--error
+components-alert--save-error-fixture
+components-alert--dismissible
+components-alert--dismiss-last
+components-alert--server-markup
+components-alert--server-markup-fixture
+components-alert--dark
+components-alert--on-themes
+
+# stories/Unformatted.stories.svelte
+unformatted--alert

@@ -89,7 +89,7 @@ test('automatic activation: each arrow selects the tab it reaches', async ({ pag
 });
 
 test('a fragment naming a panel selects it on load; with hash, choosing a tab writes the fragment', async ({ page }) => {
-  await page.goto('/iframe.html?id=tabs--hash-fixture&viewMode=story#programs-research');
+  await openStory(page, 'tabs--hash-fixture', '#programs-research');
   const { tab, panel } = tabs(page);
   await expect(tab('Undergraduate Research')).toHaveAttribute('aria-selected', 'true');
   await expect(panel).toHaveAccessibleName('Undergraduate Research');

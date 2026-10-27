@@ -37,6 +37,7 @@
 -->
 <Story
   name="Light"
+  tags={['framework-neutral']}
   globals={{ theme: 'light' }}
   play={async ({ canvasElement }) => {
     await expect(document.querySelector('link[data-ilw-styles="toolkit"]')).toBeNull();
@@ -94,6 +95,7 @@
 -->
 <Story
   name="Dark"
+  tags={['framework-neutral']}
   globals={{ theme: 'dark' }}
   play={async ({ canvasElement }) => {
     const root = one(canvasElement, '.ilw-format');
@@ -114,6 +116,7 @@
 -->
 <Story
   name="Blue theme"
+  tags={['framework-neutral']}
   args={{ theme: 'blue' }}
   play={async ({ canvasElement }) => {
     const root = one(canvasElement, '.ilw-format');
