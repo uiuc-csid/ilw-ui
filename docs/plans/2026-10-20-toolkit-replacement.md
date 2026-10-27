@@ -125,12 +125,14 @@ Each phase is a set of independent PRs that can run in parallel unless noted.
 7. **Media and the rest of the gaps.** C7–C9, E10, E11, E14, E17.
 8. **Own design plans first.** C10 OrgChart, E16 weekly time picker.
 
-## Open questions
+## Decided questions
 
-- **Following upstream.** How do we keep up with toolkit visual changes? One option is a scheduled job that refreshes `vendor/illinois-toolkit` and reruns the parity stories.
-- **Footer content.** The campus footer has required links and text. Who owns them, and how do we keep ours in step?
-- **Distribution.** ilw-ui is `private` and ships source. Other apps need to install it: as a git dependency, from GitHub Packages, or from npm.
-- **Non-Svelte server pages.** The CSS layer makes presentational components usable from any template. Should we also ship Jinja/Django macros for them, or leave markup as documented only?
+Settled 2026-10-27.
+
+- **Following upstream.** A weekly workflow (`.github/workflows/upstream.yml`) reruns `vendor:toolkit` and `vendor:footer` and, when anything but the fetch dates changed, opens a pull request and runs CI and Chromatic on it. The parity stories in Chromatic show where the toolkit moved. README: "Following upstream".
+- **Footer content.** Brand owns it; `https://api.brand.illinois.edu/footer` is the source of truth. ilw-ui ships a copy (`campusFooter`), refreshed by the weekly job. An app that can't wait for a refresh passes its own content as `Footer`'s `campus` prop.
+- **Distribution.** A git dependency for now: consumers install `github:uiuc-csid/ilw-ui#vX.Y.Z`, and releases are tags on `main` with `package.json`'s `version` to match (starting at 0.1.0). The package stays `private`. Revisit GitHub Packages or npm when an app outside CSID wants it.
+- **Non-Svelte server pages.** Markup only: the README's markup contracts are the API for server templates, and `campusFooter`/`campusLink` in `ilw-ui/core` give them the footer data. No Jinja/Django macros until a non-Svelte consumer asks; they'd be a second implementation to keep in step.
 
 ## Done when
 

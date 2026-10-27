@@ -15,17 +15,7 @@ run = "pnpm test && pnpm build-storybook && pnpm test:e2e"
 
 [tasks."vendor:toolkit"]
 description = "Refresh the vendored Illinois Web Toolkit (vendor/illinois-toolkit) from its CDN"
-run = """
-set -e
-dir=vendor/illinois-toolkit
-for f in toolkit.js toolkit.css; do
-  curl -fsSL "https://cdn.toolkit.illinois.edu/3/$f" -o "$dir/$f.tmp"
-  mv "$dir/$f.tmp" "$dir/$f"
-done
-# The CSS points at ../svg/*.svg relative to the CDN; served from here those
-# files don't exist, so point them back at the CDN.
-perl -pi -e 's#url\\(\\.\\./svg/#url(https://cdn.toolkit.illinois.edu/svg/#g' "$dir/toolkit.css"
-"""
+run = "sh scripts/vendor-toolkit.sh"
 
 [tasks."vendor:footer"]
 description = "Refresh the campus footer content (src/core/campus-footer.ts) from the brand API"

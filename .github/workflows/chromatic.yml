@@ -5,7 +5,9 @@
 # Settings: chromatic.config.json.
 name: Chromatic
 
-on: push
+on:
+  push:
+  workflow_dispatch: # .github/workflows/upstream.yml runs it on its branch
 
 permissions:
   contents: read

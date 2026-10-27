@@ -1,17 +1,19 @@
 <!--
   The campus footer (B3), rendering the markup documented in the README: the
   site band (site name, contact, actions, content), the campus band (wordmark
-  and the campus links from ilw-ui/core's campusFooter) and the legal band.
+  and the campus links from ilw-ui/core's campusFooter, or the `campus` prop)
+  and the legal band.
   Styled by footer.css. The CSS form of <ilw-footer>, without its runtime fetch
   and without injecting the OneTrust script.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { type CampusLink, campusFooter, campusLink, DEFAULT_FOOTER_SOURCE } from '../core/campus-footer.ts';
+  import { type CampusFooterData, type CampusLink, campusFooter, campusLink, DEFAULT_FOOTER_SOURCE } from '../core/campus-footer.ts';
 
   let {
     source = DEFAULT_FOOTER_SOURCE,
+    campus = campusFooter,
     legalLinks = [],
     cookiesButton = false,
     socialLabel = 'Social media',
@@ -24,6 +26,8 @@
   }: {
     /** The UTM source added to the campus links (the toolkit's `source`). */
     source?: string;
+    /** The campus sections and legal links; defaults to the vendored `campusFooter`. Override when Brand changes them before ilw-ui refreshes its copy. */
+    campus?: CampusFooterData;
     /** Extra legal and policy links, shown before "Accessibility". */
     legalLinks?: CampusLink[];
     /** Render OneTrust's "About Cookies" button. The page loads the OneTrust script itself. */
@@ -45,10 +49,10 @@
   } = $props();
 
   const legal = $derived([
-    campusFooter.privacy,
-    campusFooter.copyright,
+    campus.privacy,
+    campus.copyright,
     ...legalLinks,
-    campusFooter.accessibility,
+    campus.accessibility,
   ]);
   const href = (l: CampusLink, isCampus: boolean) => (isCampus ? campusLink(l.href, source) : l.href);
 </script>
@@ -107,7 +111,7 @@
       </a>
     </h2>
     <div class="ilw-footer-sections">
-      {#each campusFooter.sections as section (section.label)}
+      {#each campus.sections as section (section.label)}
         <div class="ilw-footer-section">
           <h3>{section.label}</h3>
           <ul>

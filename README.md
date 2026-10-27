@@ -19,6 +19,18 @@ Status: pre-release (`private: true`), first consumer
 
 ## Install and use
 
+ilw-ui isn't published to a registry yet. Install it from GitHub, pinned to a
+release tag:
+
+```sh
+pnpm add github:uiuc-csid/ilw-ui#v0.1.0
+```
+
+The repository is private, so the installing machine (and its CI) needs read
+access to it, e.g. a token in `.npmrc` or a deploy key. Releases are tags on
+`main` (`vX.Y.Z`, with `version` in `package.json` bumped to match); there is no
+build step, so the tag is the release.
+
 The package ships source (`.svelte`/`.ts`); your Vite + Svelte build compiles it.
 Peer dependency: `svelte ^5.57`. Dependencies, pinned exactly: `@zag-js/combobox`
 and `@zag-js/svelte` (1.44.0), `@tanstack/table-core` and
@@ -591,7 +603,11 @@ a button and a popover panel of columns:
   `https://api.brand.illinois.edu/footer` (Brand owns it; that API is the
   source of truth). `<ilw-footer>` fetches it on every page view; ilw-ui ships
   it, so the footer works without script, network or a `connect-src`
-  exception. `mise run vendor:footer` refreshes the copy; review the diff.
+  exception. `mise run vendor:footer` refreshes the copy; review the diff
+  (a weekly job does it too: see [Following upstream](#following-upstream)).
+  If Brand changes the content before ilw-ui catches up, pass your own
+  `CampusFooterData` as `campus` (it replaces the sections and the privacy,
+  copyright and accessibility links).
   Server templates can render the same data: `campusLink(href, source)` adds
   the toolkit's UTM parameters (`source` defaults to `Illinois_App`).
 - **Cookies.** `<ilw-footer>` injects the OneTrust script and its "About
@@ -1712,6 +1728,19 @@ task**; log each run there.
 
 The toolkit is vendored in `vendor/illinois-toolkit/` because its CDN
 CAPTCHA-blocks automated browsers. See the README there to refresh it.
+
+## Following upstream
+
+Two things are copied from upstream: the toolkit bundle
+(`vendor/illinois-toolkit/`, the parity stories' reference) and the campus
+footer content (`src/core/campus-footer.ts`, from Brand's API). Every Monday
+`.github/workflows/upstream.yml` refetches both (`scripts/vendor-toolkit.sh`,
+`scripts/vendor-footer.mjs`, also `mise run vendor:toolkit` and
+`mise run vendor:footer`). If anything but the fetch dates changed, it
+force-pushes `upstream/refresh`, opens a pull request if none is open, and runs
+CI and Chromatic on it. Review the parity stories in Chromatic: a toolkit
+change shows on the **Toolkit** side, and the ilw-ui side needs the matching
+change before merging. It can also be run by hand from the Actions tab.
 
 ## The import rule
 
