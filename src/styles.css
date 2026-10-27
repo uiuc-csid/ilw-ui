@@ -26,5 +26,7 @@
 @import './styles/icon.css';
 @import './styles/alert.css';
 @import './styles/modal.css';
+@import './styles/tabs.css';
 @import './styles/dark-mode-toggle.css';
+@import './styles/copy-button.css';
 @import './styles/components.css';

@@ -4,12 +4,15 @@
   import { untrack } from 'svelte';
 
   import { blurMatch, type ComboboxItem, filterItems } from '../core/index.ts';
+  import { AsyncSearch, type AsyncSource, statusText } from './async-search.svelte.ts';
   import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from './zag-input.ts';
 
   let {
     id,
     popupId = `${id}-popup`,
-    items,
+    items = [],
+    source,
+    debounce = 250,
     value = null,
     onchange,
     placeholder = '',
@@ -20,12 +23,20 @@
     invalid = false,
     required = false,
     labelId,
+    name,
+    loadingText = 'Loading…',
+    errorText = "Couldn't load results",
   }: {
     /** The input's id. */
     id: string;
     /** The listbox's id. */
     popupId?: string;
-    items: ComboboxItem[];
+    /** The options; with `source`, the known items (e.g. the selected one, for its label). */
+    items?: ComboboxItem[];
+    /** Fetches the options for the typed text, in place of filtering `items`. */
+    source?: AsyncSource<ComboboxItem>;
+    /** With `source`: milliseconds to wait after the last keystroke before searching. */
+    debounce?: number;
     /** The selected value (controlled: update it from `onchange`). */
     value?: string | null;
     /** Called on each commit: an option chosen, or text matched (or not) on blur. */
@@ -41,9 +52,39 @@
     required?: boolean;
     /** The id of the `<label>` for the input; it also labels the listbox. */
     labelId?: string;
+    /** Adds a hidden input with this name and the selected value (`''` when none). */
+    name?: string;
+    /** With `source`: the list's row (and the status message) while a search runs. */
+    loadingText?: string;
+    /** With `source`: the list's row (and the status message) when the source fails. */
+    errorText?: string;
   } = $props();
 
-  const labelOf = (v: string | null) => (v == null ? '' : (items.find((i) => i.value === v)?.label ?? ''));
+  // Items seen in async results, so a selection keeps its label after the
+  // results move on.
+  let seen = $state.raw<ComboboxItem[]>([]);
+  const find = (v: string) => items.find((i) => i.value === v) ?? seen.find((i) => i.value === v);
+  const labelOf = (v: string | null) => (v == null ? '' : (find(v)?.label ?? ''));
+
+  // Where to put the highlight when results arrive for an ArrowDown/Up search.
+  let arrowed: 'first' | 'last' | null = null;
+  const search = new AsyncSearch<ComboboxItem>(
+    () => source!,
+    () => debounce,
+    (q, results) => {
+      seen = [...results.filter((r) => !find(r.value)), ...seen];
+      const shown = results.slice(0, max);
+      if (!api.open || !shown.length) return;
+      if (arrowed) {
+        const sel = shown.find((i) => i.value === value);
+        api.setHighlightValue((sel ?? (arrowed === 'first' ? shown[0] : shown[shown.length - 1])).value);
+      } else if (shown.length === 1 && q === text) {
+        api.setHighlightValue(shown[0].value);
+      }
+      arrowed = null;
+    },
+  );
+  $effect(() => () => search.cancel());
 
   // Zag derives the input text from its (filtered) collection, which can't
   // label a value set from outside, so the text is ours.
@@ -60,7 +101,25 @@
     });
   });
 
-  const filtered = $derived(filterItems(items, query, max));
+  const filtered = $derived.by(() => {
+    if (!source) return filterItems(items, query, max);
+    const results = search.status === 'done' ? search.results : [];
+    return { shown: results.slice(0, max), more: Math.max(0, results.length - max) };
+  });
+  const status = $derived(
+    source ? statusText(search.status, search.results.length, { loadingText, emptyText: 'No matches', errorText }) : '',
+  );
+
+  /** What typed text commits to on blur: `blurMatch`, or with `source` an exact match or the only result for this text. */
+  function matchText(t: string): ComboboxItem | null {
+    if (!source) return blurMatch(items, t);
+    const typed = t.trim().toLowerCase();
+    if (!typed) return null;
+    const done = search.status === 'done' ? search.results : [];
+    const exact = [...done, ...items, ...seen].find((i) => i.label.toLowerCase() === typed || i.value.toLowerCase() === typed);
+    if (exact) return exact;
+    return search.query === t && done.length === 1 ? done[0] : null;
+  }
   const collection = $derived(
     combobox.collection({
       items: filtered.shown,
@@ -130,13 +189,19 @@
       if (reason !== 'input-change') return;
       text = inputValue;
       query = inputValue;
-      api.setOpen(inputValue.trim().length >= minChars);
+      const open = inputValue.trim().length >= minChars;
+      if (source) {
+        arrowed = null;
+        if (open) search.search(inputValue);
+        else search.cancel();
+      }
+      api.setOpen(open);
       // As before: highlight only a lone match, so Enter can't pick a guess.
       if (filtered.shown.length === 1) api.setHighlightValue(filtered.shown[0].value);
       else api.clearHighlightValue();
     },
     onValueChange({ value: [v] }) {
-      const item = items.find((i) => i.value === v);
+      const item = filtered.shown.find((i) => i.value === v) ?? find(v);
       if (item) commit(item);
     },
   });
@@ -167,10 +232,16 @@
           }
           if (api.open || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
           query = text === labelOf(value) ? '' : text;
+          if (source) {
+            // Alt+ArrowDown opens without a highlight, as it does with items.
+            arrowed = event.altKey ? null : event.key === 'ArrowDown' ? 'first' : 'last';
+            search.search(query, true);
+          }
         },
         onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLInputElement }) {
           if (!focusLeft(root, event)) return;
-          commit(blurMatch(items, text));
+          commit(matchText(text));
+          search.cancel();
           // Close the way zag's own dismissal does. Its outside-click handling
           // otherwise races the blur and can leave the list open or pull focus
           // back into the input.
@@ -214,12 +285,22 @@
         {/each}
       {/if}
     {/each}
-    {#if filtered.more}
+    {#if source && search.status === 'loading'}
+      <div class="combobox-loading" role="option" aria-disabled="true" aria-selected="false">{loadingText}</div>
+    {:else if source && search.status === 'error'}
+      <div class="combobox-error" role="option" aria-disabled="true" aria-selected="false">{errorText}</div>
+    {:else if filtered.more}
       <div class="combobox-more" role="option" aria-disabled="true" aria-selected="false">
         …{filtered.more} more — keep typing to narrow
       </div>
-    {:else if !filtered.shown.length}
+    {:else if !filtered.shown.length && (!source || search.status === 'done')}
       <div class="combobox-empty" role="option" aria-disabled="true" aria-selected="false">No matches</div>
     {/if}
   </div>
+  {#if source}
+    <span class="ilw-visually-hidden" role="status">{status}</span>
+  {/if}
+  {#if name}
+    <input type="hidden" {name} value={value ?? ''} />
+  {/if}
 </span>
