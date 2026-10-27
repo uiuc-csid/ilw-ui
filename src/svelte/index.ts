@@ -52,3 +52,4 @@ export {
 } from './Header.svelte';
 export { default as BackToTop } from './BackToTop.svelte';
 export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';
+export { default as Tooltip, type TooltipArrow, type TooltipAttrs } from './Tooltip.svelte';

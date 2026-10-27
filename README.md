@@ -74,6 +74,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
 | `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
+| `tooltip.css`    | `.ilw-tooltip` and its bubble (C4)                        |
 | `dark-mode-toggle.css` | `.ilw-dark-mode-toggle`'s layout; needs `switch.css` (B1) |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Combobox, Autocomplete, Pager |
 
@@ -1248,6 +1249,87 @@ reach its own toolbar) need `Modal`.
 `<form>`, with `.ilw-modal-body` before it); `h2[slot=title]` becomes
 `h2.ilw-modal-title`; the × button's name is "Close". The page no longer has
 `inert` set on `<body>`'s children: check inertness with `dialog:modal`.
+
+### `Tooltip`
+
+The replacement for `<ilw-tooltip>`, following the
+[APG tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/): a
+`role="tooltip"` bubble that describes its trigger through
+`aria-describedby`. Shown while the trigger is hovered or focused, or the
+bubble is hovered; Escape hides it. Styled by `tooltip.css`.
+
+```svelte
+<Tooltip text="Download the grades as a CSV file" arrow="top-left">
+  {#snippet children(attrs)}
+    <button type="button" class="ilw-button" {...attrs}><Icon icon={DownloadSimple} alt="Export" /></button>
+  {/snippet}
+</Tooltip>
+```
+
+Props: `text`, or `content` (a snippet, for rich text; no focusable elements:
+a tooltip is never focused), `arrow` (upstream's eight placements:
+`top-left | top-center | top-right | bottom-left | bottom-center |
+bottom-right | left | right`, default `top-center`; `top-*` puts the bubble
+above the trigger), `theme` (a `LayoutTheme`, e.g. `'blue'`), `open`
+(bindable), `id` (default `ilw-tooltip-N`) and `class`. The `children`
+snippet is the trigger: spread `attrs` (`{ 'aria-describedby' }`) on one
+focusable element, and make it the snippet's only element.
+
+DOM contract:
+
+```html
+<span class="ilw-tooltip ilw-tooltip--top-left ilw-tooltip--anchored">
+  <button type="button" class="ilw-button" aria-describedby="ilw-tooltip-1">…</button>
+  <span class="ilw-tooltip-bubble" role="tooltip" id="ilw-tooltip-1" popover="manual">
+    Download the grades as a CSV file
+  </span>
+</span>
+```
+
+Select it by role (`getByRole('tooltip', { name })`) or as the element the
+trigger's `aria-describedby` names; it is open when it matches
+`:popover-open` (Playwright: `toBeVisible()`).
+
+- **Description:** the trigger's accessible description is the tooltip text,
+  shown or not. The trigger's name comes from the trigger itself (an icon
+  button's `alt`), never from the tooltip.
+- **Showing:** on `pointerenter` and `focusin` of the wrapper, which holds the
+  trigger and the bubble, so the pointer can move from the trigger onto the
+  bubble: a transparent bridge covers the 12px gap (WCAG 1.4.13 hoverable).
+  Hidden when the pointer has left both and focus has left the trigger. No
+  delay either way.
+- **Escape** hides it wherever focus is (1.4.13 dismissible) and is consumed
+  (`preventDefault`), so it doesn't also close a surrounding modal. It stays
+  hidden until the next hover or focus.
+- **Placement:** the bubble is a manual popover, in the top layer, so no
+  `overflow` clips it. Where CSS anchor positioning (`position-area` and
+  `anchor-scope`) is supported, `--anchored` places it against the trigger;
+  centred bubbles stay 8px inside the viewport. Elsewhere a script places it
+  (`top`/`left` inline, following scroll and resize while open), clamped 8px
+  inside the viewport as upstream does. Without `popover` support the bubble is
+  toggled with `hidden`. It does not flip to the other side when there's no
+  room: pick the `arrow` that fits.
+- **No static form:** the behaviour needs the component, and its trigger is a
+  snippet, so it is used from Svelte (inside an island of your own), not from
+  `mountIslands` props. In a server template, describe the control with
+  visible help text instead.
+
+**Differences from `<ilw-tooltip>`:**
+
+- Upstream closes when the pointer leaves the trigger, even onto the bubble,
+  which fails WCAG 1.4.13; ilw-ui keeps it open over the bubble.
+- Upstream's Escape closes every tooltip on the page and isn't consumed, so it
+  also closes a modal around it; ilw-ui's is consumed by the open tooltip.
+- Upstream positions an absolute bubble inside the host, so an `overflow`
+  ancestor clips it; ilw-ui's is in the top layer.
+- `theme` recolours only the bubble. Upstream's sets the palette on the whole
+  element, so the trigger turns blue too.
+- Upstream forces `tabindex="0"` on the trigger; ilw-ui expects a focusable
+  trigger (a button or link) and leaves it alone.
+- Upstream fades in and out over 0.2s; ilw-ui shows and hides at once.
+- Not carried over: upstream's 500ms long press on touch, and closing on a
+  pointerdown elsewhere. On touch, a tap focuses the trigger (and shows it) or
+  activates it; tooltip text should never be the only way to learn something.
 
 ### `Combobox`
 
