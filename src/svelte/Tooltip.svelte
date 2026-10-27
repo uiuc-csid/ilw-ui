@@ -32,7 +32,7 @@
   import type { Snippet } from 'svelte';
 
   import { nextId } from '../core/index.ts';
-  import type { LayoutTheme } from './layout.ts';
+  import type { LayoutTheme } from '../core/layout.ts';
 
   let {
     text,

@@ -6,7 +6,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import type { LayoutWidth } from './layout.ts';
+  import type { LayoutWidth } from '../core/layout.ts';
 
   let {
     theme,

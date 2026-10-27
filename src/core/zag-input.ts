@@ -1,5 +1,7 @@
 // Workarounds shared by the components built on Zag's combobox machine
-// (Combobox, Autocomplete). Each returns its own cleanup, for an `$effect`.
+// (Combobox, MultiCombobox, Autocomplete), in every framework: they work
+// around the core machine, not an adapter. Each returns its own cleanup, for
+// an effect.
 
 /**
  * Zag moves the caret to the end (dom-query's setCaretToEnd) after nearly
@@ -88,7 +90,7 @@ export function focusStaysPut<M extends { implementations?: { actions?: Record<s
  * document focused. The document check covers a browser that reports
  * `<body>` as active while the window deactivates.
  */
-export function focusLeft(root: HTMLElement, event: FocusEvent): boolean {
+export function focusLeft(root: HTMLElement, event: { relatedTarget: EventTarget | null }): boolean {
   const to = event.relatedTarget as Node | null;
   if (root.contains(to)) return false;
   if (to != null) return true;

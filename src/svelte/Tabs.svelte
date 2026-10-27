@@ -18,7 +18,7 @@
 </script>
 
 <script lang="ts">
-  import { type LayoutTheme, type LayoutWidth, widthClass } from './layout.ts';
+  import { type LayoutTheme, type LayoutWidth, widthClass } from '../core/layout.ts';
   import TabList from './TabList.svelte';
 
   let {

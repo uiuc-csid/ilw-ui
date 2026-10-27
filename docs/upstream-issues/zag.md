@@ -2,7 +2,8 @@
 
 Draft issues for <https://github.com/chakra-ui/zag>, against **1.44.0**
 (`@zag-js/combobox`, `@zag-js/core`). **Not filed.** Each is worked around in
-`src/svelte/Combobox.svelte` and listed under **Known issues** in the README.
+`src/svelte/Combobox.svelte` (and its siblings) or `src/core/zag-input.ts`, and
+listed under **Known issues** in the README.
 When one is filed, replace its "Not filed" line with the issue link here and in
 the README. First check whether a newer release (1.46.0 at the time of writing)
 already fixes it.
@@ -105,7 +106,10 @@ focus back.
 
 **Workaround in ilw-ui:** on blur to outside the root, send
 `{ type: 'LAYER.INTERACT_OUTSIDE', src: 'interact-outside', restoreFocus: false }`
-when the list is open. The focus pull is not worked around.
+when the list is open. `focusStaysPut` (`src/core/zag-input.ts`) replaces the
+machine's `setInitialFocus` and `setFinalFocus` with a deferred focus that runs
+only while focus is still where it was (or has fallen to `<body>`), so the
+focus pull is gone too.
 
 ## 7. The live region can't be placed: it always goes on `document.body`
 
@@ -128,6 +132,6 @@ it outside the landmarks.
 **Proposal:** a `liveRegionRoot` (or `getLiveRegionRoot`) prop, passed to
 `createLiveRegion` as `root`, defaulting to `doc.body`.
 
-**Workaround in ilw-ui:** `keepLiveRegionIn` (`src/svelte/zag-input.ts`) moves
+**Workaround in ilw-ui:** `keepLiveRegionIn` (`src/core/zag-input.ts`) moves
 each `[data-live-announcer]` appended to `body` into the component's root while
 focus is inside it.

@@ -8,16 +8,18 @@
   or a click selects); `automatic` selects on focus. A URL fragment naming a
   panel, or anything in one, selects that tab. Styled by tabs.css.
 -->
-<script module lang="ts">
-  /** A tab: its panel's id and its label. */
-  export interface TabRef {
-    id: string;
-    label: string;
-  }
-</script>
-
 <script lang="ts">
   import { tick, untrack } from 'svelte';
+
+  import {
+    fragmentTab,
+    replaceTabHash,
+    scrollToFragment,
+    showTabPanel,
+    tabKeyTarget,
+    type TabRef,
+    wireTabPanels,
+  } from '../core/tabs.ts';
 
   let {
     host,
@@ -52,93 +54,35 @@
   const current = $derived(tabs.some((tab) => tab.id === selected) ? selected : tabs[0]?.id);
   const buttons: HTMLButtonElement[] = $state([]);
 
-  function panel(id: string): HTMLElement | null {
-    return host.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
-  }
-
   function select(id: string, writeHash = true): void {
     if (id === current) return;
     selected = id;
     onchange?.(id);
-    if (hash && writeHash) {
-      // An absolute URL: a page's <base href> would resolve a bare '#id' elsewhere.
-      const url = new URL(location.href);
-      url.hash = id;
-      history.replaceState(history.state, '', url);
-    }
+    if (hash && writeHash) replaceTabHash(id);
   }
 
   function onkeydown(event: KeyboardEvent, i: number): void {
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
-    const n = tabs.length;
-    let to: number;
-    // All four arrows in both orientations: the horizontal list stacks into a
-    // column at narrow widths.
-    switch (event.key) {
-      case 'ArrowRight':
-      case 'ArrowDown':
-        to = (i + 1) % n;
-        break;
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        to = (i - 1 + n) % n;
-        break;
-      case 'Home':
-        to = 0;
-        break;
-      case 'End':
-        to = n - 1;
-        break;
-      default:
-        return;
-    }
+    const to = tabKeyTarget(event, i, tabs.length);
+    if (to === null) return;
     event.preventDefault();
     buttons[to]?.focus();
     if (automatic) select(tabs[to].id);
   }
 
   // The panels' tabpanel wiring, undone on destroy (or when the tabs change).
-  $effect(() => {
-    const wired = tabs.map((tab) => [tab, panel(tab.id)] as const);
-    host.classList.add('ilw-tabs--ready');
-    for (const [tab, el] of wired) {
-      if (!el) continue;
-      el.setAttribute('role', 'tabpanel');
-      el.setAttribute('aria-labelledby', `${tab.id}-tab`);
-      el.tabIndex = 0;
-    }
-    return () => {
-      host.classList.remove('ilw-tabs--ready');
-      for (const [, el] of wired) {
-        el?.removeAttribute('role');
-        el?.removeAttribute('aria-labelledby');
-        el?.removeAttribute('tabindex');
-        el?.removeAttribute('hidden');
-      }
-    };
-  });
+  $effect(() => wireTabPanels(host, tabs));
 
-  $effect(() => {
-    for (const tab of tabs) {
-      const el = panel(tab.id);
-      if (el) el.hidden = tab.id !== current;
-    }
-  });
+  $effect(() => showTabPanel(host, tabs, current));
 
   // Follow the URL fragment: on mount and on every hashchange.
   $effect(() => {
-    const doc = host.ownerDocument;
-    const view = doc.defaultView;
+    const view = host.ownerDocument.defaultView;
     if (!view) return;
     const follow = () => {
-      const fragment = decodeURIComponent(view.location.hash.slice(1));
-      const target = fragment ? doc.getElementById(fragment) : null;
-      if (!target) return;
-      const tab = tabs.find((t) => panel(t.id)?.contains(target));
-      if (!tab) return;
-      select(tab.id, false);
-      // The target was hidden when the browser tried to scroll to it.
-      void tick().then(() => (target.id === tab.id ? host : target).scrollIntoView({ behavior: 'instant' }));
+      const found = fragmentTab(host, tabs);
+      if (!found) return;
+      select(found.tab.id, false);
+      void tick().then(() => scrollToFragment(host, found.tab, found.target));
     };
     untrack(follow);
     view.addEventListener('hashchange', follow);

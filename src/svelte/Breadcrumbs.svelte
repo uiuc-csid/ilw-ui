@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-  import { type LayoutWidth, widthClass } from './layout.ts';
+  import { type LayoutWidth, widthClass } from '../core/layout.ts';
 
   let {
     items,

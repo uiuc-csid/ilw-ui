@@ -8,7 +8,7 @@
   import type { RowData } from '@tanstack/svelte-table';
   import type { Snippet } from 'svelte';
 
-  import type { AnyDataTable } from './data-table.ts';
+  import type { AnyDataTable } from '../core/data-table.ts';
 
   let {
     table,

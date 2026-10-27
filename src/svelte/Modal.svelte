@@ -1,8 +1,16 @@
 <script lang="ts" generics="T">
   import { onMount, type Snippet } from 'svelte';
 
-  import { nextId, tabbables } from '../core/index.ts';
-  import type { CloseReason, ModalButton, ModalSize } from './modal.ts';
+  import { nextId } from '../core/index.ts';
+  import {
+    type CloseReason,
+    initialFocus,
+    markAutofocus,
+    type ModalButton,
+    type ModalSize,
+    onBackdrop,
+    wrapTab,
+  } from '../core/modal.ts';
 
   let {
     id = nextId('ilw-modal'),
@@ -41,17 +49,10 @@
   const labelledby = $derived(title ? titleId : hasMessage ? messageId : undefined);
 
   onMount(() => {
-    // Mark the initial button only now, after insertion: WebKit queues a
-    // button inserted with `autofocus` as an autofocus candidate and focuses
-    // it at a later rendering update, pulling focus back to it after the user
-    // has already tabbed on. An attribute added later is never a candidate.
-    const initial = buttons.findIndex((button) => button.autofocus);
-    if (initial !== -1) row.children[initial].setAttribute('autofocus', '');
+    // Mark the initial button only now, after insertion (see markAutofocus).
+    markAutofocus(row, buttons);
     dialog.showModal();
-    // showModal() runs the dialog focusing steps, but browsers disagree on
-    // the fallback when nothing has `autofocus`; the APG wants the first
-    // focusable element.
-    (dialog.querySelector<HTMLElement>('[autofocus]') ?? tabbables(dialog)[0])?.focus();
+    initialFocus(dialog)?.focus();
   });
 
   function handleClose() {
@@ -63,32 +64,6 @@
     if (chosen) onclose('button', chosen.value);
     else onclose('dismiss', null);
   }
-
-  // The native modal keeps focus in the page but lets Tab leave for the
-  // browser's own UI; the APG wraps it. The list is read on every Tab, so
-  // content added or enabled while open is in the cycle.
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key !== 'Tab' || e.defaultPrevented) return;
-    const list = tabbables(dialog);
-    const active = document.activeElement;
-    if (list.length === 0) {
-      e.preventDefault();
-    } else if (e.shiftKey && (active === list[0] || active === dialog)) {
-      e.preventDefault();
-      list.at(-1)!.focus();
-    } else if (!e.shiftKey && active === list.at(-1)) {
-      e.preventDefault();
-      list[0].focus();
-    }
-  }
-
-  // The backdrop is part of the <dialog> box for hit-testing: a click there
-  // targets the dialog itself, outside its border box.
-  function outside(e: MouseEvent) {
-    if (e.target !== dialog) return false;
-    const r = dialog.getBoundingClientRect();
-    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-  }
 </script>
 
 <dialog
@@ -99,10 +74,10 @@
   aria-label={labelledby ? undefined : label}
   aria-describedby={title && hasMessage ? messageId : undefined}
   onclose={handleClose}
-  onkeydown={handleKeydown}
-  onpointerdown={(e) => (downOnBackdrop = outside(e))}
+  onkeydown={(e) => wrapTab(dialog, e)}
+  onpointerdown={(e) => (downOnBackdrop = onBackdrop(dialog, e))}
   onclick={(e) => {
-    if (downOnBackdrop && outside(e)) dialog.close();
+    if (downOnBackdrop && onBackdrop(dialog, e)) dialog.close();
     downOnBackdrop = false;
   }}
 >

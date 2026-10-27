@@ -7,7 +7,7 @@
   the first and last page are plain text. Styled by pagination.css.
 -->
 <script lang="ts">
-  import { pageHref, pageWindow } from '../core/index.ts';
+  import { paginationModel } from '../core/pager.ts';
 
   let {
     page,
@@ -37,27 +37,24 @@
     class?: string;
   } = $props();
 
-  const total = $derived(Math.max(1, Math.floor(pages)));
-  const current = $derived(Math.min(Math.max(1, Math.floor(page)), total));
-  const link = $derived(href ?? ((p: number) => pageHref(url, p, parameter)));
-  const shown = $derived(pageWindow(current, total));
+  const model = $derived(paginationModel({ page, pages, url, parameter, href }));
 </script>
 
 <nav class={['ilw-pagination', className]} aria-label={label}>
   <ul>
     <li class="ilw-pagination-previous">
-      {#if current > 1}<a href={link(current - 1)} aria-label="Previous page">Previous</a>{:else}<span>Previous</span>{/if}
+      {#if model.previous !== null}<a href={model.previous} aria-label="Previous page">Previous</a>{:else}<span>Previous</span>{/if}
     </li>
-    {#each shown as p, i (p ?? `gap-${i}`)}
+    {#each model.pages as p, i (p?.page ?? `gap-${i}`)}
       {#if p === null}
         <li class="ilw-pagination-ellipsis"><span>…</span></li>
       {:else}
-        <li><a href={link(p)} aria-label="Page {p}" aria-current={p === current ? 'page' : undefined}>{p}</a></li>
+        <li><a href={p.href} aria-label="Page {p.page}" aria-current={p.current ? 'page' : undefined}>{p.page}</a></li>
       {/if}
     {/each}
     <li class="ilw-pagination-next">
-      {#if current < total}<a href={link(current + 1)} aria-label="Next page">Next</a>{:else}<span>Next</span>{/if}
+      {#if model.next !== null}<a href={model.next} aria-label="Next page">Next</a>{:else}<span>Next</span>{/if}
     </li>
   </ul>
-  {#if !hidePageCount}<span class="ilw-pagination-count">Page {current} of {total}</span>{/if}
+  {#if !hidePageCount}<span class="ilw-pagination-count">Page {model.current} of {model.total}</span>{/if}
 </nav>
