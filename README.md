@@ -2588,6 +2588,11 @@ workarounds in `src/core/zag-input.ts`). None is filed upstream yet. Draft issue
   component sits in a modal. While focus is in the component, `Combobox`,
   `MultiCombobox` and `Autocomplete` move it into their root `span` (`keepLiveRegionIn`); Zag finds
   it by id and still announces and removes it.
+- **ArrowDown and ArrowUp set their highlight a frame late,** from whatever list
+  shows then. Keys typed inside that frame have filtered the list, so the
+  selection (now hidden) replaced a lone-match highlight, or a guess was
+  highlighted that Enter or Tab would take. `highlightAtOnce` sets it at once,
+  and only to a shown option.
 
 ## License
 
