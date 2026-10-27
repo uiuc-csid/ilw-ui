@@ -1,0 +1,25 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <form>
+      <p><label>Before <input name="before" type="text" .value=""></label></p>
+      <p>
+        <label for="person-cb" id="person-label">Person</label> <span class="combobox" data-part="root" data-scope="combobox" id="combobox:person-cb"><input aria-autocomplete="list" aria-controls="person-popup" aria-expanded="false" autocapitalize="none" autocomplete="off" autocorrect="off" class="combobox-input" data-part="input" data-scope="combobox" data-state="closed" id="person-cb" placeholder="Select faculty or type NetID" role="combobox" spellcheck="false" type="text" .value="Avery Adams">
+          <div aria-labelledby="person-label" class="combobox-popup" data-part="content" data-placement="bottom" data-scope="combobox" data-side="bottom" data-state="closed" hidden id="person-popup" role="listbox" style="--layer-index: 0; --nested-layer-count: 0" tabindex="-1">
+            <div aria-selected="true" data-part="item" data-scope="combobox" data-state="checked" data-value="aadams" id="person-popup-opt-aadams" role="option" tabindex="-1">Avery Adams</div>
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="dadams" id="person-popup-opt-dadams" role="option" tabindex="-1">Drew Adams</div>
+          </div>
+          <span class="ilw-visually-hidden" role="status">2 results</span>
+          <input name="person" type="hidden" .value="aadams">
+        </span>
+      </p>
+      <p><label>After <input name="after" type="text" .value=""></label></p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <p>Selected: <output data-testid="selected">aadams</output> (<span data-testid="changes">1</span> changes, <span data-testid="submits">0</span> submits)</p>
+    <aside aria-labelledby="stub-server-heading" class="stub-server">
+      <h2 id="stub-server-heading">Test server (story only)</h2>
+      <p>No searches waiting.</p>
+    </aside>
+  </main>
+</div>

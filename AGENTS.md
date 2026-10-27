@@ -70,21 +70,31 @@ Stories are the workbench, the review surface and the test fixtures, so each one
   No story goes without one: fixture stories name their spec, parity `Toolkit` and `Side By Side` stories say what to compare. Change the comment when the story or its checks change.
 - **Every story shows the component as it will look on a page.** Non-parity stories set `parameters.styles: 'ilw-ui'` (only our stylesheet, as a consumer loads it) and render inside the default shell (`<Page format>`: skip link, `<main>`, `.ilw-format`). Only whole-page stories opt out with `shell: false`, and only the Unformatted checks with `format: false`.
 - **Give the component its page context**: the label, help text and neighbouring fields of a form, the heading and prose around a table or button row, enough rows to page, a realistic width. Not a bare widget on an empty canvas. Story-only wrappers (`stories/*Demo.svelte`, `parity/*Sample.svelte`) hold that context and say in a top comment what page they stand in for. The same goes for the markup examples in the README.
+- **Story styles go in plain `.css` files**, imported by the story or helper (`stories/TooltipDemo.css`), never in a `<style>` block: Svelte's scoped `svelte-xxxx` classes would make its markup differ from the React twin's. Class names are global there, so prefix them with the helper's name (`.tooltip-demo-toolbar`). `tests/unit/stories.test.ts` checks it.
 
 ## Tests
 
 Accessibility is proven by tests. Every component gets three layers, all driven by its stories:
 
-1. **DOM contract + ARIA** — story `play` functions, run by `@storybook/addon-vitest` as Vitest browser tests on Chromium and WebKit: `pnpm test`.
+1. **DOM contract + ARIA** — story `play` functions, run by `@storybook/addon-vitest` as Vitest browser tests on Chromium and WebKit (Vitest project `storybook-svelte`): `pnpm test`. After each story, `tests/contracts/setup.ts` normalizes its DOM and compares it with `stories/contracts/<story-id>.html` (see **DOM contract snapshots** below).
 2. **APG keyboard + focus** — `tests/e2e/*.spec.ts`, real `page.keyboard` against `storybook-static/`; every step asserts focus never falls to `<body>` (`tests/e2e/focus.ts`). Needs `pnpm build-storybook` first, then `pnpm test:e2e`.
 3. **axe** — `@storybook/addon-a11y` with `a11y.test = 'error'` (WCAG 2.0/2.1 A/AA) on every story. Every component has an "open" story so its open state is scanned. Disabling a rule on a story needs a comment with the reason and an issue link.
 
 - **Parity pairs:** the `Toolkit` story of a pair sets `a11y: { test: 'off' }` with a comment: it documents upstream, it isn't our code. `Side By Side` stories are tagged `!test` (iframes of other stories, for people).
 - Storybook runs a story's `play` function whenever the story loads, including in the static build. Playwright specs therefore use stories **without** a `play` function (the "fixture" stories), so their state is untouched when the spec starts.
-- Run one Playwright spec: `pnpm exec playwright test tests/e2e/modal.spec.ts --project chromium`.
+- Run one Playwright spec: `pnpm exec playwright test tests/e2e/modal.spec.ts --project svelte-chromium` (projects `svelte-chromium` and `svelte-webkit`). Run one story file's tests: `pnpm vitest run --project storybook-svelte stories/Modal.stories.svelte`; add `--project unit` for the node tests.
+- The specs' preview server listens on port 6007; set `ILW_E2E_PORT` to another port to run e2e in two worktrees at once, e.g. `ILW_E2E_PORT=6107 pnpm test:e2e`.
 - `mise run test` runs everything: `pnpm test && pnpm build-storybook && pnpm test:e2e`. Also run `pnpm check` (svelte-check, fails on warnings).
 - The toolkit CDN CAPTCHA-blocks automated browsers: tests load only the vendored copy. Refresh it with `mise run vendor:toolkit`.
 - Manual screen-reader checks live in `docs/at-smoke.md`; running them is a human task.
+
+### DOM contract snapshots
+
+`stories/contracts/<story-id>.html` is each story's DOM after its render and `play`: the canvas, plus any modal, popover or live region it added to `<body>`. They are the checked-in DOM contract, and every browser (and, from R0d, the React build) compares against the same file.
+
+- `tests/contracts/normalize.ts` makes them comparable: comments dropped, whitespace collapsed and dropped beside block-level boxes, attributes and `style` declarations sorted, Svelte's `svelte-xxxx` classes stripped, form state read from `.value`/`.checked`/`.selected`, and generated ids (`nextId`, `$props.id()`, `useId`) numbered in order of appearance (`ilw-field-{1}`, `{2}-label`). Zag's announcer (`[data-live-announcer]`) is left out: Zag adds it only on Apple platforms, and CI runs on Linux. If two browsers (or macOS and CI) disagree, fix the normalizer; never keep one file per browser.
+- A new story writes its file on the first local run; commit it. CI never writes: a missing or different file fails the story. After a deliberate markup change, rewrite them with `pnpm vitest run --project storybook-svelte -u`, then run again without `-u` (both browsers write the same file, so the second run proves they agree), review the diff, and treat it as a contract change (README, release note).
+- Parity `Toolkit` stories are skipped (upstream markup). Another story opts out with `parameters: { contract: false }`, which needs a comment with the reason and an issue link, like disabling an axe rule.
 
 ### No flaky tests
 
@@ -95,7 +105,7 @@ A test that sometimes fails is a bug in the test (or the component), never noise
 - **Deterministic inputs.** Fixed sample data and ids (no `Math.random`, no `Date.now()` in what is asserted), the Light theme unless the story sets `globals.theme`, a fixed viewport where layout matters, `await document.fonts.ready` before measuring text, and `behavior: 'instant'` for scrolling. A `mouse.wheel` stays short of the page's end: WebKit can rubber-band past it, and hit tests then miss everything. No network: only the vendored toolkit and local assets.
 - **Every story and spec stands alone.** It must pass when run alone, in any order and on both Chromium and WebKit. Anything mounted outside the canvas (modals, live regions, listeners on `window`) is removed by the test that made it.
 - **Assert outcomes, not timing or incidental details.** Check roles, names, states, focus and computed styles; don't count renders or depend on animation progress.
-- **Prove a new or changed test is stable** before merging: `pnpm exec playwright test <spec> --repeat-each 20`, and `pnpm test --repeats 10 stories/<Name>.stories.svelte` for its stories.
+- **Prove a new or changed test is stable** before merging: `pnpm exec playwright test <spec> --repeat-each 20`, and `pnpm vitest run --project storybook-svelte --repeats 10 stories/<Name>.stories.svelte` for its stories (repeats also prove its contract snapshot doesn't depend on what ran before).
 - **A flake found in CI gets fixed, not rerun away.** If it can't be fixed in the PR that found it, skip the test with a comment linking an issue that names the failure, and fix it before the next release.
 
 ## Plans

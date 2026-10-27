@@ -1,0 +1,13 @@
+/* Story-only styles for ButtonGrid.svelte, in a plain file so a React twin can share them. */
+
+.button-grid {
+  padding: 0.5rem 1rem;
+  background: var(--ilw-color--background);
+}
+
+.button-grid-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 1rem;
+}

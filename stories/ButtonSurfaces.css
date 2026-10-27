@@ -1,0 +1,13 @@
+/* Story-only styles for ButtonSurfaces.svelte, in a plain file so a React twin can share them. */
+
+.button-surfaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* The theme only sets properties; paint the surface so the ring sits on it. */
+.button-surface {
+  padding: 1.5rem;
+  background: var(--ilw-color--background);
+}

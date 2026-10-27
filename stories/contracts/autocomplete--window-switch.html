@@ -1,0 +1,18 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <form>
+      <p><label>Before <input name="before" type="text" .value=""></label></p>
+      <p>
+        <label for="prof" id="prof-label">Professor</label> <span class="autocomplete" data-part="root" data-scope="combobox" id="combobox:prof"><input aria-autocomplete="list" aria-controls="prof-popup" aria-expanded="true" autocapitalize="none" autocomplete="off" autocorrect="off" class="autocomplete-input" data-part="input" data-scope="combobox" data-state="open" id="prof" placeholder="Name or NetID" role="combobox" spellcheck="false" type="text" .value="brow">
+          <div aria-labelledby="prof-label" class="autocomplete-popup" data-part="content" data-placement="bottom" data-scope="combobox" data-side="bottom" data-state="open" id="prof-popup" role="listbox" style="--layer-index: 0; --nested-layer-count: 0; pointer-events: auto" tabindex="-1">
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="bbrown" id="prof-popup-opt-bbrown" role="option" tabindex="-1">B. Brown — Blake Brown (bbrown)</div>
+          </div>
+        </span>
+      </p>
+      <p><label>After <input name="after" type="text" .value=""></label></p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <p>Text: <output data-testid="text">brow</output>; chosen: <output data-testid="chosen"></output> (<span data-testid="selects">0</span> selects, <span data-testid="submits">0</span> submits; change on pick: <output data-testid="picks">brown</output>)</p>
+  </main>
+</div>

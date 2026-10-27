@@ -4,6 +4,8 @@
 
   import ChoiceChipsDemo from './ChoiceChipsDemo.svelte';
 
+  import './ChoiceChips.stories.css';
+
   // No `component`: the stories render ChoiceChipsDemo, which binds the value.
   const { Story } = defineMeta({
     title: 'Forms/ChoiceChips',
@@ -254,10 +256,10 @@
     }
   }}
 >
-  <div class="surfaces">
+  <div class="chips-surfaces">
     {#each ['white', 'gray', 'blue', 'orange'] as surface (surface)}
       <!-- `theme` isn't a typed HTML attribute; the theme rules select on it. -->
-      <section class="surface" {...{ theme: surface }} aria-label="{surface} surface">
+      <section class="chips-surface" {...{ theme: surface }} aria-label="{surface} surface">
         <ChoiceChipsDemo legend="Country ({surface})" name="country-{surface}" options={countries.slice(0, 3)} value="ca" />
       </section>
     {/each}
@@ -279,18 +281,3 @@
     <input id="fixture-after" type="text" name="filename" />
   </div>
 </Story>
-
-<style>
-  .surfaces {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  /* The theme only sets properties; paint the surface so the chips sit on it. */
-  .surface {
-    padding: 0 1.5rem;
-    background: var(--ilw-color--background);
-    color: var(--ilw-color--text);
-  }
-</style>

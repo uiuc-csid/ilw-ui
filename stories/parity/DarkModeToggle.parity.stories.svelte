@@ -4,6 +4,8 @@
 
   import DarkModeToggle from '../../src/svelte/DarkModeToggle.svelte';
 
+  import './DarkModeToggle.parity.stories.css';
+
   // No autodocs: a Docs page renders every story in one document, and the two
   // sides of a pair need different stylesheets.
   const { Story } = defineMeta({ title: 'Parity/Dark-mode toggle' });
@@ -49,9 +51,9 @@
 <Story name="Side By Side" tags={['!test']} parameters={{ styles: 'ilw-ui', a11y: { test: 'off' } }}>
   {#snippet template(_args, context)}
     {@const globals = `theme:${String(context.globals.theme ?? 'light')}`}
-    <div class="stacked">
+    <div class="dark-mode-stacked">
       {#each [['Toolkit', 'toolkit', 220], ['ilw-ui', 'ilw-ui', 80]] as const as [label, side, height] (side)}
-        <div class="head">{label}</div>
+        <div class="dark-mode-stacked-head">{label}</div>
         <iframe
           title="Dark-mode toggle, {side}"
           src="iframe.html?{new URLSearchParams({ id: `parity-dark-mode-toggle--${side}`, viewMode: 'story', globals })}"
@@ -61,22 +63,3 @@
     </div>
   {/snippet}
 </Story>
-
-<style>
-  .stacked {
-    display: grid;
-    gap: 0.25rem;
-    font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
-  }
-
-  .head {
-    margin-top: 0.75rem;
-    font-weight: 700;
-    font-size: 1.25rem;
-  }
-
-  iframe {
-    width: 100%;
-    border: 1px solid var(--il-storm-60, #8e9090);
-  }
-</style>

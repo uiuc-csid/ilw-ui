@@ -7,6 +7,8 @@
 <script lang="ts">
   import { CopyButton } from '../src/svelte/index.ts';
 
+  import './CopyButtonDemo.css';
+
   let { resetAfter = 1500 }: { resetAfter?: number } = $props();
 
   let roster = $state([
@@ -60,18 +62,3 @@
     {resetAfter}
   />
 </p>
-
-<style>
-  .ilw-copy-demo-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .ilw-copy-demo-input {
-    flex: 1 1 20rem;
-    padding: 8px;
-    font: inherit;
-  }
-</style>

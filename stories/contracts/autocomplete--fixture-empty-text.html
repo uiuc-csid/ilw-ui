@@ -1,0 +1,21 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <form>
+      <p><label>Before <input name="before" type="text" .value=""></label></p>
+      <p>
+        <label for="prof" id="prof-label">Professor</label> <span class="autocomplete" data-part="root" data-scope="combobox" id="combobox:prof"><input aria-autocomplete="list" aria-controls="prof-popup" aria-expanded="false" autocapitalize="none" autocomplete="off" autocorrect="off" class="autocomplete-input" data-part="input" data-scope="combobox" data-state="closed" id="prof" placeholder="Name or NetID" role="combobox" spellcheck="false" type="text" .value="">
+          <div aria-labelledby="prof-label" class="autocomplete-popup" data-part="content" data-scope="combobox" data-state="closed" hidden id="prof-popup" role="listbox" tabindex="-1">
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="aadams" id="prof-popup-opt-aadams" role="option" tabindex="-1">A. Adams — Avery Adams (aadams)</div>
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="bbrown" id="prof-popup-opt-bbrown" role="option" tabindex="-1">B. Brown — Blake Brown (bbrown)</div>
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="cclark" id="prof-popup-opt-cclark" role="option" tabindex="-1">C. Clark — Casey Clark (cclark)</div>
+            <div data-part="item" data-scope="combobox" data-state="unchecked" data-value="dadams" id="prof-popup-opt-dadams" role="option" tabindex="-1">D. Adams — Drew Adams (dadams)</div>
+          </div>
+        </span>
+      </p>
+      <p><label>After <input name="after" type="text" .value=""></label></p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <p>Text: <output data-testid="text"></output>; chosen: <output data-testid="chosen"></output> (<span data-testid="selects">0</span> selects, <span data-testid="submits">0</span> submits; change on pick: <output data-testid="picks"></output>)</p>
+  </main>
+</div>

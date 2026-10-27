@@ -1,0 +1,40 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h1>Course settings</h1>
+    <p>Settings for CS 124, Fall 2026. Changes apply to every section of the course.</p>
+    <div class="ilw-alert ilw-alert--error" role="alert">
+      <svg aria-hidden="true" class="ilw-icon ilw-alert-icon" fill="currentColor" height="1em" viewBox="0 0 256 256" width="1em" xmlns="http://www.w3.org/2000/svg">
+        <rect fill="none" height="256" width="256"></rect>
+        <path d="M227.31,80.23,175.77,28.69A16.13,16.13,0,0,0,164.45,24H91.55a16.13,16.13,0,0,0-11.32,4.69L28.69,80.23A16.13,16.13,0,0,0,24,91.55v72.9a16.13,16.13,0,0,0,4.69,11.32l51.54,51.54A16.13,16.13,0,0,0,91.55,232h72.9a16.13,16.13,0,0,0,11.32-4.69l51.54-51.54A16.13,16.13,0,0,0,232,164.45V91.55A16.13,16.13,0,0,0,227.31,80.23ZM120,80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm8,104a12,12,0,1,1,12-12A12,12,0,0,1,128,184Z"></path>
+      </svg>
+      <div class="ilw-alert-body">
+        <span class="ilw-visually-hidden">Error:</span>
+        <p class="ilw-alert-title">Your changes weren't saved</p>
+        <p>The server didn't answer. Your edits are still in the form below.</p>
+        <div class="ilw-alert-actions">
+          <button class="ilw-button" type="button">Try again</button>
+          <a class="ilw-button" href="#login">Log in again</a>
+        </div>
+      </div>
+      <button aria-label="Dismiss" class="ilw-alert-dismiss" type="button">
+        <svg aria-hidden="true" class="ilw-icon" fill="currentColor" height="1em" viewBox="0 0 256 256" width="1em" xmlns="http://www.w3.org/2000/svg">
+          <rect fill="none" height="256" width="256"></rect>
+          <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+        </svg>
+      </button>
+    </div>
+    <form>
+      <div class="ilw-input-entry">
+        <label class="ilw-label-required" for="ilw-field-{1}">Course title</label>
+        <input id="ilw-field-{1}" name="title" required type="text" .value="Introduction to Computer Science">
+      </div>
+      <div class="ilw-input-entry">
+        <label for="ilw-field-{2}">Enrollment cap</label>
+        <input aria-describedby="ilw-field-{2}-description" id="ilw-field-{2}" name="cap" type="number" .value="900">
+        <p class="ilw-input-description" id="ilw-field-{2}-description">Across all sections.</p>
+      </div>
+      <p><button class="ilw-button" type="submit">Save</button></p>
+    </form>
+  </main>
+</div>

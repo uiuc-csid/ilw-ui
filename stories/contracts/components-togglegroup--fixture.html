@@ -1,0 +1,33 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h2>Courses needing TAs</h2>
+    <p>Filter the list by course level and by the terms each course is offered.</p>
+    <div aria-labelledby="fixture-level-label" class="ilw-toggle-group" id="fixture-level" role="group">
+      <span class="ilw-toggle-group-label" id="fixture-level-label">Level</span>
+      <button aria-pressed="true" class="ilw-button ilw-button-small" data-value="all" type="button">All</button>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="100" type="button">100–299</button>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="300" type="button">300–499</button>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="500" type="button">500+</button>
+    </div>
+    <div aria-labelledby="fixture-terms-label" class="ilw-toggle-group" id="fixture-terms" role="group">
+      <span class="ilw-toggle-group-label" id="fixture-terms-label">Offered</span>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="fa" type="button">Fall</button>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="sp" type="button">Spring</button>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="su" type="button">Summer</button>
+      <button aria-pressed="false" class="ilw-button ilw-button-small" data-value="wi" disabled type="button">Winter</button>
+    </div>
+    <p data-testid="count" role="status">Showing 0 of 9 courses</p>
+    <table class="ilw-table">
+      <caption class="ilw-visually-hidden">Courses</caption>
+      <thead>
+        <tr>
+          <th scope="col">Course</th>
+          <th scope="col">Title</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p>Level: <output data-testid="level">all</output> (changes: <span data-testid="level-changes"></span>); terms: <output data-testid="terms"></output> (changes: <span data-testid="term-changes">0</span>)</p>
+  </main>
+</div>

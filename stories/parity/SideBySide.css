@@ -1,0 +1,24 @@
+/* Story-only styles for SideBySide.svelte, in a plain file so a React twin can share them. */
+
+.side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1rem;
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.side-by-side-head {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.side-by-side-label {
+  grid-column: 1 / -1;
+  margin-top: 0.75rem;
+  font-weight: 700;
+}
+
+.side-by-side iframe {
+  width: 100%;
+  border: 1px solid var(--il-storm-60, #8e9090);
+}

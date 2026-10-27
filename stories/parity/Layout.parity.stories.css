@@ -1,0 +1,8 @@
+/* Story-only styles for Layout.parity.stories.svelte, in a plain file so a React twin can share them. */
+
+.layout-parity-sample {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--ilw-color--border, currentcolor);
+}

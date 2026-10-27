@@ -1,4 +1,6 @@
 <script lang="ts">
+  import './FormatSample.css';
+
   let { theme }: { theme?: string } = $props();
   // `theme` isn't a typed HTML attribute; the toolkit selects on it ([theme=blue]).
   const attrs = $derived(theme ? { theme } : {});
@@ -7,7 +9,7 @@
 <!-- A long sample page: every element .ilw-format styles. The same markup on
      both sides of the parity pair; the toolkit styles it through the story
      wrapper's <ilw-page class="ilw-format"><main>, ilw-ui through this div. -->
-<div class="ilw-format sample" {...attrs}>
+<div class="ilw-format format-sample" {...attrs}>
   <h1 id="format-top">Graduate admissions</h1>
   <p>
     The department admits students to the <strong>MS</strong> and <strong>PhD</strong> programs each fall. Read the
@@ -60,10 +62,3 @@
   <pre><code>pnpm storybook</code></pre>
   <p><b>Bold</b>, <i>italic</i> and <a href="#format-requirements">a second link</a> in one line.</p>
 </div>
-
-<style>
-  /* Story-only: room around the sample, so a painted .ilw-format background shows. */
-  .sample {
-    padding: 0.5rem 1rem 1.5rem;
-  }
-</style>

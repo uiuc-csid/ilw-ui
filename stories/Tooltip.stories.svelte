@@ -5,6 +5,8 @@
   import Tooltip, { type TooltipArrow } from '../src/svelte/Tooltip.svelte';
   import TooltipDemo from './TooltipDemo.svelte';
 
+  import './Tooltip.stories.css';
+
   // No `component`: every story renders its own Tooltips, and Storybook would
   // otherwise render a bare Tooltip (with no `children`) from the args.
   const { Story } = defineMeta({
@@ -184,7 +186,7 @@
 >
   <h1>Placements</h1>
   <p>Each button's tooltip sits on the side its name gives, with the arrow pointing back at it.</p>
-  <div class="placements">
+  <div class="tooltip-placements">
     {#each ARROWS as arrow (arrow)}
       <Tooltip {arrow} text="Tooltip text that wraps onto a second line.">
         {#snippet children(attrs)}
@@ -194,19 +196,3 @@
     {/each}
   </div>
 </Story>
-
-<style>
-  /* Three rows: top-*, then left and right at the ends, then bottom-*. About 900px wide, with
-     room on each side for the left and right bubbles, so no bubble reaches the viewport's edge. */
-  .placements {
-    display: grid;
-    grid-template-columns: repeat(3, 8rem);
-    gap: 6rem 2rem;
-    padding: 6rem 14rem;
-    width: max-content;
-  }
-
-  .placements > :global(:nth-child(5)) {
-    grid-column: 3;
-  }
-</style>

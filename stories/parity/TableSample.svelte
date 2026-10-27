@@ -1,6 +1,8 @@
 <script lang="ts">
   import { TABLE_VARIANTS } from './tables.ts';
 
+  import './TableSample.css';
+
   /** 'all', or one variant id from TABLE_VARIANTS. */
   let { variant = 'all' }: { variant?: string } = $props();
   const shown = $derived(variant === 'all' ? TABLE_VARIANTS : TABLE_VARIANTS.filter((v) => v.id === variant));
@@ -32,7 +34,7 @@
 {/snippet}
 
 <!-- Each variant on the page default, so dark mode shows around it too. -->
-<div class="tables">
+<div class="table-samples">
   {#each shown as v (v.id)}
     {#if v.wrap === 'responsive'}
       <!-- A scrolling region must be focusable so keyboard users can scroll it (axe scrollable-region-focusable). -->
@@ -47,13 +49,3 @@
     {/if}
   {/each}
 </div>
-
-<style>
-  .tables {
-    display: grid;
-    gap: 1.5rem;
-    padding: 1rem;
-    background: var(--ilw-color--background);
-    color: var(--ilw-color--text);
-  }
-</style>

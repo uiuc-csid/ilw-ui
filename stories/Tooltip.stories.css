@@ -1,0 +1,15 @@
+/* Story-only styles for Tooltip.stories.svelte, in a plain file so a React twin can share them. */
+
+/* Three rows: top-*, then left and right at the ends, then bottom-*. About 900px wide, with
+   room on each side for the left and right bubbles, so no bubble reaches the viewport's edge. */
+.tooltip-placements {
+  display: grid;
+  grid-template-columns: repeat(3, 8rem);
+  gap: 6rem 2rem;
+  padding: 6rem 14rem;
+  width: max-content;
+}
+
+.tooltip-placements > :nth-child(5) {
+  grid-column: 3;
+}

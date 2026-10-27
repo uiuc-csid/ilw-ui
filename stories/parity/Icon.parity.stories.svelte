@@ -8,6 +8,8 @@
   import { toolkitIcons } from './icons.ts';
   import SideBySide from './SideBySide.svelte';
 
+  import './Icon.parity.stories.css';
+
   // No autodocs: a Docs page renders every story in one document, and the two
   // sides of a pair need different stylesheets.
   const { Story } = defineMeta({ title: 'Parity/Icon' });
@@ -91,20 +93,3 @@
     <SideBySide pair="parity-icon" theme={String(context.globals.theme ?? 'light')} height={2400} />
   {/snippet}
 </Story>
-
-<style>
-  .icon-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-    gap: 0.5rem 1rem;
-    padding: 0;
-    list-style: none;
-    font-size: 1.25rem;
-  }
-  .icon-grid li {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 1.25rem;
-  }
-</style>

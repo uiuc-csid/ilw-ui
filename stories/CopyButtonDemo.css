@@ -1,0 +1,14 @@
+/* Story-only styles for CopyButtonDemo.svelte, in a plain file so a React twin can share them. */
+
+.ilw-copy-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ilw-copy-demo-input {
+  flex: 1 1 20rem;
+  padding: 8px;
+  font: inherit;
+}

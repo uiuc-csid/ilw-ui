@@ -1,0 +1,48 @@
+/* Story-only styles for ThemeSwatch.svelte, in a plain file so a React twin can share them. */
+
+.theme-swatch {
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--ilw-color--border);
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+/* Large text (WCAG: 18.66px bold): the toolkit's orange theme puts white on
+   Illinois Orange (3.3:1) in headings and controls, which passes only at this size. */
+.theme-swatch h2 {
+  margin: 0 0 0.5rem;
+  color: var(--ilw-color--heading);
+  font: 700 1.5rem/1.2 var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.theme-swatch p {
+  margin: 0 0 0.75rem;
+  font: 400 1.125rem/1.5 var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.theme-swatch a {
+  color: var(--ilw-color--link);
+}
+
+.theme-swatch a:hover {
+  color: var(--ilw-color--link-hover);
+}
+
+.theme-swatch button {
+  padding: 0.375rem 1rem;
+  border: 2px solid var(--ilw-color--control-text);
+  border-radius: 0;
+  background: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+  font: 700 1.25rem/1.2 var(--il-font-sans, 'Source Sans 3', sans-serif);
+  cursor: pointer;
+}
+
+.theme-swatch a:focus-visible,
+.theme-swatch button:focus-visible {
+  outline: 3px solid var(--ilw-color--focus--outline);
+  outline-offset: 2px;
+  background: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+}
