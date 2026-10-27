@@ -25,6 +25,8 @@ export { default as Grid } from './Grid.svelte';
 export { default as Icon } from './Icon.svelte';
 export { type LayoutTheme, type LayoutWidth } from './layout.ts';
 export { default as Modal } from './Modal.svelte';
+export { default as MultiCombobox } from './MultiCombobox.svelte';
+export { type AsyncSource } from './async-search.svelte.ts';
 export {
   alert,
   type CloseReason,
