@@ -6,6 +6,7 @@ export { default as Content } from './Content.svelte';
 export { default as DarkModeToggle } from './DarkModeToggle.svelte';
 export { default as Field, type FieldAttrs } from './Field.svelte';
 export { default as RadioGroup, type RadioOption } from './RadioGroup.svelte';
+export { type ChipOption, default as ChoiceChips } from './ChoiceChips.svelte';
 export {
   type AnyDataTable,
   createDataTable,

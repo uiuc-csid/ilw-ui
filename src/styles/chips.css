@@ -1,0 +1,145 @@
+/* Choice chips (E5), no toolkit equivalent: native radios or checkboxes in
+   fieldset.ilw-chips, each wrapped in label.ilw-chip and drawn as a pill.
+   No script: the inputs stay real form controls, so the keyboard and the form
+   submission are native. ChoiceChips renders this markup.
+
+   Checked is never colour alone: the input stays visible as the chip's
+   indicator (a circle for a radio, a square for a checkbox) and fills with a
+   dot or a tick, and the chip inverts to the control text colour, as the
+   switch does. Focus is a 3px ring around the whole chip; an invalid group's
+   chips get the 2px ring forms.css gives invalid radios. Colours come from
+   --ilw-color--* (tokens.css), so themes and dark mode follow. Help text and
+   the error reuse .ilw-input-description and .ilw-input-alert (forms.css).
+   The label type is the button's (700, 19px): large text, so the orange
+   theme's white on orange (3:1) still passes. Each selector weighs one class, the rest in :where(), as in forms.css. */
+
+.ilw-chips {
+  min-inline-size: 0;
+  margin: 20px 0;
+  padding: 0;
+  border: 0;
+}
+
+:is(.ilw-chips) > :where(legend) {
+  margin: 0;
+  padding: 0 0 5px;
+  color: var(--ilw-color--text);
+  font: 600 1.125rem/1.4rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-align: left;
+}
+
+.ilw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  box-sizing: border-box;
+  margin: 0 8px 8px 0;
+  padding: 4px 14px 4px 10px;
+  border: 2px solid var(--ilw-color--control-text);
+  border-radius: 1.25em;
+  background-color: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+  font: 700 1.188rem/1.5rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.ilw-chip:where(:hover):where(:not(:has(input:checked, input:disabled))) {
+  background-color: var(--ilw-color--focus--background);
+  color: var(--ilw-color--focus--text);
+}
+
+.ilw-chip:where(:has(input:checked)) {
+  background-color: var(--ilw-color--control-text);
+  color: var(--ilw-color--control);
+}
+
+/* Radios ring on :focus, not :focus-visible: WebKit stops matching
+   :focus-visible once an arrow key moves focus within the group. */
+.ilw-chip:where(:has(input:focus-visible, input[type='radio']:focus)) {
+  outline: 3px solid var(--ilw-color--link-hover);
+  outline-offset: 2px;
+}
+
+.ilw-chip:where(:has(input:disabled)) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* The indicator: the input itself, 1em, in the chip's text colour. */
+:is(.ilw-chip) > :where(input) {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-content: center;
+  box-sizing: border-box;
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  padding: 0;
+  border: 2px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  appearance: none;
+  cursor: inherit;
+}
+
+:is(.ilw-chip) > :where(input[type='radio']) {
+  border-radius: 50%;
+}
+
+:is(.ilw-chip) > :where(input)::before {
+  width: 0.5em;
+  height: 0.5em;
+  background-color: currentColor;
+  content: '';
+  transform: scale(0);
+}
+
+:is(.ilw-chip) > :where(input[type='radio'])::before {
+  border-radius: 50%;
+}
+
+:is(.ilw-chip) > :where(input[type='checkbox'])::before {
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
+}
+
+:is(.ilw-chip) > :where(input:checked)::before {
+  transform: scale(1);
+}
+
+/* The ring is on the chip, not the input. */
+:is(.ilw-chip) > :where(input:focus) {
+  outline: none;
+}
+
+/* Help text and the error, under the chips. */
+:is(.ilw-chips) > :where(.ilw-input-description) {
+  margin: 0;
+  padding-top: 0;
+  color: var(--ilw-color--text);
+  font: 1rem/1.125rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+:is(.ilw-chips) > :where(.ilw-input-alert) {
+  margin-top: 5px;
+}
+
+/* An invalid group: role="radiogroup" with aria-invalid, an aria-invalid
+   checkbox, or :user-invalid. */
+:is(.ilw-chips) > :where(.ilw-chip):where([aria-invalid='true'] > *, :has(input:user-invalid, input[aria-invalid='true'])):where(:not(:has(input:focus-visible, input[type='radio']:focus))) {
+  outline: 2px solid var(--ilw-color--link-hover);
+  outline-offset: 1px;
+}
+
+/* Forced colours drop the fill and the painted mark: fall back to the native
+   control inside the chip's border. */
+@media (forced-colors: active) {
+  :is(.ilw-chip) > :where(input) {
+    appearance: auto;
+  }
+
+  :is(.ilw-chip) > :where(input)::before {
+    content: none;
+  }
+}
