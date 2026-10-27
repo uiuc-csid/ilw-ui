@@ -27,6 +27,8 @@ export { default as Grid } from './Grid.svelte';
 export { default as Icon } from './Icon.svelte';
 export { type LayoutTheme, type LayoutWidth } from './layout.ts';
 export { default as Modal } from './Modal.svelte';
+export { default as MultiCombobox } from './MultiCombobox.svelte';
+export { type AsyncSource } from './async-search.svelte.ts';
 export {
   alert,
   type CloseReason,
@@ -55,3 +57,5 @@ export {
 export { default as BackToTop } from './BackToTop.svelte';
 export { default as SectionNav, type SectionNavItem } from './SectionNav.svelte';
 export { default as Tooltip, type TooltipArrow, type TooltipAttrs } from './Tooltip.svelte';
+export { default as Tabs, type TabItem } from './Tabs.svelte';
+export { enhanceAllTabs, enhanceTabs } from './tabs.ts';

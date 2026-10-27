@@ -4,13 +4,21 @@
   // last suggestion chosen.
   import type { AutocompleteItem } from '../src/core/index.ts';
   import Autocomplete from '../src/svelte/Autocomplete.svelte';
+  import StubServerPanel from './StubServerPanel.svelte';
+  import type { StubServer } from './stub-source.svelte.ts';
 
   let {
-    items,
+    items = [],
+    server,
     value = '',
     ...rest
   }: {
-    items: AutocompleteItem[];
+    items?: AutocompleteItem[];
+    /** Async stories: the stub search endpoint; its `source` is passed on, and its panel shown. */
+    server?: StubServer<AutocompleteItem>;
+    debounce?: number;
+    loadingText?: string;
+    errorText?: string;
     value?: string;
     placeholder?: string;
     minChars?: number;
@@ -52,6 +60,7 @@
       popupId="prof-popup"
       labelId="prof-label"
       {items}
+      source={server?.source}
       bind:value={text}
       onselect={(item) => {
         chosen = item.value;
@@ -68,3 +77,6 @@
   (<span data-testid="selects">{selects}</span> selects, <span data-testid="submits">{submits}</span> submits; change on pick:
   <output data-testid="picks">{picks.join(' | ')}</output>)
 </p>
+{#if server}
+  <StubServerPanel {server} />
+{/if}

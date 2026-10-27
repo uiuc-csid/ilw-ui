@@ -4,13 +4,22 @@
   // ta-manager's ComboboxSelect adapter will render it.
   import type { ComboboxItem } from '../src/core/index.ts';
   import Combobox from '../src/svelte/Combobox.svelte';
+  import StubServerPanel from './StubServerPanel.svelte';
+  import type { StubServer } from './stub-source.svelte.ts';
 
   let {
-    items,
+    items = [],
+    server,
     value = null,
     ...rest
   }: {
-    items: ComboboxItem[];
+    items?: ComboboxItem[];
+    /** Async stories: the stub search endpoint; its `source` is passed on, and its panel shown. */
+    server?: StubServer<ComboboxItem>;
+    debounce?: number;
+    loadingText?: string;
+    errorText?: string;
+    name?: string;
     value?: string | null;
     placeholder?: string;
     max?: number;
@@ -42,6 +51,7 @@
       popupId="person-popup"
       labelId="person-label"
       {items}
+      source={server?.source}
       value={selected}
       onchange={(v) => {
         selected = v;
@@ -54,3 +64,6 @@
   <p><button type="submit">Submit</button></p>
 </form>
 <p>Selected: <output data-testid="selected">{selected ?? ''}</output> (<span data-testid="changes">{changes}</span> changes, <span data-testid="submits">{submits}</span> submits)</p>
+{#if server}
+  <StubServerPanel {server} />
+{/if}
