@@ -79,6 +79,50 @@ export function focusStaysPut<M extends { implementations?: { actions?: Record<s
   };
 }
 
+interface HighlightParams {
+  context: { get(key: 'value'): string[]; set(key: 'highlightedValue', value: string): void };
+  prop(key: 'collection'): {
+    has(value: string): boolean;
+    sort(values: string[]): string[];
+    firstValue: string | null;
+    lastValue: string | null;
+  };
+}
+
+/**
+ * ArrowDown or ArrowUp on a closed list opens it on the selection, else the
+ * first or last option (`highlightFirstOrSelectedItem`,
+ * `highlightLastOrSelectedItem`; a click, `highlightFirstSelectedItem`). Zag
+ * sets that highlight a frame later (a `raf`), from whatever list shows then.
+ * Keys typed inside that frame have filtered the list since, so it replaced a
+ * lone match with a selection now hidden (a WebKit CI flake), or highlighted a
+ * guess that Enter or Tab would take. Each component updates its list before
+ * Zag's keydown handler runs, so highlight at once, and only a shown option.
+ */
+export function highlightAtOnce<M extends { implementations?: { actions?: Record<string, unknown> } }>(machine: M): M {
+  const highlight =
+    (fallback: 'firstValue' | 'lastValue' | null) =>
+    ({ context, prop }: HighlightParams) => {
+      const collection = prop('collection');
+      const selected = collection.sort(context.get('value')).find((v) => collection.has(v));
+      const value = selected ?? (fallback && collection[fallback]);
+      if (value != null) context.set('highlightedValue', value);
+    };
+  const implementations = machine.implementations ?? {};
+  return {
+    ...machine,
+    implementations: {
+      ...implementations,
+      actions: {
+        ...implementations.actions,
+        highlightFirstSelectedItem: highlight(null),
+        highlightFirstOrSelectedItem: highlight('firstValue'),
+        highlightLastOrSelectedItem: highlight('lastValue'),
+      },
+    },
+  };
+}
+
 /**
  * Whether a `focusout` inside `root` means focus has left it. When the window
  * loses focus (switching windows or tabs, or a headless browser's window
