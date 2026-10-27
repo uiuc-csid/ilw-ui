@@ -9,7 +9,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { type LayoutTheme, type LayoutWidth, widthClass } from './layout.ts';
+  import { type LayoutTheme, type LayoutWidth, widthClass } from '../core/layout.ts';
 
   let {
     mode = '1x1',

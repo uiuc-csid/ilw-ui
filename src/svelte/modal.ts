@@ -10,31 +10,14 @@
 import { mount, type Snippet, unmount } from 'svelte';
 
 import { nextId } from '../core/index.ts';
+import { confirmButtons, defaultButtons, type ModalBaseOptions } from '../core/modal.ts';
 import Modal from './Modal.svelte';
 
-export type CloseReason = 'button' | 'dismiss';
+export type { CloseReason, ModalButton, ModalSize } from '../core/modal.ts';
 
-export type ModalSize = 'small' | 'medium' | 'large' | 'full';
-
-export interface ModalButton<T> {
-  label: string;
-  value: T;
-  /** Focus this button on open. Give it to the safe choice so a stray Enter never confirms. */
-  autofocus?: boolean;
-}
-
-export interface ModalOptions<T> {
-  title?: string;
-  /** The dialog's name when there is neither `title` nor `message`. Default 'Dialog'. */
-  label?: string;
+export interface ModalOptions<T> extends ModalBaseOptions<T> {
   /** Rich content; takes precedence over `message`. */
   body?: Snippet;
-  /** Plain text, rendered as a `<p>`. */
-  message?: string;
-  buttons?: ModalButton<T>[];
-  size?: ModalSize;
-  /** Where focus goes on close. Default: whatever had focus at open. */
-  returnFocusEl?: HTMLElement | null;
 }
 
 export async function openModal<T = true>({
@@ -42,7 +25,7 @@ export async function openModal<T = true>({
   label,
   body,
   message = '',
-  buttons = [{ label: 'Got it', value: true as T }],
+  buttons = defaultButtons<T>(),
   size = 'small',
   returnFocusEl = document.activeElement as HTMLElement | null,
 }: ModalOptions<T> = {}): Promise<T | null> {
@@ -101,10 +84,7 @@ export async function confirm({
     title,
     message,
     returnFocusEl,
-    buttons: [
-      { label: 'Cancel', value: false, autofocus: true },
-      { label: confirmLabel, value: true },
-    ],
+    buttons: confirmButtons(confirmLabel),
   });
   return choice === true;
 }

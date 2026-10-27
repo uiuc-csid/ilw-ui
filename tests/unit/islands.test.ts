@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { mountIslands, parseProps, readProps } from '../../src/svelte/islands.ts';
+import { parseProps, readProps } from '../../src/core/islands.ts';
+import { mountIslands } from '../../src/svelte/islands.ts';
 
-// Just enough of the DOM for islands.ts to walk, in node.
+// Just enough of the DOM for the island loop to walk, in node.
 function fakeEl(attrs: Record<string, string>, extra: Partial<Element> = {}): Element {
   const a = new Map(Object.entries(attrs));
   return {
