@@ -48,6 +48,26 @@ The package ships source (`.svelte`/`.ts`); consumers' Vite compiles it. `export
 - Pin every `storybook`/`@storybook/*` package to one exact version.
 - **Sources stay under `src/`.** No top-level file or folder may share a dependency's name: Vite (root = this repo) resolved the bare `svelte` import to a top-level `svelte/` folder in the ta-manager spikes. `tests/unit/guard.test.ts` checks it; don't add an alias or `optimizeDeps.exclude` instead.
 
+## Stories
+
+Stories are the workbench, the review surface and the test fixtures, so each one must explain itself and look like the real thing.
+
+- **Every story says what it tests and what to look for**, in an HTML comment directly above its `<Story>` (addon-svelte-csf turns it into the story's description on the Docs page):
+
+  ```svelte
+  <!--
+    One line: what the story renders.
+
+    **Why:** what is under test and how: what the play function checks, which spec the story backs, or why the story exists.
+
+    **Review:** what a person should see, and what to try by hand (keys, clicks, light and dark).
+  -->
+  ```
+
+  No story goes without one: fixture stories name their spec, parity `Toolkit` and `Side By Side` stories say what to compare. Change the comment when the story or its checks change.
+- **Every story shows the component as it will look on a page.** Non-parity stories set `parameters.styles: 'ilw-ui'` (only our stylesheet, as a consumer loads it) and render inside the default shell (`<Page format>`: skip link, `<main>`, `.ilw-format`). Only whole-page stories opt out with `shell: false`, and only the Unformatted checks with `format: false`.
+- **Give the component its page context**: the label, help text and neighbouring fields of a form, the heading and prose around a table or button row, enough rows to page, a realistic width. Not a bare widget on an empty canvas. Story-only wrappers (`stories/*Demo.svelte`, `parity/*Sample.svelte`) hold that context and say in a top comment what page they stand in for. The same goes for the markup examples in the README.
+
 ## Tests
 
 Accessibility is proven by tests. Every component gets three layers, all driven by its stories:
@@ -62,6 +82,18 @@ Accessibility is proven by tests. Every component gets three layers, all driven 
 - `mise run test` runs everything: `pnpm test && pnpm build-storybook && pnpm test:e2e`. Also run `pnpm check` (svelte-check, fails on warnings).
 - The toolkit CDN CAPTCHA-blocks automated browsers: tests load only the vendored copy. Refresh it with `mise run vendor:toolkit`.
 - Manual screen-reader checks live in `docs/at-smoke.md`; running them is a human task.
+
+### No flaky tests
+
+A test that sometimes fails is a bug in the test (or the component), never noise. These rules keep the suite deterministic:
+
+- **Wait on a condition, never on the clock.** Use `waitFor`/`expect.poll` in play functions and Playwright's auto-waiting locators and `expect`. No `setTimeout` sleeps, `waitForTimeout` or fixed delays. To let a known frame or task pass (e.g. Zag's deferred focus), await `requestAnimationFrame` or a zero-delay task and say why in a comment.
+- **No retries.** Vitest and Playwright run with `retries: 0`; don't raise it, and don't wrap assertions in loops that swallow failures.
+- **Deterministic inputs.** Fixed sample data and ids (no `Math.random`, no `Date.now()` in what is asserted), the Light theme unless the story sets `globals.theme`, a fixed viewport where layout matters, `await document.fonts.ready` before measuring text, and `behavior: 'instant'` for scrolling. A `mouse.wheel` stays short of the page's end: WebKit can rubber-band past it, and hit tests then miss everything. No network: only the vendored toolkit and local assets.
+- **Every story and spec stands alone.** It must pass when run alone, in any order and on both Chromium and WebKit. Anything mounted outside the canvas (modals, live regions, listeners on `window`) is removed by the test that made it.
+- **Assert outcomes, not timing or incidental details.** Check roles, names, states, focus and computed styles; don't count renders or depend on animation progress.
+- **Prove a new or changed test is stable** before merging: `pnpm exec playwright test <spec> --repeat-each 20`, and `pnpm test --repeats 10 stories/<Name>.stories.svelte` for its stories.
+- **A flake found in CI gets fixed, not rerun away.** If it can't be fixed in the PR that found it, skip the test with a comment linking an issue that names the failure, and fix it before the next release.
 
 ## Plans
 

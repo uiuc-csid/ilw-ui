@@ -342,6 +342,7 @@ The last child of `.ilw-page`, so it is last in the focus order.
 - **Keyboard and focus** (`tests/e2e/page-chrome.spec.ts`, against fixture stories without play functions): Tab from the top reaches the skip link first and Enter moves focus into `main`; Tab order through the header at wide and narrow widths; `details` toggles with Enter and Space; popovers open from their buttons, Escape closes them and focus returns; back-to-top moves focus to the top so the next Tab is the skip link. Focus never falls to `<body>`.
 - **axe:** every story, plus an "open" story per disclosure (a `details` with `open`, a popover shown from its play function).
 - **Parity pairs** per item (`stories/parity/<Name>.parity.stories.svelte`): the toolkit element against our markup, in each theme variant. Toolkit sides that need the network (`ilw-footer` fetches the campus links) render whatever arrives; the footer's toolkit side supplies its own cookies button, so the toolkit never injects the OneTrust script into the test run.
+- **Story descriptions and page context:** every story has the AGENTS.md "Stories" comment (summary, **Why:**, **Review:**) and renders with `styles.css` only, inside the page shell, with real page content around each piece of chrome (a title, breadcrumbs and a few paragraphs under the header; enough page to scroll for back-to-top).
 - **AT smoke:** a section per item in `docs/at-smoke.md`, with the announcements listed above.
 
 ## Order

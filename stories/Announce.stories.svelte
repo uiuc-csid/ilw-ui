@@ -6,6 +6,7 @@
 
   const { Story } = defineMeta({
     title: 'announce',
+    parameters: { styles: 'ilw-ui' },
     // The Docs page lists every story with its review notes (the comment above it).
     tags: ['autodocs'],
   });

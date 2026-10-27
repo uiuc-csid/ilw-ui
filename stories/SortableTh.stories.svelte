@@ -78,6 +78,8 @@
 <!--
   The sorted column, descending.
 
+  **Why:** the play function checks the descending state: `aria-sort="descending"` on the `th`, `th-sort on` on the button, and the arrow in an `aria-hidden` span so the accessible name stays "Name".
+
   **Review:** the heading shows "Name ↓", and the arrow is hidden from screen readers.
 -->
 <Story
@@ -95,6 +97,8 @@
 
 <!--
   Has no `play` function: it is the starting page for `tests/e2e/sortable-th.spec.ts`. Three headings, sorted with `nextSort`.
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
 
   **Review:** tab to a heading and press Enter or Space. The rows re-sort, and focus stays on the same button rather than dropping to `<body>` when the table re-renders.
 -->

@@ -310,12 +310,16 @@
 <!--
   Has no `play` function: it is the starting page for `tests/e2e/modal.spec.ts`.
 
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state. A synthetic Escape doesn't close a native dialog, so the focus trap and Escape are only provable with real keys.
+
   **Review:** open the dialog by keyboard. Focus starts on Cancel, and Tab cycles Cancel → Delete → × and back to Cancel without leaving the dialog. Escape closes it, Enter on Delete confirms, and focus always returns to the trigger.
 -->
 <Story name="Trigger" args={{ kind: 'confirm' }} />
 
 <!--
   Has no `play` function: the starting page for the Tab-cycle spec with a form body in `tests/e2e/modal.spec.ts`.
+
+  **Why:** Storybook runs a story's `play` function whenever it loads, so a spec needs a story without one to start from a clean state.
 
   **Review:** open it, type a name, and Tab through: input → Preview link → Cancel → Rename → × → input.
 -->
