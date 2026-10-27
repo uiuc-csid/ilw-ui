@@ -215,7 +215,7 @@ The toolkit fetches `https://api.brand.illinois.edu/footer` on every page view. 
 
 - `src/core/campus-footer.ts` holds that JSON as a typed constant (`campusFooter`: three sections of four links, plus privacy, copyright and accessibility), with the fetch date in a comment, and `campusLink(href, source)`, which appends `utm_source=<source>&utm_medium=web&utm_campaign=Footer` the way upstream does. Exported from `ilw-ui/core`, so non-Svelte servers can render it too.
 - **Why not fetch at runtime:** it needs script and a `connect-src` exception, it would leave the footer empty on server-rendered and no-JS pages, and it would make the tests depend on the network.
-- **Keeping it in step:** `mise run vendor:footer` refetches the JSON and rewrites the constant; the diff shows any change. Running it on a schedule joins the roadmap's "following upstream" open question (the toolkit refresh job). Brand owns the content (the roadmap's "footer content" question); the README points at the API as the source of truth.
+- **Keeping it in step:** `mise run vendor:footer` refetches the JSON and rewrites the constant; the diff shows any change. The weekly upstream workflow runs it with the toolkit refresh (the roadmap's "following upstream" decision). Brand owns the content; the README points at the API as the source of truth, and `Footer`'s `campus` prop overrides our copy (the roadmap's "footer content" decision).
 
 ### Svelte
 

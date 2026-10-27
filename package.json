@@ -1,6 +1,6 @@
 {
   "name": "ilw-ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Accessible Svelte components that look and behave like the Illinois Web Toolkit",
   "license": "MIT",

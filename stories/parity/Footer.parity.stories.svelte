@@ -140,6 +140,43 @@
 </Story>
 
 <!--
+  The campus content passed in through `campus`, replacing the vendored copy.
+
+  **Why:** Brand can change the campus links before ilw-ui refreshes `campusFooter`; an app overrides them without waiting for a release. The play function checks the override replaces the sections and the legal links, and keeps the UTM parameters.
+
+  **Review:** one campus section, "Override Section", and the legal row's privacy, copyright and accessibility links read "Override …".
+-->
+<Story
+  name="Campus Override"
+  parameters={{ styles: 'ilw-ui' }}
+  play={async ({ canvasElement }) => {
+    const footer = within(canvasElement.querySelector<HTMLElement>('footer')!);
+    const sections = canvasElement.querySelectorAll('.ilw-footer-section');
+    await expect(sections).toHaveLength(1);
+    await expect(footer.getByRole('heading', { level: 3, name: 'Override Section' })).toBeInTheDocument();
+    await expect(footer.getByRole('link', { name: 'Override Link' })).toHaveAttribute(
+      'href',
+      'https://example.illinois.edu/?utm_source=Illinois_App&utm_medium=web&utm_campaign=Footer',
+    );
+    const legal = [...canvasElement.querySelectorAll('.ilw-footer-legal a')].map((a) => a.textContent);
+    await expect(legal).toEqual(['Override Privacy', 'Override Copyright', 'Override Accessibility']);
+  }}
+>
+  <Footer
+    campus={{
+      sections: [
+        { label: 'Override Section', links: [{ label: 'Override Link', href: 'https://example.illinois.edu/' }] },
+      ],
+      privacy: { label: 'Override Privacy', href: 'https://example.illinois.edu/privacy' },
+      copyright: { label: 'Override Copyright', href: 'https://example.illinois.edu/copyright' },
+      accessibility: { label: 'Override Accessibility', href: 'https://example.illinois.edu/accessibility' },
+    }}
+  >
+    {#snippet siteName()}Sample Site{/snippet}
+  </Footer>
+</Story>
+
+<!--
   Both sides, each in its own iframe.
 
   **Why:** the two stylesheets share class names, so they can't be compared in one document. Not a test (`!test`, axe off): its frames are the two stories above, which are tested themselves.

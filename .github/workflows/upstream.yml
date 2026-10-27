@@ -1,0 +1,56 @@
+# Follows upstream: refreshes the vendored toolkit (vendor/illinois-toolkit)
+# and the campus footer content (src/core/campus-footer.ts) every week, and
+# opens or updates a pull request when either changed beyond its fetch date.
+# Review it in Chromatic: the parity stories show how the toolkit side moved.
+#
+# Pushes and pull requests made with GITHUB_TOKEN don't trigger other
+# workflows, so this dispatches CI and Chromatic on the branch itself. Needs
+# "Allow GitHub Actions to create and approve pull requests" in the repository's
+# Actions settings.
+name: Upstream
+
+on:
+  schedule:
+    - cron: '0 13 * * 1' # Mondays, 13:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write # workflow_dispatch for CI and Chromatic
+
+concurrency: upstream
+
+env:
+  BRANCH: upstream/refresh
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - run: sh scripts/vendor-toolkit.sh
+      - run: node scripts/vendor-footer.mjs
+      - name: Open or update the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Both scripts rewrite their fetch date on every run; ignore it.
+          if git diff --quiet -I '[Ff]etched [0-9][0-9-]*'; then
+            echo 'No upstream changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -C "$BRANCH"
+          git commit -am 'Refresh vendored toolkit and campus footer'
+          git push --force origin "$BRANCH"
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            gh pr create --head "$BRANCH" --title 'Refresh vendored toolkit and campus footer' --body \
+              'Weekly refresh of `vendor/illinois-toolkit` and `src/core/campus-footer.ts` (`.github/workflows/upstream.yml`). Review the parity stories in Chromatic and the diff; update ilw-ui where the toolkit moved.'
+          fi
+          gh workflow run ci.yml --ref "$BRANCH"
+          gh workflow run chromatic.yml --ref "$BRANCH"

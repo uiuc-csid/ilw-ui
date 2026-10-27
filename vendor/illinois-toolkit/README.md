@@ -15,7 +15,9 @@ bundle tests against exactly what consuming pages run.
 One local edit: `toolkit.css` refers to `../svg/*.svg` relative to the CDN.
 Those are rewritten to absolute CDN URLs, where they resolved before.
 
-To update: `mise run vendor:toolkit` (it reapplies that edit), check the stories
-in `pnpm storybook`, run `mise run test`, and update the date above.
+To update: `mise run vendor:toolkit` (it reapplies that edit and the date
+above), check the stories in `pnpm storybook` and run `mise run test`. A weekly
+job does the same and opens a pull request when anything changed
+(`.github/workflows/upstream.yml`).
 
 The toolkit still loads the brand stylesheet from `cdn.brand.illinois.edu`.
