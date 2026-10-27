@@ -1,0 +1,194 @@
+/* Tooltip (C4), the look of <ilw-tooltip>. Markup (Tooltip.svelte renders it
+   and adds the behaviour; it is not usable without script):
+
+     <span class="ilw-tooltip ilw-tooltip--top-center ilw-tooltip--anchored">
+       <button type="button" aria-describedby="tip-1">…</button>
+       <span class="ilw-tooltip-bubble" role="tooltip" id="tip-1" popover="manual">Shown on hover and focus</span>
+     </span>
+
+   The trigger is the wrapper's first child. The bubble is a manual popover in
+   the top layer, so no overflow clips it. With --anchored (where position-area
+   and anchor-scope are supported), position-area places it against the
+   trigger; without, the script sets top and left. Colours come from the theme-neutral --ilw-color--* properties
+   (tokens.css): a theme attribute on the bubble recolours it, and dark mode
+   follows.
+
+   Differences from the toolkit, all deliberate:
+   - A transparent bridge (::before) covers the gap to the trigger, so the
+     pointer can move onto the bubble without closing it (WCAG 1.4.13).
+   - No fade: it shows and hides at once. */
+
+.ilw-tooltip {
+  --ilw-tooltip--width: 200px;
+  --ilw-tooltip--offset: 12px;
+
+  display: inline-flex;
+}
+
+.ilw-tooltip-bubble {
+  position: fixed;
+  inset: auto;
+  z-index: 1000;
+  box-sizing: border-box;
+  inline-size: max-content;
+  min-inline-size: min-content;
+  max-inline-size: min(var(--ilw-tooltip--width), calc(100vw - 16px));
+  margin: 0;
+  padding: 8px 12px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0.5rem;
+  box-shadow: 2px 0 4px 4px rgb(0 0 0 / 10%);
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+  font: 400 1rem/1.375rem var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* The popover UA sheet hides it when closed; this covers the no-popover fallback. */
+.ilw-tooltip-bubble[hidden] {
+  display: none;
+}
+
+.ilw-tooltip-bubble a {
+  color: inherit;
+  font: inherit;
+}
+
+/* The hover bridge, over the gap on the trigger's side. */
+.ilw-tooltip-bubble::before {
+  content: '';
+  position: absolute;
+}
+
+[class*='ilw-tooltip--top'] > .ilw-tooltip-bubble::before {
+  inset: 100% 0 auto;
+  height: var(--ilw-tooltip--offset);
+}
+
+[class*='ilw-tooltip--bottom'] > .ilw-tooltip-bubble::before {
+  inset: auto 0 100%;
+  height: var(--ilw-tooltip--offset);
+}
+
+.ilw-tooltip--left > .ilw-tooltip-bubble::before {
+  inset: 0 auto 0 100%;
+  width: var(--ilw-tooltip--offset);
+}
+
+.ilw-tooltip--right > .ilw-tooltip-bubble::before {
+  inset: 0 100% 0 auto;
+  width: var(--ilw-tooltip--offset);
+}
+
+/* Anchor positioning: each wrapper scopes the name to its own trigger. */
+.ilw-tooltip--anchored {
+  anchor-scope: --ilw-tooltip;
+}
+.ilw-tooltip--anchored > :first-child {
+  anchor-name: --ilw-tooltip;
+}
+.ilw-tooltip--anchored > .ilw-tooltip-bubble {
+  position-anchor: --ilw-tooltip;
+}
+.ilw-tooltip--anchored.ilw-tooltip--top-center > .ilw-tooltip-bubble {
+  position-area: top;
+}
+.ilw-tooltip--anchored.ilw-tooltip--top-left > .ilw-tooltip-bubble {
+  position-area: top span-right;
+}
+.ilw-tooltip--anchored.ilw-tooltip--top-right > .ilw-tooltip-bubble {
+  position-area: top span-left;
+}
+.ilw-tooltip--anchored.ilw-tooltip--bottom-center > .ilw-tooltip-bubble {
+  position-area: bottom;
+}
+.ilw-tooltip--anchored.ilw-tooltip--bottom-left > .ilw-tooltip-bubble {
+  position-area: bottom span-right;
+}
+.ilw-tooltip--anchored.ilw-tooltip--bottom-right > .ilw-tooltip-bubble {
+  position-area: bottom span-left;
+}
+.ilw-tooltip--anchored.ilw-tooltip--left > .ilw-tooltip-bubble {
+  position-area: left;
+}
+.ilw-tooltip--anchored.ilw-tooltip--right > .ilw-tooltip-bubble {
+  position-area: right;
+}
+
+/* Centred bubbles stay 8px inside the viewport, as upstream's script keeps them. */
+.ilw-tooltip--anchored.ilw-tooltip--top-center > .ilw-tooltip-bubble,
+.ilw-tooltip--anchored.ilw-tooltip--bottom-center > .ilw-tooltip-bubble {
+  margin-inline: 8px;
+}
+
+.ilw-tooltip--anchored[class*='ilw-tooltip--top'] > .ilw-tooltip-bubble {
+  margin-block-end: var(--ilw-tooltip--offset);
+}
+.ilw-tooltip--anchored[class*='ilw-tooltip--bottom'] > .ilw-tooltip-bubble {
+  margin-block-start: var(--ilw-tooltip--offset);
+}
+.ilw-tooltip--anchored.ilw-tooltip--left > .ilw-tooltip-bubble {
+  margin-inline-end: var(--ilw-tooltip--offset);
+}
+.ilw-tooltip--anchored.ilw-tooltip--right > .ilw-tooltip-bubble {
+  margin-inline-start: var(--ilw-tooltip--offset);
+}
+
+/* The arrow: a 6px triangle in the bubble's colour, pointing at the trigger. */
+.ilw-tooltip-bubble::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  filter: drop-shadow(2px 2px 4px rgb(0 0 0 / 10%));
+}
+
+[class*='ilw-tooltip--top'] > .ilw-tooltip-bubble::after {
+  top: 100%;
+  border-block-end-width: 0;
+  border-block-start-color: var(--ilw-color--background);
+}
+
+[class*='ilw-tooltip--bottom'] > .ilw-tooltip-bubble::after {
+  bottom: 100%;
+  border-block-start-width: 0;
+  border-block-end-color: var(--ilw-color--background);
+}
+
+.ilw-tooltip--top-center > .ilw-tooltip-bubble::after,
+.ilw-tooltip--bottom-center > .ilw-tooltip-bubble::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.ilw-tooltip--top-left > .ilw-tooltip-bubble::after,
+.ilw-tooltip--bottom-left > .ilw-tooltip-bubble::after {
+  left: 12px;
+}
+
+.ilw-tooltip--top-right > .ilw-tooltip-bubble::after,
+.ilw-tooltip--bottom-right > .ilw-tooltip-bubble::after {
+  right: 12px;
+}
+
+.ilw-tooltip--left > .ilw-tooltip-bubble::after,
+.ilw-tooltip--right > .ilw-tooltip-bubble::after {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ilw-tooltip--left > .ilw-tooltip-bubble::after {
+  left: 100%;
+  border-inline-end-width: 0;
+  border-inline-start-color: var(--ilw-color--background);
+}
+
+.ilw-tooltip--right > .ilw-tooltip-bubble::after {
+  right: 100%;
+  border-inline-start-width: 0;
+  border-inline-end-color: var(--ilw-color--background);
+}
