@@ -1,8 +1,9 @@
 // The framework adapters are optional peers, so a React app doesn't get
 // Svelte and the other way round (pnpm's autoInstallPeers installs required
 // peers). The pinning rule still holds: each adapter peer is exact, and equals
-// the devDependency the stories and tests run on. Renovate bumps peers rather
-// than widening them (.github/renovate.json5).
+// the devDependency the stories and tests run on. Renovate bumps adapter peers
+// rather than widening them, and leaves the framework peers alone
+// (.github/renovate.json5).
 import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
