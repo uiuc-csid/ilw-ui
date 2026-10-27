@@ -135,3 +135,30 @@ it outside the landmarks.
 **Workaround in ilw-ui:** `keepLiveRegionIn` (`src/core/zag-input.ts`) moves
 each `[data-live-announcer]` appended to `body` into the component's root while
 focus is inside it.
+
+## 8. The arrow-key highlight lands a frame late, on whatever list shows then
+
+**Status:** Not filed. Found on 1.46.0.
+
+ArrowDown or ArrowUp on a closed list runs `highlightFirstOrSelectedItem` or
+`highlightLastOrSelectedItem` (a click with `openOnClick`,
+`highlightFirstSelectedItem`). Each sets `highlightedValue` inside a
+`requestAnimationFrame`, from the collection as it is when the frame runs.
+`collection.sort(value)` keeps values the collection no longer has, so the
+selection is highlighted even when it is filtered out.
+
+**Repro:** select an option, press ArrowDown, Escape, clear the text and type
+a query with one match, all within a frame (delay `requestAnimationFrame`, or a
+slow machine). The app's lone-match highlight is replaced by the selection,
+which is no longer shown, so nothing is highlighted. With no selection, the
+first option of the filtered list is highlighted instead: a guess that Enter
+(or an app that commits on Tab) takes.
+
+**Proposal:** set the highlight in the transition, or have the deferred action
+skip values the collection doesn't have and do nothing if the input changed
+since.
+
+**Workaround in ilw-ui:** `highlightAtOnce` (`src/core/zag-input.ts`) replaces
+the three actions with synchronous ones that highlight only a shown option. The
+components update their list before Zag's keydown handler runs, so the
+collection is already current.

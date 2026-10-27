@@ -100,6 +100,26 @@ test('Tab before Zag\'s deferred focus lands still moves on', async ({ page }) =
   await expect(after).toBeFocused();
 });
 
+test('keys typed in the frame after ArrowDown get no highlight that Tab would take', async ({ page }) => {
+  // ArrowDown highlights the first suggestion; Zag did it a frame later,
+  // after the next keys had filtered the list, so a guess was highlighted
+  // and Tab took it. The long delay holds that frame past every key below.
+  await slowFrames(page, 1000);
+  await openStory(page, 'autocomplete--fixture');
+  const { input, after, chosen } = parts(page);
+
+  await input.focus();
+  await press(page, 'ArrowDown');
+  await expect(input).toHaveAttribute('aria-expanded', 'true');
+  await type(page, 'adams');
+  await framesSettled(page);
+  await expect(input).not.toHaveAttribute('aria-activedescendant');
+  await press(page, 'Tab');
+  await expect(after).toBeFocused();
+  await expect(input).toHaveValue('adams');
+  await expect(chosen).toHaveText('');
+});
+
 test('free text stays on Tab, and Enter with nothing highlighted submits the form', async ({ page }) => {
   await openStory(page, 'autocomplete--fixture');
   const { input, after, text, chosen, submits } = parts(page);

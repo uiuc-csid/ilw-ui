@@ -4,7 +4,7 @@
   import { untrack } from 'svelte';
 
   import { blurMatch, type ComboboxItem, filterItems } from '../core/index.ts';
-  import { focusLeft, focusStaysPut, keepCaret, keepLiveRegionIn } from '../core/zag-input.ts';
+  import { focusLeft, focusStaysPut, highlightAtOnce, keepCaret, keepLiveRegionIn } from '../core/zag-input.ts';
   import { AsyncSearch, type AsyncSource, statusText } from './async-search.svelte.ts';
 
   let {
@@ -141,7 +141,7 @@
     onchange(v, item);
   }
 
-  const service = useMachine(focusStaysPut(combobox.machine, () => input), {
+  const service = useMachine(highlightAtOnce(focusStaysPut(combobox.machine, () => input)), {
     get id() {
       return id;
     },

@@ -127,6 +127,31 @@ test('ArrowDown on a selected value opens the whole list at the selection', asyn
   await expect(input).toHaveValue('Drew Adams');
 });
 
+test('keys typed in the frame after ArrowDown keep their lone-match highlight', async ({ page }) => {
+  // ArrowDown highlights the selection; Zag did it a frame later, after the
+  // next keys had filtered the list, and the hidden selection replaced the
+  // lone match (flaked in CI on WebKit). The long delay holds that frame
+  // past every key below.
+  await slowFrames(page, 1000);
+  await openStory(page, 'combobox--fixture');
+  const { input, selected } = parts(page);
+
+  await input.focus();
+  await type(page, 'drew');
+  await press(page, 'Enter');
+  await expect(selected).toHaveText('dadams');
+  await press(page, 'ArrowDown');
+  await press(page, 'Escape');
+  await press(page, 'ControlOrMeta+a');
+  await press(page, 'Backspace');
+  await type(page, 'blake');
+  await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown');
+  await framesSettled(page);
+  await expect(input).toHaveAttribute('aria-activedescendant', 'person-popup-opt-bbrown');
+  await press(page, 'Enter');
+  await expect(selected).toHaveText('bbrown');
+});
+
 test('Enter with nothing highlighted keeps the list open and does not submit', async ({ page }) => {
   await openStory(page, 'combobox--fixture');
   const { input } = parts(page);
