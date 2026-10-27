@@ -3,7 +3,7 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Field, Footer, Header, Icon, PageTitle, Pagination, SectionNav } from '../src/svelte/index.ts';
+  import { Alert, Breadcrumbs, Button, Field, Footer, Header, Icon, PageTitle, Pagination, SectionNav } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
   import { programs } from './section-nav-data.ts';
@@ -201,4 +201,24 @@
     brandSans(canvasElement.querySelectorAll('.th-sort, table td, .ilw-pager-btn, .ilw-pager-count'))}
 >
   <DataTableDemo count={8} pageSize={3} />
+</Story>
+
+<!--
+  `Alert`, a warning with a title, a message and an action, outside `.ilw-format`.
+
+  **Why:** the card sets its own font, so the play function checks the title, the message and the action are in Source Sans without the prose styles, and the paragraphs keep the card's own margins.
+
+  **Review:** the same type and spacing as on **Components → Alert → Warning**.
+-->
+<Story
+  name="Alert"
+  play={async ({ canvasElement }) => {
+    await brandSans(canvasElement.querySelectorAll('.ilw-alert-title, .ilw-alert-body > p, .ilw-alert-actions .ilw-button'));
+    await expect(getComputedStyle(canvasElement.querySelector('.ilw-alert-title')!).marginTop).toBe('0px');
+  }}
+>
+  <Alert variant="warning" title="Applications close Friday at 5 p.m.">
+    <p>Your application is missing a course preference.</p>
+    {#snippet actions()}<Button href="#review">Review application</Button>{/snippet}
+  </Alert>
 </Story>

@@ -73,6 +73,7 @@ Each partial is exported too, so a page can take only what it needs, e.g.
 | `pagination.css` | `.ilw-pagination` (C5)                                    |
 | `footer.css`     | `.ilw-footer` (B3)                                        |
 | `icon.css`       | `.ilw-icon`, `.ilw-icon-row` (A6)                         |
+| `alert.css`      | `.ilw-alert` and its parts, the variants' accents (E1); needs `icon.css` |
 | `modal.css`      | `dialog.ilw-modal` and its parts (C1)                     |
 | `dark-mode-toggle.css` | `.ilw-dark-mode-toggle`'s layout; needs `switch.css` (B1) |
 | `components.css` | `.ilw-visually-hidden`, SortableTh, Combobox, Autocomplete, Pager |
@@ -1122,6 +1123,107 @@ The replacement for `<ilw-icon>`: a [Phosphor](https://phosphoricons.com) icon
   to the nearest idea, so check them by eye. Google+ maps to the Google logo.
 - `.ilw-icon-row`'s `align-items` default is `flex-start`; upstream's is
   `top`, which isn't a value, so its rows stretch.
+
+### `Alert`, `enhanceAlerts` and `.ilw-alert`
+
+Notices and messages: a save error with "Try again", a Django `messages`
+partial, "Applications close Friday". No toolkit equivalent; it looks like a
+toolkit card (white palette, brand accent stripe, `ilw-button` actions, a
+round × like the modal's).
+
+```svelte
+<script>
+  import { Alert, Button } from 'ilw-ui/svelte';
+</script>
+
+{#if saveFailed}
+  <Alert variant="error" title="Your changes weren't saved" dismissible ondismiss={() => (saveFailed = false)}>
+    <p>The server didn't answer. Your edits are still in the form below.</p>
+    {#snippet actions()}
+      <Button onclick={retry}>Try again</Button>
+      <Button href="/login/?next=/settings/">Log in again</Button>
+    {/snippet}
+  </Alert>
+{/if}
+```
+
+DOM contract, and the markup for a server template (a Django `messages`
+partial, the icons pasted from `@phosphor-icons/core`'s fill weight):
+
+```html
+<div class="ilw-alert ilw-alert--error" role="alert">
+  <svg class="ilw-icon ilw-alert-icon" aria-hidden="true" viewBox="0 0 256 256" width="1em" height="1em" fill="currentColor">…</svg>
+  <div class="ilw-alert-body">
+    <span class="ilw-visually-hidden">Error:</span>
+    <p class="ilw-alert-title">Your changes weren't saved</p>
+    <p>The server didn't answer. Your edits are still in the form below.</p>
+    <div class="ilw-alert-actions">
+      <button type="button" class="ilw-button">Try again</button>
+      <a class="ilw-button" href="/login/?next=/settings/">Log in again</a>
+    </div>
+  </div>
+  <button type="button" class="ilw-alert-dismiss" aria-label="Dismiss" hidden>
+    <svg class="ilw-icon" aria-hidden="true" …>…</svg>
+  </button>
+</div>
+```
+
+```django
+{% for message in messages %}
+  <div class="ilw-alert ilw-alert--{{ message.level_tag|default:'info' }}" role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}">
+    …icon…
+    <div class="ilw-alert-body">
+      <span class="ilw-visually-hidden">{{ message.level_tag|capfirst }}:</span>
+      <p>{{ message }}</p>
+    </div>
+    <button type="button" class="ilw-alert-dismiss" aria-label="Dismiss message" hidden>…</button>
+  </div>
+{% endfor %}
+```
+
+```js
+import { enhanceAlerts } from 'ilw-ui/svelte';
+enhanceAlerts(document); // shows and wires every .ilw-alert-dismiss[hidden]
+```
+
+- Props: `variant` (`'info'`, the default, `'success'`, `'warning'`,
+  `'error'`), `title` (string or snippet, a bold first line), `children`
+  (the message), `actions` (snippet: buttons or links), `dismissible`,
+  `dismissLabel` (default "Dismiss"), `label` (the hidden variant text,
+  default "Information:", "Success:", "Warning:", "Error:"), `open`
+  (bindable; dismissing sets it false), `ondismiss`, `id`, `class`.
+- **Roles:** `role="alert"` for errors only; info, success and warning are
+  `role="status"`. An error inserted after load is spoken at once. A status
+  rendered with the page is read where it sits; one that appears later is
+  spoken when it lands in a container that's already on the page, but not by
+  every screen reader when the alert itself is inserted. If the user must hear
+  it, also call [`announce()`](#announce). `Alert` doesn't call it for you:
+  where the reader does announce the inserted status, it would be heard twice.
+- The hidden label names the variant, so it isn't carried by colour and
+  icon alone. Django's `level_tag` gives `debug`, `info`, `success`,
+  `warning`, `error`; map `debug` to `info`.
+- **Dismissing** removes the alert. If focus was inside it (or had already
+  fallen to `<body>`), focus moves to the next tabbable element after it,
+  else the previous one, else `<main>` (given `tabindex="-1"` if it has
+  none). It never falls to `<body>`. `ondismiss` runs before that; if it
+  moves focus itself, focus stays where it put it.
+- **Actions** are yours. An action that removes the alert (a successful
+  "Try again") must move focus itself, for example to the form's submit
+  button or the field to fix.
+- **Server markup:** write the dismiss button with `hidden`, so a page
+  without JavaScript shows no dead button. `enhanceAlerts(root = document)`
+  shows and wires each `.ilw-alert-dismiss[hidden]` in `root` (call it
+  again on new content; wired buttons are skipped) and returns a cleanup.
+  Dismissing dispatches a bubbling, cancelable `ilw-alert-dismiss` event on
+  the alert first; `preventDefault()` keeps it. `dismissAlert(el)` does the
+  same from your own code.
+- **Colours:** the card always uses the white palette, so it is a light card
+  on the blue and orange themes and a dark one in dark mode, and its links and
+  buttons follow. The accent (stripe and icon) is Industrial, Prairie, Earth
+  on a Harvest stripe, and Altgeld; in dark mode Industrial lighter 2, a light
+  Prairie, Harvest and Orange. Each icon is at least 3:1 against the card.
+  Override `--ilw-alert--info`, `--ilw-alert--success`, `--ilw-alert--warning`
+  (`--ilw-alert--warning-stripe`) or `--ilw-alert--error` to change them.
 
 ### `SortableTh`
 
