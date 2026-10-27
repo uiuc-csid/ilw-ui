@@ -146,6 +146,16 @@ Status: **pending human run.**
 - [ ] Tabbing reads "Previous page, link", then "Page 1, link" … "Page 6, current page, link" … "Next page, link"; the ellipses and "Page 6 of 12" are read in browse mode but are not Tab stops.
 - [ ] On the first page (Pagination → Ends), "Previous" is read as text, not a link.
 
+## ToggleGroup (story: Components → ToggleGroup → Fixture)
+
+Status: **pending human run.**
+
+- [ ] Tabbing to the first button reads the group name ("Level, group"), then "All, toggle button, pressed" (VoiceOver: "selected"); the next reads "100–299, toggle button, not pressed". The check mark is not read.
+- [ ] Space or Enter on an unpressed button announces the new pressed state; in Level, the previously pressed button now reads "not pressed".
+- [ ] "Showing N of 9 courses" is announced after each change (a status region in the story, not part of the component).
+- [ ] Winter is read as dimmed/unavailable in browse mode and is not a Tab stop.
+- [ ] In Windows High Contrast (forced colours), pressed buttons still show their check mark.
+
 ## Results log
 
 | Date | Tester | AT + browser (versions) | Component(s) | Result / notes |

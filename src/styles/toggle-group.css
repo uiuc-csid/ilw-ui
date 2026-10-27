@@ -1,0 +1,51 @@
+/* Toggle group (E4): filter buttons with aria-pressed in a labelled group.
+   No toolkit equivalent. Markup:
+
+     <div class="ilw-toggle-group" role="group" aria-labelledby="level-label">
+       <span class="ilw-toggle-group-label" id="level-label">Level</span>
+       <button type="button" class="ilw-button ilw-button-small" aria-pressed="true" data-value="all">All</button>
+       <button type="button" class="ilw-button ilw-button-small" aria-pressed="false" data-value="100">100–299</button>
+     </div>
+
+   The buttons are .ilw-button (button.css), so size and theme classes work
+   as on any button. The pressed state isn't colour alone: a pressed button is
+   filled and shows a check mark (empty alt text, so screen readers read only
+   aria-pressed). Hover only underlines, so an unpressed button can't look
+   pressed; focus keeps a pressed button's fill under the two-tone ring.
+   Each rule weighs one class, after button.css. */
+
+.ilw-toggle-group {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  column-gap: 8px;
+  margin: 6px 0;
+  font-family: var(--il-font-sans, 'Source Sans 3', sans-serif);
+}
+
+.ilw-toggle-group-label {
+  margin-inline-end: 4px;
+  font-weight: 700;
+}
+
+.ilw-toggle-group :where(button.ilw-button:hover) {
+  background: var(--ilw-color--control);
+  color: var(--ilw-color--control-text);
+}
+
+.ilw-toggle-group :where(button.ilw-button[aria-pressed='true']),
+.ilw-toggle-group :where(button.ilw-button[aria-pressed='true']:focus-visible) {
+  background: var(--ilw-color--control-text);
+  color: var(--ilw-color--control);
+}
+
+.ilw-toggle-group :where(button.ilw-button[aria-pressed='true'])::before {
+  content: '✓' / '';
+  margin-inline-end: 0.3em;
+}
+
+.ilw-toggle-group :where(button.ilw-button:disabled) {
+  border-color: var(--il-storm-lighter-1, #707372);
+  background: var(--ilw-color--white--background);
+  color: var(--il-storm-lighter-1, #707372);
+}

@@ -20,6 +20,7 @@
 @import './styles/header.css';
 @import './styles/section-nav.css';
 @import './styles/pagination.css';
+@import './styles/toggle-group.css';
 @import './styles/footer.css';
 @import './styles/back-to-top.css';
 @import './styles/icon.css';

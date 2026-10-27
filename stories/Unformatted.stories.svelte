@@ -3,7 +3,7 @@
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
 
-  import { Breadcrumbs, Button, Field, Footer, Header, Icon, PageTitle, Pagination, SectionNav } from '../src/svelte/index.ts';
+  import { Breadcrumbs, Button, Field, Footer, Header, Icon, PageTitle, Pagination, SectionNav, ToggleGroup } from '../src/svelte/index.ts';
   import DataTableDemo from './DataTableDemo.svelte';
   import TableSample from './parity/TableSample.svelte';
   import { programs } from './section-nav-data.ts';
@@ -201,4 +201,25 @@
     brandSans(canvasElement.querySelectorAll('.th-sort, table td, .ilw-pager-btn, .ilw-pager-count'))}
 >
   <DataTableDemo count={8} pageSize={3} />
+</Story>
+
+<!--
+  A `ToggleGroup` with a visible label outside `.ilw-format`.
+
+  **Why:** the play function checks the label and buttons are in Source Sans without the prose styles.
+
+  **Review:** matches **Components/ToggleGroup → Default**.
+-->
+<Story
+  name="Toggle Group"
+  play={({ canvasElement }) => brandSans(canvasElement.querySelectorAll('.ilw-toggle-group-label, .ilw-toggle-group button'))}
+>
+  <ToggleGroup
+    label="Degree"
+    options={[
+      { value: 'phd', label: 'PhD' },
+      { value: 'ms', label: 'MS' },
+    ]}
+    value="phd"
+  />
 </Story>
