@@ -49,7 +49,7 @@ No React app is waiting on this, so the order follows dependencies, not a consum
   - The pinning rule keeps working through three checks:
     - `devDependencies` pin the same versions exactly;
     - a unit test asserts each adapter peer equals its devDependency;
-    - Renovate uses `rangeStrategy: 'bump'` for peers, so it doesn't widen them.
+    - Renovate uses `rangeStrategy: 'bump'` for adapter peers, so it doesn't widen them, and leaves the `react`, `react-dom` and `svelte` peer floors alone (it would rewrite them as `^19.3.1`); a major raises them by hand.
   - This is breaking for ta-manager, which must add `@zag-js/svelte`, `@tanstack/svelte-table` and `phosphor-svelte` itself. It ships as v0.2.0, with a release note on the GitHub release and a coordinated ta-manager PR.
 
 ### Shared core
