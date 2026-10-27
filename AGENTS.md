@@ -9,7 +9,7 @@ Accessible Svelte 5 components that look and behave like the **Illinois Web Tool
 - **Storybook 10** (`@storybook/svelte-vite`, Svelte CSF stories) — the workbench and the test fixture host
 - **Vitest** (browser mode, Playwright provider) and **@playwright/test**
 - **MCP servers** (`.mcp.json`): `svelte` (local `@sveltejs/mcp`: Svelte docs + autofixer), `storybook` (`@storybook/addon-mcp`, live only while `pnpm storybook` runs on :6006), `playwright` (drive stories in a real browser)
-- **Agent skills** (`.claude/skills/`): `playwright-cli` (browser automation via `playwright cli`, from the pinned `playwright`). Refresh it after a Playwright bump with `pnpm exec playwright cli install --skills`
+- **Agent skills** live in `.agents/skills/`; each is symlinked into `.claude/skills/` (`ln -s ../../.agents/skills/<name> .claude/skills/<name>`). `playwright-cli`: browser automation via `playwright cli`, from the pinned `playwright`. Refresh it after a Playwright bump with `pnpm exec playwright cli install --skills=agents`
 
 ## Source Layout
 
