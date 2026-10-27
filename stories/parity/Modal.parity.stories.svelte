@@ -15,6 +15,18 @@
     { label: 'Cancel', value: false, autofocus: true },
     { label: 'Delete', value: true },
   ];
+
+  // Focuses Cancel once <ilw-modal> has opened, as the ilw-ui side does. Left
+  // alone, <ilw-modal> focuses its panel (it honours `autofocus` only on its
+  // direct children, not on a button inside the button row), and that panel's
+  // focus ring shows only in whichever Side By Side frame has focus.
+  function focusAfterOpen(button: HTMLButtonElement) {
+    const modal = button.closest('ilw-modal') as (HTMLElement & { updateComplete?: Promise<unknown> }) | null;
+    void customElements
+      .whenDefined('ilw-modal')
+      .then(() => modal?.updateComplete)
+      .then(() => button.focus());
+  }
 </script>
 
 <!--
@@ -30,7 +42,9 @@
       <h2 slot="title">{title}</h2>
       <p>{message}</p>
       <div class="modal-buttons" style="display: flex; gap: 12px; margin-top: 1rem">
-        {#each buttons as b (b.label)}<button type="button" class="ilw-button">{b.label}</button>{/each}
+        {#each buttons as b (b.label)}
+          <button type="button" class="ilw-button" {@attach b.autofocus && focusAfterOpen}>{b.label}</button>
+        {/each}
       </div>
     </ilw-modal>
   {/snippet}
