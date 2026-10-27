@@ -189,7 +189,15 @@ Status: **pending human run.**
 - [ ] Heading navigation (VoiceOver rotor, NVDA H) finds the open panel's hidden heading, and not the closed panels' headings.
 - [ ] In No Script, the three sections are read as level-3 headings with their text, and there is no tab list.
 
+## Button and CopyButton (stories: Button → Fixture; CopyButton → Fixture, Denied)
+
+- [ ] Button: Tab reads "Before, button", "Link button, link", "Plain button, button", "After, button": the disabled pair is skipped. In browse mode (virtual cursor), "Disabled button" reads as a dimmed or unavailable button and "Disabled link" as a dimmed link.
+- [ ] CopyButton: Tabbing to the first one reads "Copy link, button"; the icon is not read. Enter copies and "Copied" is announced once, without moving focus.
+- [ ] The icon-only row buttons read "Copy netid of Alan Turing, button".
+- [ ] In Denied, pressing "Copy link" interrupts with "Could not copy to the clipboard".
+
 ## Results log
 
 | Date | Tester | Framework | AT + browser (versions) | Component(s) | Result / notes |
 | ---- | ------ | --------- | ----------------------- | ------------ | -------------- |
+| — | — | React | not run yet | Button, Icon, Content, Columns, Grid, Spacer, CopyButton (R1a) | Needs a person: the Button and CopyButton checklist against `pnpm storybook:react`. Icon and the layout components have no checklist: their markup is the Svelte twin's, byte for byte (DOM contracts). |

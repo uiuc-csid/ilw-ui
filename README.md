@@ -42,7 +42,7 @@ ships. The frameworks take any later minor.
 | Framework | Peers to install |
 | --------- | ---------------- |
 | Svelte (`ilw-ui/svelte`) | `svelte` ^5.57, `@zag-js/svelte` 1.46.0, `@tanstack/svelte-table` 9.3.1, `phosphor-svelte` 3.1.1 |
-| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): `Page` and `BackToTop` so far) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
+| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): the components with a React section below) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
 
 ```sh
 pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1
@@ -50,7 +50,7 @@ pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svel
 
 pnpm doesn't install optional peers for you. A missing one fails the build:
 Vite can't resolve the import. Pass icons to `Icon` from the same
-`phosphor-svelte`.
+`phosphor-svelte` (React: `@phosphor-icons/react`).
 
 **React:** the package is `.tsx` source, so your Vite build needs
 `@vitejs/plugin-react` (Vite compiles `.tsx` inside `node_modules` too). With
@@ -249,7 +249,7 @@ the specificity of a single element, so a class of yours wins.
 `width.css`, `content.css`, `columns.css`, `grid.css` and `spacer.css`
 replace `<ilw-content>`, `<ilw-columns>`, `<ilw-grid>`, `<ilw-spacer>` and the
 toolkit's `width` attribute with classes on plain HTML; each also ships as a
-Svelte component that renders exactly this markup. The plan is
+Svelte and a React component that render exactly this markup. The plan is
 [docs/plans/2026-10-26-layout.md](docs/plans/2026-10-26-layout.md).
 
 ### Widths and `.ilw-container`
@@ -315,6 +315,8 @@ Svelte component that renders exactly this markup. The plan is
   (smaller headings, wide padding).
 - Props: `mode`, `align` (`'left' | 'center' | 'right'`), `decoration`,
   `transparent` (no background), `theme`, `width`, `class`.
+- **React:** `import { Content } from 'ilw-ui/react'`, the same props with
+  `className` for `class`; the prose is its children.
 - Differs from `<ilw-content>`: at `full` and `auto` the box spans the page
   (upstream's `max-width: 100%` stops it at the parent's width); no `padding` attribute (an inline style, which
   consumers' CSP blocks; use a class); the centred lede's rule is `::after`, not
@@ -348,6 +350,8 @@ Svelte component that renders exactly this markup. The plan is
   reading order stays the DOM order, so use it only when one side is
   decorative.
 - Props: `mode` (`ColumnsMode`), `reverse`, `gap`, `theme`, `width`, `class`.
+- **React:** `import { Columns, type ColumnsMode } from 'ilw-ui/react'`, the
+  same props with `className` for `class`; the columns are its children.
 - Differs from `<ilw-columns>`: no `padding` attribute and no default 40 px
   bottom padding (the CSS-only class has none either); the gap defaults to the
   CSS-only class's 20 px, not the element's 0.
@@ -376,6 +380,8 @@ Svelte component that renders exactly this markup. The plan is
   (`'ul' | 'div'`), `itemWidth`, `gap`, `theme`, `width`, `class`.
 - Differs from `<ilw-grid>`: no `padding` attribute and no default 40 px
   bottom padding.
+- **React:** `import { Grid } from 'ilw-ui/react'`, the same props with
+  `className` for `class`; the items are its children.
 
 ### `Spacer` and `.ilw-spacer`
 
@@ -390,6 +396,9 @@ Svelte component that renders exactly this markup. The plan is
 - Vertical space between two blocks, hidden from assistive technology
   (`aria-hidden`; upstream's `role="presentation"` does nothing on an empty
   `div`).
+- **React:** `import { Spacer } from 'ilw-ui/react'`; `<Spacer height="3rem" />`.
+- `LayoutTheme` and `LayoutWidth`, the `theme` and `width` prop types, are
+  exported by both `ilw-ui/svelte` and `ilw-ui/react`.
 
 ## Page chrome
 
@@ -859,7 +868,7 @@ styles writes `data-theme="light"` always and leaves the toggle out.
 
 The toolkit's buttons, from `button.css`: the same classes, so toolkit markup
 looks the same with no `toolkit.css`. Server templates use the classes;
-Svelte code can use `Button`, which renders that markup.
+Svelte and React code can use `Button`, which renders that markup.
 
 ```html
 <a class="ilw-button" href="/apply">Apply now</a>
@@ -911,6 +920,19 @@ single-class rule overrides it, and prose link styles never do.
 
 Other attributes and handlers (`onclick`, `type="submit"`, `target`, `class`, …)
 pass through to the element.
+
+**React:** the same props, with `className` for `class` and children for the
+label. Other attributes, handlers and `ref` (`onClick`, `type="submit"`,
+`target`, …) pass through to the element, as above; a disabled link drops
+`onClick` and `tabIndex`.
+
+```tsx
+import { Button } from 'ilw-ui/react';
+
+<Button href="/apply">Apply now</Button>
+<Button theme="blue-solid" size="large" onClick={save}>Save</Button>
+<Button disabled>Save</Button>
+```
 
 DOM contract (consumers' tests select on it): exactly the markup above. A
 disabled `<button>` gets `disabled`, never `aria-disabled`. A disabled link
@@ -1224,14 +1246,22 @@ The replacement for `<ilw-icon>`: a [Phosphor](https://phosphoricons.com) icon
 - Without `alt` the icon is decorative: `aria-hidden="true"` and no role.
   With `alt` it is `role="img"` named by `alt`. Phosphor's own components set
   `role="img"` with no name, which axe flags; `Icon` replaces it.
+- **React:** the same props, with `className` for `class`. Pass the icon from
+  Phosphor's server entry, one path per icon:
+  `import { StudentIcon } from '@phosphor-icons/react/dist/ssr/Student'`, then
+  `<Icon icon={StudentIcon} />`. That entry has no hooks or context, so it
+  renders on the server and in islands; the package index would pull in every
+  icon. `Icon` names the icon with `aria-label`, never Phosphor's own `alt`
+  (which adds a `<title>`), so the markup is the Svelte one's exactly.
 - Server templates: paste the SVG for the icon's weight from
   [`@phosphor-icons/core`](https://github.com/phosphor-icons/core) with the
   `ilw-icon` class, as above.
 - **Toolkit names:** the **Parity/Icon** story maps every name in the
-  toolkit's font to a Phosphor icon (`stories/parity/icons.ts`). Most match
-  closely. Phosphor has no Bluesky, Substack, Weibo, Yelp or Flickr logo, and
-  no campus glyphs (admissions, alumni, donor, program of study, …); those map
-  to the nearest idea, so check them by eye. Google+ maps to the Google logo.
+  toolkit's font to a Phosphor icon (`stories/parity/toolkit-icons.ts`). Most
+  match closely. Phosphor has no Bluesky, Substack, Weibo, Yelp or Flickr logo,
+  and no campus glyphs (admissions, alumni, donor, program of study, …); those
+  map to the nearest idea, so check them by eye. Google+ maps to the Google
+  logo.
 - `.ilw-icon-row`'s `align-items` default is `flex-start`; upstream's is
   `top`, which isn't a value, so its rows stretch.
 
@@ -2404,6 +2434,14 @@ if (!(await copyText(tsv))) showFallback();
   without the button. `text` may be a function.
 - Needs JavaScript: there is no script-free form. On a server-rendered page,
   mount it as an island.
+- **React:** `import { CopyButton } from 'ilw-ui/react'`, the same props with
+  `className` for `class`, `onFail` for `onfail`, and **`onCopied(text)` for
+  `oncopy`**: React's `onCopy` is the DOM's clipboard event, which still passes
+  through to the `<button>`. The markup is the same.
+
+  ```tsx
+  <CopyButton value={row.netid} label={`Copy netid of ${row.name}`} hideLabel size="small" onCopied={log} />
+  ```
 
 DOM contract (`data-state` is `idle`, `copied` or `failed`):
 
