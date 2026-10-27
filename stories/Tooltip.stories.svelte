@@ -196,10 +196,17 @@
 </Story>
 
 <style>
+  /* Three rows: top-*, then left and right at the ends, then bottom-*. About 900px wide, with
+     room on each side for the left and right bubbles, so no bubble reaches the viewport's edge. */
   .placements {
     display: grid;
-    grid-template-columns: repeat(3, max-content);
-    gap: 6rem 14rem;
+    grid-template-columns: repeat(3, 8rem);
+    gap: 6rem 2rem;
     padding: 6rem 14rem;
+    width: max-content;
+  }
+
+  .placements > :global(:nth-child(5)) {
+    grid-column: 3;
   }
 </style>
