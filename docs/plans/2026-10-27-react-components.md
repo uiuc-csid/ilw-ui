@@ -31,7 +31,7 @@ No React app is waiting on this, so the order follows dependencies, not a consum
 - **Both frameworks in lockstep.**
   - Once the React toolchain (R0d) merges, every new component ships in both frameworks in the same PR.
   - From then on, a roadmap row counts as done only when both versions pass.
-  - Components that already exist are ported by R1–R7 below.
+  - Components that already exist are ported by R1–R8 below.
 - **Adapters become optional peers.**
   - Headless engines stay in `dependencies`: `@zag-js/combobox` and `@tanstack/table-core`.
   - These move to optional peers (`peerDependenciesMeta`): `svelte`, `@zag-js/svelte`, `@tanstack/svelte-table`, `phosphor-svelte`, `react`, `react-dom`, `@zag-js/react`, `@tanstack/react-table`, `@phosphor-icons/react`. pnpm's `autoInstallPeers` installs non-optional peers, so otherwise a React app would get Svelte, and the other way round.
@@ -64,6 +64,8 @@ Framework-neutral logic now in `src/svelte/` moves to `src/core/` before any Rea
 | ---- | ------- |
 | `islands.ts` | `parseProps`, `readProps`, `report`, the scan loop and the pagehide teardown, as `mountIslandsWith(registry, root, mountFn)`. Each adapter supplies only `mountFn`. |
 | `zag-input.ts` | All four helpers (`keepCaret`, `keepLiveRegionIn`, `focusStaysPut`, `focusLeft`). They work around the core Zag machine, so React needs them too. `focusLeft` takes any `FocusEvent`-like value. |
+| `async-search.svelte.ts` | The debounce, abort and status logic of `AsyncSearch`, as a plain class that notifies subscribers, plus `statusText` and the `AsyncSource` type. Svelte wraps it in `$state`; React reads it with `useSyncExternalStore`. |
+| `TabList.svelte`, `tabs.ts` | Reading the tabs from server markup (`.ilw-tabs-panel[id]`, `.ilw-tabs-heading`, the `data-*` options), the panel attributes it sets and restores, and the hash and key handling that doesn't need component state. |
 | `data-table.ts` | The features, the options builder (everything but the `createTable` call), `PagerClasses` and both class maps, `isPaged`, `setTableFilter`, and the types. |
 | `Pager.svelte`, `Pagination.svelte` | `pagerModel()` (page, count, window) and `paginationModel()` (clamping, links). |
 | `SortableTh.svelte`, `TableSortTh.svelte` | The `aria-sort`, class and arrow mapping, and the toggle-then-reset-page step. |
@@ -140,7 +142,13 @@ Each is settled in its port PR. They are listed here so nobody has to rediscover
 - It is synchronous only when called from outside React. React apps use `<Combobox>` directly, so there is no `ref={enhanceSelect}` form.
 - The React demo calls `enhanceSelects` from its play function, not from an effect.
 
-#### `Combobox`, `Autocomplete`
+#### `Tabs`, `enhanceTabs`, `enhanceAllTabs`
+
+- `enhanceTabs` mounts the tab list into the server markup, just before the first panel, with no wrapper. As with `enhanceSelect`, the React version creates the `role="tablist"` element, inserts it there and renders into it. A portal would append it after the panels.
+- `enhanceTabs` is synchronous only when called from outside React, so the Svelte attachment form (`{@attach enhanceTabs}`) has no React twin. React apps use `<Tabs>`.
+- Unmounting must put the sections back exactly as they were (roles, names, `tabindex`, `hidden`, `.ilw-tabs--ready`), including under StrictMode's mount, unmount, mount.
+
+#### `Combobox`, `Autocomplete`, `MultiCombobox`
 
 - The input stays uncontrolled: Zag writes `input.value` itself.
 - `filterItems` runs inline in `onInputValueChange`, because React state read there is a render behind.
@@ -149,6 +157,7 @@ Each is settled in its port PR. They are listed here so nobody has to rediscover
 - `value` arrays are memoized or module constants.
 - No inline `style`, for the CSP spec.
 - The Autocomplete demo records picks with `addEventListener('change')`, since React's form `onChange` fires on every keystroke.
+- Async sources go through the shared `AsyncSearch` core. Its in-flight request is aborted on unmount, which StrictMode exercises in development.
 
 #### `DataTable`, `DataRows`, `TableSortTh`, `Pager`
 
@@ -315,7 +324,7 @@ Each row is one PR. R0a–R0d run in order. After R0d, the ports can run in para
 - R5 needs R1 (`TableSortTh` renders `SortableTh`);
 - R7 needs R6 (`SelectCombobox` renders `Combobox`).
 
-R2, R3 and R4 are independent: `Header` imports only `DarkModeToggle`, and `Modal` draws its own icon.
+R2, R3, R4 and R8 are independent: `Header` imports only `DarkModeToggle`, `Modal` draws its own icon, and `Tabs` uses nothing but `layout.ts`. `CopyButton` renders `Button` and `Icon`, so it comes last in R1.
 
 | # | PR | Contents |
 | - | -- | -------- |
@@ -323,13 +332,14 @@ R2, R3 and R4 are independent: `Header` imports only `DarkModeToggle`, and `Moda
 | R0b | Svelte test plumbing | No behaviour change. `.storybook/shared.ts`. Rename the Vitest project to `storybook-svelte` and the Playwright projects to `svelte-*`. The per-subtree guard. The contract normalizer and snapshots for every existing Svelte story. Story-helper styles into `.css` files. AGENTS.md test commands. |
 | R0c | Packaging (v0.2.0) | Optional exact peers, the peer = devDependency test, Renovate rules, README "Install and use", the release note, and the ta-manager PR. |
 | R0d | React toolchain | React dependencies and the `./react` export. `tsconfig.react.json`, ESLint, `.storybook-react/`, the `storybook-react` Vitest project, the `react-*` Playwright projects and `ILW_FW`, CI, scripts, launch and MCP entries, the twins check, `react-ssr.test.ts`. React `Page` and `BackToTop` (the shell needs them); their stories stay on `twins-pending` until R1, because they use R1's components. AGENTS.md: intro, Tech Stack, Source Layout, and the rules on Imports, Islands and static pages, No HTML sinks, Visual parity, Stories (the React description form), Tests and lockstep. This roadmap's "for Svelte apps" wording. **Lockstep starts when this merges.** |
-| R1 | Presentational | `Button`, `Icon`, `Columns`, `Content`, `Grid`, `Spacer`, `Breadcrumbs`, `PageTitle`, `SectionNav`, `Footer`, `Pagination`, `SortableTh`, with their Unformatted, Layout and parity `IlwUi` twins. May split into layout, Button and Icon, then page chrome. |
-| R2 | Forms | `Field`, `RadioGroup`. |
+| R1 | Presentational | `Button`, `Icon`, `Columns`, `Content`, `Grid`, `Spacer`, `Breadcrumbs`, `PageTitle`, `SectionNav`, `Footer`, `Pagination`, `SortableTh`, then `CopyButton`, with their Unformatted, Layout and parity `IlwUi` twins. May split into layout, Button, Icon and `CopyButton`, then page chrome. |
+| R2 | Forms | `Field`, `RadioGroup`, `ChoiceChips`. |
 | R3 | Islands and header | React `mountIslands`, `DarkModeToggle`, `Header`, and the Islands stories. |
 | R4 | Modal | `Modal`, `openModal`, `alert`, `confirm`, and the `data-autofocus` story. |
 | R5 | Data | `useDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`. Re-exports `isPaged`, `setTableFilter` and both pager class maps. |
-| R6 | Zag | `Combobox`, `Autocomplete`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
+| R6 | Zag | The `AsyncSearch` adapter, `Combobox`, `Autocomplete`, `MultiCombobox`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
 | R7 | Select enhancement | `SelectCombobox`, `enhanceSelect`, `enhanceSelects`. |
+| R8 | Tabs | `Tabs`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
 
 Every port PR includes:
 
@@ -343,7 +353,7 @@ Every port PR includes:
 
 ## The rest of the roadmap
 
-- Under the lockstep rule, every open row of the [toolkit-replacement roadmap](2026-10-20-toolkit-replacement.md) (C2–C10, D1–D9, E1, E3–E17) needs both frameworks to be done.
+- Under the lockstep rule, every row of the [toolkit-replacement roadmap](2026-10-20-toolkit-replacement.md) still open when R0d merges needs both frameworks to be done. Rows merged before then, such as C3 `Tabs`, E3 `MultiCombobox`, E5 `ChoiceChips` and E6 `CopyButton`, are ported in R1–R8.
 - Component plans written from now on have a React section: the API mapping and the hard parts.
 - The pending `page-chrome`, `form-styles` and `layout` plans describe components that already exist. Once they're checked off, they move to `docs/old-plans/`. Their components are ported in R1–R3, so lockstep doesn't apply to them.
 
