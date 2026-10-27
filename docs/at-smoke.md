@@ -166,6 +166,17 @@ Status: **pending human run.**
 - [ ] Winter is read as dimmed/unavailable in browse mode and is not a Tab stop.
 - [ ] In Windows High Contrast (forced colours), pressed buttons still show their check mark.
 
+## Accordion (stories: Accordion → Fixture, Single fixture, Compact groups)
+
+Status: **pending human run.**
+
+- [ ] Tabbing to a header reads its text as a button with its state ("How do I submit my application?, collapsed, button"; VoiceOver may say "disclosure triangle"); the chevron is not read.
+- [ ] Enter or Space toggles it, the new state ("expanded"/"collapsed") is announced, and focus stays on the header.
+- [ ] The headers appear in the headings list / heading navigation (NVDA: H; VoiceOver: rotor) at level 3 (level 4 in Compact groups). Record any AT + browser where they don't: it is the known gap of a heading inside `summary`.
+- [ ] Expand All / Collapse All read as "Expand All Enrollment FAQ, button"; after pressing, the panels' new state can be found by reading on.
+- [ ] In Single fixture, opening a second question closes the first; the first's state reads "collapsed" when reached again.
+- [ ] Find in page (Ctrl/Cmd+F) for "admissions portal" opens the closed panel that holds it.
+
 ## Tabs (stories: Tabs → Fixture, Automatic Fixture, No Script)
 
 Status: **pending human run.**
