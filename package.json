@@ -5,7 +5,7 @@
   "description": "Accessible Svelte and React components that look and behave like the Illinois Web Toolkit",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.16.1",
   "exports": {
     "./core": {
       "types": "./src/core/index.ts",
