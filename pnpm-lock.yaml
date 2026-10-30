@@ -237,8 +237,8 @@ importers:
         specifier: 1.46.0
         version: 1.46.0(svelte@5.57.3(@typescript-eslint/types@8.72.1))
       chromatic:
-        specifier: 18.13.3
-        version: 18.13.3
+        specifier: 18.13.6
+        version: 18.13.6
       eslint:
         specifier: 9.39.5
         version: 9.39.5(supports-color@7.2.0)
@@ -1590,8 +1590,8 @@ packages:
     resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
     engines: {node: '>= 14.16.0'}
 
-  chromatic@18.13.3:
-    resolution: {integrity: sha512-86wzIxGIdDMBvyYWCXF+V0RyckI+3kl6ki9lJoZem6a0UfwHtEEg5ruORpryTpu6c9dVtBk2qSTX4xtkz3gwsA==}
+  chromatic@18.13.6:
+    resolution: {integrity: sha512-4NVvud3yFIA8AGuBQeyIGhvYGih+ZcvFaKcnECotTSfHaA3FyUAckNutcqnvofnKDOxZz9ZrA33sT+wz7wz3HQ==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -4252,7 +4252,7 @@ snapshots:
     dependencies:
       readdirp: 4.1.2
 
-  chromatic@18.13.3:
+  chromatic@18.13.6:
     dependencies:
       semver: 7.8.5
 
