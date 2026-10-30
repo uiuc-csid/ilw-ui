@@ -99,7 +99,7 @@
     "@vitest/browser-playwright": "5.0.5",
     "@zag-js/react": "1.46.0",
     "@zag-js/svelte": "1.46.0",
-    "chromatic": "18.13.3",
+    "chromatic": "18.13.6",
     "eslint": "9.39.5",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react-hooks": "7.1.1",
