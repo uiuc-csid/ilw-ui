@@ -1,4 +1,4 @@
-import type { SectionNavItem } from '../src/svelte/SectionNav.svelte';
+import type { SectionNavItem } from '../src/core/section-nav.ts';
 
 /** The toolkit README's example tree, with the current page two levels down. */
 export const programs: SectionNavItem[] = [

@@ -193,3 +193,8 @@ Status: **pending human run.**
 
 | Date | Tester | Framework | AT + browser (versions) | Component(s) | Result / notes |
 | ---- | ------ | --------- | ----------------------- | ------------ | -------------- |
+| — | — | React | NVDA + Firefox; VoiceOver + Safari | Page chrome (`Page`, `Breadcrumbs`, `PageTitle`, `Footer`) | Pending human run (R1b), on `pnpm storybook:react`. |
+| — | — | React | NVDA + Firefox; VoiceOver + Safari | Section nav | Pending human run (R1b). |
+| — | — | React | NVDA + Firefox; VoiceOver + Safari | Back to top | Pending human run (R1b). |
+| — | — | React | NVDA + Firefox; VoiceOver + Safari | Pagination | Pending human run (R1b). |
+| — | — | React | NVDA + Firefox; VoiceOver + Safari | SortableTh | Pending human run (R1b). |

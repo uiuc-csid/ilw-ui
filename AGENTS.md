@@ -18,7 +18,8 @@ Accessible Svelte 5 and React 19 components that look and behave like the **Illi
 src/
   core/        framework-agnostic code. index.ts is the public `ilw-ui/core` (nextSort, nextId, …); the modules it
                doesn't re-export are internal logic every framework's components share (islands, zag-input: the Zag
-               workarounds, async-search, tabs, data-table, pager, sort, modal, dark-mode, layout, class-names)
+               workarounds, async-search, tabs, data-table, pager, sort, modal, dark-mode, layout, class-names,
+               section-nav)
   svelte/      Svelte components + index.ts exports: thin views over core/
   react/       React components (.tsx) + index.ts exports, the twins of svelte/'s under the same names; index.ts
                groups them by row of the React plan
