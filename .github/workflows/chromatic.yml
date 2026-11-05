@@ -2,11 +2,15 @@
 # (https://www.chromatic.com/docs/github-actions/). Push only: Chromatic
 # recommends against pull_request, whose ephemeral merge commits pick the
 # wrong baselines. Needs the CHROMATIC_PROJECT_TOKEN repository secret.
-# Settings: chromatic.config.json.
+# Settings: chromatic.config.json. Skips Renovate's branches (renovate/*):
+# dependency bumps would spend snapshots on every rebase; their merge to main
+# still runs it.
 name: Chromatic
 
 on:
   push:
+    branches-ignore:
+      - 'renovate/**'
   workflow_dispatch: # .github/workflows/upstream.yml runs it on its branch
 
 permissions:
