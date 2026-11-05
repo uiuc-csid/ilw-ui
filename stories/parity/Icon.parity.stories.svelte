@@ -2,9 +2,9 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import Calendar from 'phosphor-svelte/lib/Calendar';
   import Envelope from 'phosphor-svelte/lib/Envelope';
-  import { expect } from 'storybook/test';
 
   import Icon from '../../src/svelte/Icon.svelte';
+  import * as plays from '../plays/icon.ts';
   import { toolkitIcons } from './icons.ts';
   import SideBySide from './SideBySide.svelte';
 
@@ -45,29 +45,7 @@
 <Story
   name="IlwUi"
   parameters={{ styles: 'ilw-ui' }}
-  play={async ({ canvas, canvasElement }) => {
-    const icons = canvasElement.querySelectorAll<SVGSVGElement>('.icon-grid svg');
-    await expect(icons).toHaveLength(toolkitIcons.length * 2);
-    for (const svg of icons) {
-      await expect(svg).toHaveClass('ilw-icon');
-      await expect(svg).toHaveAttribute('aria-hidden', 'true');
-      await expect(svg).not.toHaveAttribute('role');
-    }
-    const li = canvasElement.querySelector('.icon-grid li')!;
-    // The text is in the brand font, as on the toolkit side, and it has loaded.
-    await expect(getComputedStyle(li).fontFamily).toMatch(/^"?Source Sans/);
-    await document.fonts.ready;
-    await expect(document.fonts.check('1rem "Source Sans"')).toBe(true);
-    // 1em: the icon follows the text's size and colour, as a font glyph does.
-    await expect(icons[0].getBoundingClientRect().height).toBeCloseTo(parseFloat(getComputedStyle(li).fontSize), 0);
-    await expect(getComputedStyle(icons[0]).fill).toBe(getComputedStyle(li).color);
-    // A labelled icon is an image with that name, at the size asked for.
-    const labelled = canvas.getByRole('img', { name: 'Calendar' });
-    await expect(labelled).toHaveAttribute('width', '2rem');
-    const row = canvasElement.querySelector<HTMLElement>('.ilw-icon-row')!;
-    await expect(getComputedStyle(row).display).toBe('flex');
-    await expect(getComputedStyle(row).columnGap).toBe('18px');
-  }}
+  play={plays.parity}
 >
   <ul class="icon-grid">
     {#each toolkitIcons as [name, icon] (name)}

@@ -9,6 +9,14 @@ export { Page } from './Page.tsx';
 
 // R1 layout, Button, Icon, CopyButton: Button, ButtonSize, ButtonTheme, Icon, Columns, ColumnsMode, Content,
 // Grid, Spacer, LayoutTheme, LayoutWidth, CopyButton
+export { Button, type ButtonSize, type ButtonTheme } from './Button.tsx';
+export { Icon } from './Icon.tsx';
+export { Columns, type ColumnsMode } from './Columns.tsx';
+export { Content } from './Content.tsx';
+export { Grid } from './Grid.tsx';
+export { Spacer } from './Spacer.tsx';
+export { type LayoutTheme, type LayoutWidth } from '../core/layout.ts';
+export { CopyButton } from './CopyButton.tsx';
 
 // R1 page chrome: Breadcrumbs, Crumb, PageTitle, SectionNav, SectionNavItem, Footer, Pagination, SortableTh
 

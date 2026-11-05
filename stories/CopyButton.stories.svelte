@@ -1,63 +1,17 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect, waitFor } from 'storybook/test';
 
   import CopyButtonDemo from './CopyButtonDemo.svelte';
-
-  /**
-   * `parameters.clipboard`: what `navigator.clipboard` does in the story.
-   * `ok` keeps the text in memory (no permission prompt, nothing on the real
-   * clipboard), `denied` rejects as a browser without permission does, `none`
-   * has no clipboard at all, as on a plain-http page.
-   */
-  type ClipboardMode = 'ok' | 'denied' | 'none';
+  import * as plays from './plays/copy-button.ts';
 
   const { Story } = defineMeta({
     title: 'CopyButton',
+    // `clipboard`: what navigator.clipboard does in the story ('ok', 'denied' or 'none'; see plays/copy-button.ts).
     parameters: { styles: 'ilw-ui', clipboard: 'ok' },
     // The Docs page lists every story with its review notes (the comment above it).
     tags: ['autodocs'],
-    // The stub is an own property shadowing Navigator.prototype.clipboard; deleting it restores the real one.
-    beforeEach: ({ parameters }) => {
-      const mode = (parameters.clipboard ?? 'ok') as ClipboardMode;
-      let text = '';
-      const stub = {
-        ok: {
-          writeText: async (t: string) => void (text = t),
-          readText: async () => text,
-        },
-        denied: {
-          writeText: () => Promise.reject(new DOMException('Write permission denied.', 'NotAllowedError')),
-          readText: async () => text,
-        },
-        none: undefined,
-      }[mode];
-      Object.defineProperty(navigator, 'clipboard', { value: stub, configurable: true });
-      return () => {
-        delete (navigator as { clipboard?: unknown }).clipboard;
-      };
-    },
+    beforeEach: plays.stubClipboard,
   });
-
-  const region = (politeness: 'polite' | 'assertive') => document.querySelector(`[data-ilw-announce="${politeness}"]`);
-  const clipboardText = () => navigator.clipboard.readText();
-
-  /** Clicks `button` and checks it copied `expected`, said so, and kept focus; then that it resets. */
-  async function copies(button: HTMLElement, expected: string, copiedName: string, restName: string) {
-    await expect(button).toHaveAttribute('data-state', 'idle');
-    await navigator.clipboard.writeText('');
-    button.click();
-    await waitFor(() => expect(button).toHaveAttribute('data-state', 'copied'));
-    await expect(await clipboardText()).toBe(expected);
-    await expect(button).toHaveAccessibleName(copiedName);
-    await waitFor(() => expect(region('polite')).toHaveTextContent(copiedName));
-    await expect(region('polite')).toHaveAttribute('role', 'status');
-    await expect(button).toHaveFocus();
-    // The demo's resetAfter is short, so this waits on the reset, not a clock.
-    await waitFor(() => expect(button).toHaveAttribute('data-state', 'idle'));
-    await expect(button).toHaveAccessibleName(restName);
-    await expect(button).toHaveFocus();
-  }
 </script>
 
 <!--
@@ -81,25 +35,7 @@
 <Story
   name="Contract"
   asChild
-  play={async ({ canvas }) => {
-    const link = canvas.getByRole('button', { name: 'Copy link' });
-    await expect(link.tagName).toBe('BUTTON');
-    await expect(link).toHaveAttribute('type', 'button');
-    await expect(link).toHaveClass('ilw-button', 'ilw-copy-button');
-    await expect(link).toHaveAttribute('data-state', 'idle');
-    const [svg, label] = link.children;
-    await expect(svg).toHaveClass('ilw-icon');
-    await expect(svg).toHaveAttribute('aria-hidden', 'true');
-    await expect(label).toHaveClass('ilw-copy-button-label');
-    await expect(label).toHaveTextContent('Copy link');
-
-    const token = canvas.getByRole('button', { name: 'Copy token' });
-    await expect(token).toHaveClass('ilw-button', 'ilw-copy-button', 'ilw-button-small', 'ilw-theme-blue-solid');
-
-    const netid = canvas.getByRole('button', { name: 'Copy netid of Grace Hopper' });
-    await expect(netid.querySelector('span')).toHaveClass('ilw-visually-hidden');
-    await expect(netid.querySelector('.ilw-copy-button-label')).toBeNull();
-  }}
+  play={plays.contract}
 >
   <CopyButtonDemo />
 </Story>
@@ -114,24 +50,7 @@
 <Story
   name="Copies"
   asChild
-  play={async ({ canvas, userEvent }) => {
-    const link = canvas.getByRole('button', { name: 'Copy link' });
-    link.focus();
-    await copies(link, 'https://tam.cs.illinois.edu/courses/cs-225/fa26', 'Copied', 'Copy link');
-
-    const token = canvas.getByRole('button', { name: 'Copy token' });
-    token.focus();
-    await copies(token, 'tam_7Qx2dH9kLm4Rv8Zp', 'Copied', 'Copy token');
-
-    const netid = canvas.getByRole('button', { name: 'Copy netid of Alan Turing' });
-    netid.focus();
-    await copies(netid, 'aturing2', 'Copied', 'Copy netid of Alan Turing');
-
-    await userEvent.click(canvas.getByRole('checkbox', { name: /Confirmed.*Alan Turing/ }));
-    const list = canvas.getByRole('button', { name: 'Copy netids of confirmed students' });
-    list.focus();
-    await copies(list, 'ghopper3', 'Copied', 'Copy netids of confirmed students');
-  }}
+  play={plays.copies}
 >
   <CopyButtonDemo resetAfter={200} />
 </Story>
@@ -146,13 +65,7 @@
 <Story
   name="Copied State"
   asChild
-  play={async ({ canvas, userEvent }) => {
-    const link = canvas.getByRole('button', { name: 'Copy link' });
-    await userEvent.click(link);
-    await waitFor(() => expect(link).toHaveAttribute('data-state', 'copied'));
-    await expect(link).toHaveAccessibleName('Copied');
-    await expect(link).toHaveFocus();
-  }}
+  play={plays.copiedState}
 >
   <CopyButtonDemo resetAfter={600_000} />
 </Story>
@@ -168,15 +81,7 @@
   name="Denied"
   asChild
   parameters={{ clipboard: 'denied' }}
-  play={async ({ canvas, userEvent }) => {
-    const link = canvas.getByRole('button', { name: 'Copy link' });
-    await userEvent.click(link);
-    await waitFor(() => expect(link).toHaveAttribute('data-state', 'failed'));
-    await expect(link).toHaveAccessibleName('Copy failed');
-    await waitFor(() => expect(region('assertive')).toHaveTextContent('Could not copy to the clipboard'));
-    await expect(region('assertive')).toHaveAttribute('role', 'alert');
-    await expect(link).toHaveFocus();
-  }}
+  play={plays.denied}
 >
   <CopyButtonDemo resetAfter={600_000} />
 </Story>
@@ -192,15 +97,7 @@
   name="No Clipboard"
   asChild
   parameters={{ clipboard: 'none' }}
-  play={async ({ canvas, userEvent }) => {
-    await expect(navigator.clipboard).toBeUndefined();
-    const token = canvas.getByRole('button', { name: 'Copy token' });
-    await userEvent.click(token);
-    await waitFor(() => expect(token).toHaveAttribute('data-state', 'failed'));
-    await expect(token).toHaveAccessibleName('Copy failed');
-    await waitFor(() => expect(region('assertive')).toHaveTextContent('Could not copy to the clipboard'));
-    await expect(token).toHaveFocus();
-  }}
+  play={plays.noClipboard}
 >
   <CopyButtonDemo resetAfter={600_000} />
 </Story>

@@ -1,7 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import ButtonGrid, { BUTTON_THEMES, BUTTON_VARIANTS } from './ButtonGrid.svelte';
+  import { BUTTON_THEMES, BUTTON_VARIANTS } from './button-themes.ts';
+  import ButtonGrid from './ButtonGrid.svelte';
   import SideBySide from './SideBySide.svelte';
 
   // No autodocs: a Docs page renders every story in one document, and the two
