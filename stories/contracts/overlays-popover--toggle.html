@@ -1,0 +1,49 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h1>CS 225: Course staff</h1>
+    <p>Teaching assistants, graders and course assistants for this term. Filter the list by role.</p>
+    <div class="popover-demo-toolbar">
+      <span class="ilw-popover ilw-popover--bottom-left">
+        <button class="ilw-button" popovertarget="staff-filters" type="button">Filters</button>
+        <div class="ilw-popover-panel" id="staff-filters" popover>
+          <fieldset class="ilw-fieldset">
+            <legend>Show</legend>
+            <div class="ilw-input-entry-checkbox">
+              <label for="show-tas">Teaching assistants</label>
+              <input id="show-tas" type="checkbox" .checked .value="on">
+            </div>
+            <div class="ilw-input-entry-checkbox">
+              <label for="show-graders">Graders</label>
+              <input id="show-graders" type="checkbox" .value="on">
+            </div>
+            <div class="ilw-input-entry-checkbox">
+              <label for="show-cas">Course assistants</label>
+              <input id="show-cas" type="checkbox" .value="on">
+            </div>
+          </fieldset>
+          <button class="ilw-button" popovertarget="staff-filters" popovertargetaction="hide" type="button">Done</button>
+        </div>
+      </span>
+      <p>Filters panel: <output data-testid="filters-state">closed</output></p>
+    </div>
+    <ul>
+      <li>Ana Ruiz, teaching assistant</li>
+      <li>Ben Okafor, teaching assistant</li>
+      <li>Chen Wei, grader</li>
+      <li>Dana Fox, grader</li>
+    </ul>
+    <div class="popover-demo-field">
+      <div class="ilw-input-entry">
+        <label for="office-hours">Office hours per week</label>
+        <input id="office-hours" min="0" type="number" .value="4">
+      </div>
+      <span class="ilw-popover ilw-popover--bottom-left">
+        <button aria-label="About office hours" class="ilw-button popover-demo-help" popovertarget="help-hours" type="button">?</button>
+        <div class="ilw-popover-panel" id="help-hours" popover>
+          <p>Count only hours held at a fixed place and time. Review sessions count; answering email doesn't. See <a href="#staffing-policy">the staffing policy</a>.</p>
+        </div>
+      </span>
+    </div>
+  </main>
+</div>

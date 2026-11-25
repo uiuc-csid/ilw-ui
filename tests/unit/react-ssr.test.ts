@@ -15,8 +15,17 @@ import { describe, expect, it } from 'vitest';
 import * as react from '../../src/react/index.ts';
 import * as svelte from '../../src/svelte/index.ts';
 
-/** Server markup without Svelte's hydration comments and the whitespace between tags. */
-const markup = (html: string) => html.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+</g, '><').trim();
+/**
+ * Server markup without Svelte's hydration comments and the whitespace between tags, with
+ * attribute names lowercased: HTML ignores their case, and React's server render spells some in
+ * camelCase (`popoverTarget="…"`), which the browser's parser reads as `popovertarget`.
+ */
+const markup = (html: string) =>
+  html
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/>\s+</g, '><')
+    .replace(/<[a-z][^>]*>/g, (tag) => tag.replace(/\s([A-Za-z-]+)(?==")/g, (name) => name.toLowerCase()))
+    .trim();
 
 /** A Svelte snippet of fixed markup, the twin of a JSX child. */
 const snippet = (html: string) => createRawSnippet(() => ({ render: () => html }));
@@ -103,6 +112,36 @@ const cases: Case[] = [
   // R11 alert
 
   // R12 toggle group
+
+  // E18 popover (new in both frameworks): the closed popover, as a server template writes it
+  {
+    name: 'Popover',
+    react: createElement(react.Popover, { id: 'filters', label: 'Filters', children: createElement('p', null, 'Panel') }),
+    svelte: ssr(svelte.Popover, { id: 'filters', label: 'Filters', children: snippet('<p>Panel</p>') }),
+  },
+  {
+    name: 'Popover, own trigger, placement and class',
+    react: createElement(
+      react.Popover,
+      {
+        id: 'help',
+        placement: 'top-right',
+        className: 'app-help',
+        trigger: (attrs: { popoverTarget: string }) =>
+          createElement('button', { type: 'button', 'aria-label': 'Help', ...attrs }, '?'),
+        children: createElement('p', null, 'Panel'),
+      },
+    ),
+    svelte: ssr(svelte.Popover, {
+      id: 'help',
+      placement: 'top-right',
+      class: 'app-help',
+      trigger: createRawSnippet((attrs: () => { popovertarget: string }) => ({
+        render: () => `<button type="button" aria-label="Help" popovertarget="${attrs().popovertarget}">?</button>`,
+      })),
+      children: snippet('<p>Panel</p>'),
+    }),
+  },
 ];
 
 describe('presentational components render on the server like their Svelte twins', () => {

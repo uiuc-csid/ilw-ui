@@ -189,6 +189,18 @@ Status: **pending human run.**
 - [ ] Heading navigation (VoiceOver rotor, NVDA H) finds the open panel's hidden heading, and not the closed panels' headings.
 - [ ] In No Script, the three sections are read as level-3 headings with their text, and there is no tab list.
 
+## Popover (stories: Overlays → Popover → Fixture, Phone)
+
+Status: **pending human run.** Run it in the Svelte and the React Storybook.
+
+- [ ] Tabbing to Filters reads "Filters, button, collapsed" (or "popup button"); Enter opens it, "expanded" is announced, and focus stays on the button.
+- [ ] The next Tab reaches "Show, group" and the first checkbox, "Teaching assistants, checkbox, checked", wherever the panel is drawn.
+- [ ] Escape from inside closes it, and focus is back on Filters, read as "collapsed".
+- [ ] Done closes it, and focus is back on Filters.
+- [ ] Tab past Done reaches "Office hours per week" and the panel is gone.
+- [ ] "About office hours" (the "?") reads its name, not "question mark"; opened, Tab reaches the link "the staffing policy".
+- [ ] On a phone (VoiceOver iOS, TalkBack), in the Phone story: double-tap opens it, swiping right reaches the checkboxes, and the panel fits the screen.
+
 ## Results log
 
 | Date | Tester | Framework | AT + browser (versions) | Component(s) | Result / notes |

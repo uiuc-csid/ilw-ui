@@ -1,0 +1,106 @@
+/* Popover (E18): a button that opens a non-modal panel anchored to it. The
+   toolkit has none; it looks like a Tooltip bubble grown into a panel.
+   Markup (works without script; Popover.svelte / Popover.tsx render it and
+   add the open state, closing on focus leaving, and placement where CSS
+   anchor positioning isn't supported):
+
+     <span class="ilw-popover ilw-popover--bottom-left">
+       <button type="button" class="ilw-button" popovertarget="ilw-popover-1">Filters</button>
+       <div class="ilw-popover-panel" id="ilw-popover-1" popover>…</div>
+     </span>
+
+   The button is the wrapper's first child. The panel is an auto popover in
+   the top layer, so no overflow clips it. Where position-area and
+   anchor-scope are supported, it is placed against the button and flips to
+   the other side when there's no room; elsewhere the component's script sets
+   position, top and left inline (without the component, the browser centres
+   it). Colours come
+   from the theme-neutral --ilw-color--* properties (tokens.css): a theme
+   attribute on the panel recolours it, and dark mode follows. */
+
+.ilw-popover {
+  --ilw-popover--width: 20rem;
+  --ilw-popover--offset: 4px;
+
+  display: inline-flex;
+}
+
+.ilw-popover-panel {
+  box-sizing: border-box;
+  inline-size: max-content;
+  min-inline-size: min-content;
+  max-inline-size: min(var(--ilw-popover--width), calc(100vw - 16px));
+  max-block-size: calc(100vh - 16px);
+  padding: 1rem;
+  overflow: auto;
+  border: 1px solid var(--ilw-color--border-light);
+  border-radius: 0.5rem;
+  box-shadow: 2px 0 4px 4px rgb(0 0 0 / 10%);
+  background: var(--ilw-color--background);
+  color: var(--ilw-color--text);
+  font: 400 1rem/1.5 var(--il-font-sans, 'Source Sans 3', sans-serif);
+  text-align: start;
+}
+
+.ilw-popover-panel > :first-child {
+  margin-block-start: 0;
+}
+
+.ilw-popover-panel > :last-child {
+  margin-block-end: 0;
+}
+
+.ilw-popover-panel a {
+  color: var(--ilw-color--link);
+}
+
+/* Anchor positioning: each wrapper scopes the name to its own button. */
+@supports (position-area: top) and (anchor-scope: all) {
+  .ilw-popover {
+    anchor-scope: --ilw-popover;
+  }
+
+  .ilw-popover > :first-child {
+    anchor-name: --ilw-popover;
+  }
+
+  .ilw-popover > .ilw-popover-panel {
+    position: fixed;
+    position-anchor: --ilw-popover;
+    position-try-fallbacks: flip-block;
+    inset: auto;
+    margin: 0;
+  }
+
+  .ilw-popover--bottom-left > .ilw-popover-panel {
+    position-area: bottom span-right;
+  }
+  .ilw-popover--bottom-center > .ilw-popover-panel {
+    position-area: bottom;
+  }
+  .ilw-popover--bottom-right > .ilw-popover-panel {
+    position-area: bottom span-left;
+  }
+  .ilw-popover--top-left > .ilw-popover-panel {
+    position-area: top span-right;
+  }
+  .ilw-popover--top-center > .ilw-popover-panel {
+    position-area: top;
+  }
+  .ilw-popover--top-right > .ilw-popover-panel {
+    position-area: top span-left;
+  }
+
+  [class*='ilw-popover--bottom'] > .ilw-popover-panel {
+    margin-block-start: var(--ilw-popover--offset);
+  }
+  [class*='ilw-popover--top'] > .ilw-popover-panel {
+    margin-block-end: var(--ilw-popover--offset);
+  }
+
+  /* Centred panels stay 8px inside the viewport. */
+  .ilw-popover--bottom-center > .ilw-popover-panel,
+  .ilw-popover--top-center > .ilw-popover-panel {
+    margin-inline: 8px;
+  }
+}

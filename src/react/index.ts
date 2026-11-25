@@ -36,3 +36,6 @@ export { Page } from './Page.tsx';
 // R11 alert: Alert, AlertVariant, dismissAlert, enhanceAlerts
 
 // R12 toggle group: ToggleGroup, ToggleOption
+
+// E18 popover (new in both frameworks)
+export { Popover, type PopoverAttrs, type PopoverPlacement } from './Popover.tsx';
