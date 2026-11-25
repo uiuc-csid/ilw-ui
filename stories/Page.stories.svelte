@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
 
   import Breadcrumbs from '../src/svelte/Breadcrumbs.svelte';
   import Footer from '../src/svelte/Footer.svelte';

@@ -5,7 +5,6 @@ const config: StorybookConfig = {
   core: { disableTelemetry: true },
   stories: ['../stories/**/*.stories.svelte'],
   addons: [
-    '@storybook/addon-svelte-csf',
     '@storybook/addon-docs',
     '@storybook/addon-a11y',
     '@storybook/addon-vitest',

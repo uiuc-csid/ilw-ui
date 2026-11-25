@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
   import { expect, userEvent, waitFor } from 'storybook/test';
 
   import Tooltip, { type TooltipArrow } from '../src/svelte/Tooltip.svelte';

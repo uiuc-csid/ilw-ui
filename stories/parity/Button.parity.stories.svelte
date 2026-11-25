@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
 
   import ButtonGrid, { BUTTON_THEMES, BUTTON_VARIANTS } from './ButtonGrid.svelte';
   import SideBySide from './SideBySide.svelte';

@@ -1,10 +1,10 @@
 // Play functions for the Page shell's stories, shared by the Svelte and React twins.
 
-import type { PlayFunctionContext, WebRenderer } from 'storybook/internal/types';
+import type { StoryContext, WebRenderer } from 'storybook/internal/types';
 import { expect } from 'storybook/test';
 
 /** Parity/Page → IlwUi: the skip link, the landmarks and the theme's page colours. */
-export async function parity({ canvas, canvasElement }: PlayFunctionContext<WebRenderer>) {
+export async function parity({ canvas, canvasElement }: StoryContext<WebRenderer>) {
   const shell = canvasElement.querySelector('.ilw-page')!;
   await expect(shell).toHaveAttribute('id', 'top');
   const skip = canvas.getByRole('link', { name: 'Skip to main content' });
@@ -27,7 +27,7 @@ export async function parity({ canvas, canvasElement }: PlayFunctionContext<WebR
 }
 
 /** Page Chrome/Page → Dark: the shell's dark colours, and the footer's brand plate. */
-export async function dark({ canvasElement }: PlayFunctionContext<WebRenderer>) {
+export async function dark({ canvasElement }: StoryContext<WebRenderer>) {
   const shell = canvasElement.querySelector('.ilw-page')!;
   await expect(getComputedStyle(shell).backgroundColor).toBe('rgb(17, 24, 29)');
   await expect(getComputedStyle(shell).color).toBe('rgb(244, 244, 244)');

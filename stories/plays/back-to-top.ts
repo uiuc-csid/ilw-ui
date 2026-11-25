@@ -1,6 +1,6 @@
 // Play functions for the back-to-top stories, shared by the Svelte and React twins.
 
-import type { PlayFunctionContext, WebRenderer } from 'storybook/internal/types';
+import type { StoryContext, WebRenderer } from 'storybook/internal/types';
 import { expect, waitFor } from 'storybook/test';
 
 /** Scrolls to the bottom of the page and waits until `shown`: both parity sides start hidden at the top. */
@@ -11,7 +11,7 @@ export async function scrollDown(shown: () => boolean) {
 }
 
 /** Parity/BackToTop → IlwUi: the look against upstream's, once scrolled into view. */
-export async function parity({ canvas }: PlayFunctionContext<WebRenderer>) {
+export async function parity({ canvas }: StoryContext<WebRenderer>) {
   const link = canvas.getByRole('link', { name: 'Back to top' });
   // It fades in over the first screen of scrolling, so the page must scroll at least that far.
   const scroller = document.scrollingElement!;
@@ -29,7 +29,7 @@ export async function parity({ canvas }: PlayFunctionContext<WebRenderer>) {
 }
 
 /** Page Chrome/Back to top → Long page: the contract, and fully shown once scrolled. */
-export async function longPage({ canvas, canvasElement }: PlayFunctionContext<WebRenderer>) {
+export async function longPage({ canvas, canvasElement }: StoryContext<WebRenderer>) {
   const shell = canvasElement.querySelector('.ilw-page')!;
   const link = canvas.getByRole('link', { name: 'Back to top' });
   await expect(link).toHaveClass('ilw-back-to-top');

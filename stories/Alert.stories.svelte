@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
   import CheckCircle from 'phosphor-svelte/lib/CheckCircle';
   import Info from 'phosphor-svelte/lib/Info';
   import X from 'phosphor-svelte/lib/X';

@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
   import { expect } from 'storybook/test';
 
   import { Breadcrumbs, Columns, type ColumnsMode, Content, Grid, Page, PageTitle, Spacer } from '../src/svelte/index.ts';

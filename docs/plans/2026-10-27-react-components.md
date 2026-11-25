@@ -185,7 +185,7 @@ The bar doesn't move: every React component gets the three layers in AGENTS.md, 
 
 #### A second Storybook
 
-- One Storybook can't host two frameworks, so `.storybook-react/` sets up `@storybook/react-vite` 10.6.4.
+- One Storybook can't host two frameworks, so `.storybook-react/` sets up `@storybook/react-vite`, at the Svelte Storybook's exact version.
   - `react()` from `@vitejs/plugin-react` is added in `viteFinal`; the preset doesn't add it.
   - It uses the same addons and `staticDirs`, with stories in `stories/react/**/*.stories.tsx`.
 - The theme global, `initialGlobals`, a11y parameters and styles loader move to `.storybook/shared.ts`, used by both previews. `styles.ts` already has no framework code.
@@ -204,7 +204,7 @@ Each React story file is the twin of a Svelte one:
 
 #### Shared play functions
 
-- Play bodies and their helpers move to `stories/plays/<name>.ts`, typed `PlayFunctionContext<WebRenderer>`, and both story files import them.
+- Play bodies and their helpers move to `stories/plays/<name>.ts`, typed `StoryContext<WebRenderer>`, and both story files import them.
 - Framework-specific steps (`flushSync`, `mountIslands`) are passed in. Shared plays never call `ctx.mount`.
 - They move one component at a time, in that component's port PR. The moved Svelte stories are proven stable with `--repeats 10` like new ones.
 
