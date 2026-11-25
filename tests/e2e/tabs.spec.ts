@@ -103,3 +103,37 @@ test('a fragment naming a panel selects it on load; with hash, choosing a tab wr
   await expect(panel).toHaveAccessibleName('Classroom Experience');
   await expect(panel).toBeInViewport();
 });
+
+test('panel content that loads on its first `active` loads once, when its tab is first chosen', async ({ page }) => {
+  await openStory(page, 'tabs--panel-context-fixture');
+  const tab = (name: string) => page.getByRole('tablist', { name: 'Matcher run results' }).getByRole('tab', { name });
+  const loads = (id: string) => page.getByTestId(`${id}-loads`);
+
+  // Only the shown panel's sheet loaded on mount.
+  await expect(tab('Assignments')).toHaveAttribute('aria-selected', 'true');
+  await expect(loads('run-assignments')).toHaveText('1');
+  await expect(loads('run-validation')).toHaveText('0');
+  await expect(loads('run-warnings')).toHaveText('0');
+
+  await press(page, 'Tab');
+  await press(page, 'Tab');
+  await press(page, 'Tab');
+  await press(page, 'Tab');
+  await press(page, 'Tab');
+  await expect(tab('Assignments')).toBeFocused();
+  await press(page, 'ArrowDown');
+  await expect(loads('run-validation')).toHaveText('0');
+  await press(page, 'Enter');
+  await expect(loads('run-validation')).toHaveText('1');
+  await expect(page.getByTestId('run-validation-active')).toHaveText('true');
+  await expect(page.getByTestId('run-assignments-active')).toHaveText('false');
+
+  // Back and forth: no sheet loads twice.
+  await tab('Assignments').click();
+  await tab('Validation').click();
+  await tab('Warnings (2)').click();
+  await expect(page.getByTestId('run-warnings-active')).toHaveText('true');
+  await expect(loads('run-assignments')).toHaveText('1');
+  await expect(loads('run-validation')).toHaveText('1');
+  await expect(loads('run-warnings')).toHaveText('1');
+});

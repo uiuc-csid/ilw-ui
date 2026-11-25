@@ -12,6 +12,7 @@
   import { tick, untrack } from 'svelte';
 
   import {
+    currentTab,
     fragmentTab,
     replaceTabHash,
     scrollToFragment,
@@ -51,7 +52,7 @@
     onchange?: (id: string) => void;
   } = $props();
 
-  const current = $derived(tabs.some((tab) => tab.id === selected) ? selected : tabs[0]?.id);
+  const current = $derived(currentTab(tabs, selected));
   const buttons: HTMLButtonElement[] = $state([]);
 
   function select(id: string, writeHash = true): void {

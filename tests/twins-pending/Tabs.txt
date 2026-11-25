@@ -6,6 +6,8 @@ export Tabs
 export TabPanel
 export enhanceTabs
 export enhanceAllTabs
+export getTabPanel
+export TabPanelContext
 
 # stories/Tabs.stories.svelte
 tabs--fixture
@@ -22,6 +24,9 @@ tabs--enhanced-then-restored
 tabs--no-script
 tabs--dark
 tabs--blue-theme
+tabs--panel-context
+tabs--panel-context-fixture
+tabs--panel-without-tabs
 
 # stories/parity/Tabs.parity.stories.svelte
 parity-tabs--ilw-ui

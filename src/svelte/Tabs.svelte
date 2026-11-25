@@ -7,6 +7,7 @@
 <script lang="ts">
   import { type Snippet, untrack } from 'svelte';
 
+  import { currentTab } from '../core/tabs.ts';
   import { type LayoutTheme, type LayoutWidth, widthClass } from '../core/layout.ts';
   import TabList from './TabList.svelte';
   import { type TabEntry, setTabsContext } from './tabs-context.ts';
@@ -59,20 +60,36 @@
   // `theme` isn't a typed HTML attribute; tokens.css selects on it ([theme=blue]).
   const themeAttr = $derived(theme ? { theme } : {});
 
-  // The panels, as they register once in the document; listed in document order.
+  // The panels, as they register (in the order they initialise); listed in
+  // document order once every section is bound.
   let entries = $state.raw<TabEntry[]>([]);
   const refs = $derived(
-    entries
-      .toSorted((a, b) => (a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
-      .map((entry) => ({ id: entry.id, label: entry.label })),
+    (entries.every((entry) => entry.el)
+      ? entries.toSorted((a, b) => (a.el!.compareDocumentPosition(b.el!) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
+      : entries
+    ).map((entry) => ({ id: entry.id, label: entry.label })),
   );
+
+  // True in the browser from the start: a pre-effect runs while the component
+  // initialises, before its children's effects (it never runs on the server).
+  let browser = $state(false);
+  $effect.pre(() => {
+    browser = true;
+  });
+
+  // The panel that shows, as TabList decides it (currentTab over the same tabs
+  // and `selected`). Undefined in a server render, where every panel shows.
+  const current = $derived(browser && refs.length ? currentTab(refs, selected) : undefined);
 
   setTabsContext({
     get level() {
       return level;
     },
+    get current() {
+      return current;
+    },
     add(entry) {
-      // Untracked: a panel registers from its own effect.
+      // Untracked: a panel registers while it initialises, inside this component's render.
       entries = [...untrack(() => entries), entry];
       return () => {
         entries = untrack(() => entries).filter((e) => e !== entry);

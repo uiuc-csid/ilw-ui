@@ -2,8 +2,10 @@
   import { defineMeta } from '@storybook/svelte-vite';
   import { expect, userEvent, waitFor } from 'storybook/test';
 
+  import TabPanelAloneDemo from './TabPanelAloneDemo.svelte';
   import TabsDemo from './TabsDemo.svelte';
   import TabsMarkupDemo from './TabsMarkupDemo.svelte';
+  import TabsPanelContextDemo from './TabsPanelContextDemo.svelte';
 
   // No `component`: the stories render TabsDemo, which binds the selection.
   const { Story } = defineMeta({
@@ -13,6 +15,8 @@
 
   const LABELS = ['Degree Programs', 'Non-degree Programs', 'Classroom Experience', 'Undergraduate Research'];
   const IDS = ['programs-degree', 'programs-non-degree', 'programs-classroom', 'programs-research'];
+
+  const SHEETS = ['run-assignments', 'run-validation', 'run-warnings'];
 
   /** Puts the story's URL back as it was (the Hash stories change its fragment). */
   function restoreUrl(url: string): void {
@@ -307,6 +311,106 @@
   }}
 >
   <TabsMarkupDemo enhance={false} />
+</Story>
+
+<!--
+  Panel content reading its panel with `getTabPanel()`: a matcher run's sheets, each showing its panel's id, label and `active`, and loading the first time its panel shows.
+
+  **Why:** the play function checks that only the shown panel reports `active`, and that it moves with the selection: the first panel in document order with no `selected` (an "Overview" panel shown in an `{#if}` before the others takes over), a click, Enter after the arrows, a URL fragment (`hashchange`; the URL is put back) and the page setting the bound `selected`. Adding a warning updates the Warnings panel's `label`. Each sheet loads once, when first shown; the probe after the box, outside every `TabPanel`, gets `undefined`.
+
+  **Review:** "Assignments" reads `active: true` and `loads: 1`, the others `false` and `0`. Open a tab: its sheet loads, and `active` follows. Press the buttons above the box; the probe under the box says `none`.
+-->
+<Story
+  name="Panel Context"
+  play={async ({ canvas }) => {
+    const url = location.href;
+    const active = (id: string) => canvas.getByTestId(`${id}-active`);
+    const loads = (id: string) => canvas.getByTestId(`${id}-loads`);
+    /** Only `id`'s panel reports active. */
+    const onlyActive = async (id: string, ids: string[]) => {
+      for (const other of ids) await expect(active(other)).toHaveTextContent(String(other === id));
+    };
+    try {
+      await waitFor(() => expect(canvas.getByRole('tablist')).toBeVisible());
+      await onlyActive('run-assignments', SHEETS);
+      await expect(canvas.getByTestId('run-assignments-id')).toHaveTextContent('run-assignments');
+      await expect(canvas.getByTestId('run-validation-label')).toHaveTextContent('Validation');
+      await expect(SHEETS.map((id) => loads(id).textContent)).toEqual(['1', '0', '0']);
+      await expect(canvas.getByTestId('outside-id')).toHaveTextContent('none');
+      await expect(canvas.getByTestId('outside-active')).toHaveTextContent('none');
+
+      // No `selected`: the first panel in document order, even one that appears later.
+      await userEvent.click(canvas.getByRole('button', { name: 'Show overview' }));
+      await waitFor(() => expect(canvas.getAllByRole('tab')[0]).toHaveTextContent('Overview'));
+      await onlyActive('run-overview', ['run-overview', ...SHEETS]);
+      await expect(loads('run-overview')).toHaveTextContent('1');
+      await userEvent.click(canvas.getByRole('button', { name: 'Show overview' }));
+      await waitFor(() => expect(canvas.getAllByRole('tab')).toHaveLength(3));
+      await onlyActive('run-assignments', SHEETS);
+
+      await userEvent.click(canvas.getByRole('tab', { name: 'Validation' }));
+      await onlyActive('run-validation', SHEETS);
+      await expect(loads('run-validation')).toHaveTextContent('1');
+
+      // Arrow to Warnings: focus moves, the selection doesn't until Enter.
+      await userEvent.keyboard('{ArrowDown}');
+      await expect(canvas.getByRole('tab', { name: 'Warnings (2)' })).toHaveFocus();
+      await onlyActive('run-validation', SHEETS);
+      await userEvent.keyboard('{Enter}');
+      await onlyActive('run-warnings', SHEETS);
+
+      // What following the "validation sheet" link does.
+      location.hash = 'run-assignments';
+      await waitFor(() => expect(active('run-assignments')).toHaveTextContent('true'));
+      await onlyActive('run-assignments', SHEETS);
+
+      await userEvent.click(canvas.getByRole('button', { name: 'Go to warnings' }));
+      await onlyActive('run-warnings', SHEETS);
+      await expect(canvas.getByTestId('selected')).toHaveTextContent('run-warnings');
+
+      await userEvent.click(canvas.getByRole('button', { name: 'Add a warning' }));
+      await expect(canvas.getByTestId('run-warnings-label')).toHaveTextContent('Warnings (3)');
+      await expect(canvas.getByRole('tab', { selected: true })).toHaveTextContent('Warnings (3)');
+
+      // Each sheet loaded once, however often it was shown.
+      await expect(SHEETS.map((id) => loads(id).textContent)).toEqual(['1', '1', '1']);
+    } finally {
+      restoreUrl(url);
+    }
+  }}
+>
+  <TabsPanelContextDemo />
+</Story>
+
+<!--
+  The **Panel Context** page without a play function.
+
+  **Why:** the fixture for the spec that checks lazy panel content loads once, when its tab is first chosen, and not before (`tests/e2e/tabs.spec.ts`).
+
+  **Review:** as **Panel Context**.
+-->
+<Story name="Panel Context Fixture">
+  <TabsPanelContextDemo />
+</Story>
+
+<!--
+  A `TabPanel` on its own, without a `Tabs`: a headed section whose content reads `getTabPanel()`.
+
+  **Why:** the play function checks the content gets the panel's id and label, and `active` is true (the section shows, so content waiting for `active` loads).
+
+  **Review:** a "Notes" heading over `active: true` and `loads: 1`.
+-->
+<Story
+  name="Panel Without Tabs"
+  play={async ({ canvas }) => {
+    await expect(canvas.queryByRole('tablist')).toBeNull();
+    await expect(canvas.getByTestId('run-notes-id')).toHaveTextContent('run-notes');
+    await expect(canvas.getByTestId('run-notes-label')).toHaveTextContent('Notes');
+    await expect(canvas.getByTestId('run-notes-active')).toHaveTextContent('true');
+    await expect(canvas.getByTestId('run-notes-loads')).toHaveTextContent('1');
+  }}
+>
+  <TabPanelAloneDemo />
 </Story>
 
 <!--
