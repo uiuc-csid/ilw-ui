@@ -114,6 +114,7 @@ Some of these are done: `SortableTh`, `Combobox`, `Autocomplete` (E2, #8), `Data
 | E15 | `FileInput` | A native file input with type and size checks plus a dropzone. | ta-manager import, opportunities emailer |
 | E16 | Weekly time picker | Pick weekly availability by keyboard and mouse. Needs its own design plan. | opportunities (FullCalendar, mouse-only) |
 | E17 | Small display bits | `StatusPill`, `RelativeTime`, `Avatar`, `downloadResponse()` | queue-next, ngpa |
+| E18 | `Popover` | A button that opens a non-modal panel (filters, help, secondary actions): native `popover` + `popovertarget`, so the markup works without script, placed by anchor positioning. Done; plan in `docs/old-plans/2026-11-25-popover.md`. | ta-manager filter panels and help text |
 
 ## Order
 

@@ -1,0 +1,10 @@
+/* Story-only styles for the Placements stories (Svelte and React), in a plain file both share. */
+
+/* Two rows, top-* then bottom-*, with room above and below for the panels so none flips. */
+.popover-placements {
+  display: grid;
+  grid-template-columns: repeat(3, 10rem);
+  gap: 12rem 6rem;
+  padding: 8rem 6rem;
+  width: max-content;
+}

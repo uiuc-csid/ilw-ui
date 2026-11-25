@@ -43,7 +43,7 @@ ships. The frameworks take any later minor.
 | Framework | Peers to install |
 | --------- | ---------------- |
 | Svelte (`ilw-ui/svelte`) | `svelte` ^5.57, `@zag-js/svelte` 1.46.0, `@tanstack/svelte-table` 9.3.1, `phosphor-svelte` 3.1.1 |
-| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): `Page` and `BackToTop` so far) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
+| React (`ilw-ui/react`, [in progress](docs/plans/2026-10-27-react-components.md): `Page`, `BackToTop` and `Popover` so far) | `react` and `react-dom` ^19.3, `@zag-js/react` 1.46.0, `@tanstack/react-table` 9.3.1, `@phosphor-icons/react` 2.1.10 |
 
 ```sh
 pnpm add svelte @zag-js/svelte@1.46.0 @tanstack/svelte-table@9.3.1 phosphor-svelte@3.1.1
@@ -1543,6 +1543,83 @@ trigger's `aria-describedby` names; it is open when it matches
 - Not carried over: upstream's 500ms long press on touch, and closing on a
   pointerdown elsewhere. On touch, a tap focuses the trigger (and shows it) or
   activates it; tooltip text should never be the only way to learn something.
+### `Popover` and `.ilw-popover`
+
+A button that opens a non-modal panel anchored to it: a filters panel, a "?"
+help button, secondary actions. Not a menu (no `role="menu"`), not a modal
+(`Modal`), not a tooltip (`Tooltip`: hover and focus, never focused). The panel
+is a native auto popover opened by the button's `popovertarget`, so Escape, a
+click outside, one-open-at-a-time and focus return come from the browser, and
+the markup works from a server template with no script. Styled by
+`popover.css`. Svelte and React.
+
+```svelte
+<Popover label="Filters" placement="bottom-left" bind:open>
+  <fieldset class="ilw-fieldset">…</fieldset>
+  <button type="button" class="ilw-button" popovertarget="staff-filters" popovertargetaction="hide">Done</button>
+</Popover>
+
+<Popover id="help-hours">
+  {#snippet trigger(attrs)}
+    <button type="button" class="ilw-button" aria-label="About office hours" {...attrs}>?</button>
+  {/snippet}
+  <p>Count only hours held at a fixed place and time.</p>
+</Popover>
+```
+
+```tsx
+<Popover label="Filters" open={open} onOpenChange={setOpen}>…</Popover>
+<Popover trigger={(attrs) => <button type="button" aria-label="About office hours" {...attrs}>?</button>}>…</Popover>
+```
+
+Props: `label` (the default button's text; it is an `.ilw-button`) or
+`trigger` (a snippet, in React a render prop, given `attrs` = `{ popovertarget }`,
+React `{ popoverTarget }`: spread it on one button, the only element), the
+panel's content as `children`, `placement` (`bottom-left | bottom-center |
+bottom-right | top-left | top-center | top-right`, default `bottom-left`:
+under the button, left edges aligned), `open` (Svelte: bindable; React:
+optional, it shows or hides the panel when it changes, with `onOpenChange`
+reporting every open and close), `id` (the panel's, default `ilw-popover-N`)
+and `class` (React `className`) on the wrapper. `--ilw-popover--width` (20rem)
+caps the panel's width.
+
+DOM contract:
+
+```html
+<span class="ilw-popover ilw-popover--bottom-left">
+  <button type="button" class="ilw-button" popovertarget="ilw-popover-1">Filters</button>
+  <div class="ilw-popover-panel" id="ilw-popover-1" popover>
+    …
+    <button type="button" class="ilw-button" popovertarget="ilw-popover-1" popovertargetaction="hide">Done</button>
+  </div>
+</span>
+```
+
+The button is the wrapper's first child and the panel its last. Select the
+panel as the element the button's `popovertarget` names; it is open when it
+matches `:popover-open` (Playwright: `toBeVisible()`). Don't put a popover
+inside a `<p>`: the panel is a `<div>`.
+
+- **Pattern:** the APG disclosure, not a dialog. The button gets an implicit
+  `aria-expanded` from `popovertarget` (no attribute is written); opening it
+  leaves focus on the button, and the panel is next in the Tab order after it,
+  wherever it is drawn.
+- **Closing:** the button again, Escape, a click outside, opening another auto
+  popover, or a `popovertargetaction="hide"` button inside; focus returns to
+  the button when it was inside the panel. With the component, focus moving to
+  an element outside the wrapper (Tab past the panel's end, Shift+Tab from the
+  button) closes it too.
+- **Placement:** the panel is in the top layer, so no `overflow` clips it.
+  Where CSS anchor positioning (`position-area` and `anchor-scope`) is
+  supported, `popover.css` places it 4px off the button and flips it to the
+  other side when there's no room (`position-try-fallbacks: flip-block`), with
+  or without the component. Elsewhere the component places it by script
+  (`top`/`left` inline, flipping the same way, clamped 8px inside the viewport,
+  following scroll and resize while open); server markup without the component
+  gets the browser's centred popover there.
+- **No `popover` support** (Safari before 17, Firefox before 125): the panel
+  shows in place, always open.
+
 ### `Tabs`, `enhanceTabs` and `.ilw-tabs`
 
 The replacement for `<ilw-tabs>`: APG tabs over a box of headed sections.
