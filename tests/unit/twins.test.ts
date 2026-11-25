@@ -61,7 +61,7 @@ function dedent(text: string): string {
     .trim();
 }
 
-/** addon-svelte-csf's exportName for a story without one: 'Side By Side' → 'SideBySide'. */
+/** Svelte CSF's exportName for a story without one: 'Side By Side' → 'SideBySide'. */
 function svelteExportName(name: string): string {
   return sanitize(name.replace(/([A-Z])/g, ' $1').trim())
     .split('-')
@@ -147,7 +147,7 @@ function readReact(path: string): StoryFile {
         exportName,
         name: story.name ?? '',
         tags: story.tags ?? [],
-        description: dedent(extractDescription(csf._storyStatements[exportName]) ?? ''),
+        description: dedent(extractDescription(csf._storyStatements[exportName], csf.editor) ?? ''),
       };
     }),
   };

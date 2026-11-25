@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
   import { mount, unmount } from 'svelte';
   import { expect, fn, waitFor, within } from 'storybook/test';
 

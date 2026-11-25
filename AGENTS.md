@@ -7,7 +7,7 @@ Accessible Svelte 5 and React 19 components that look and behave like the **Illi
 - **Node** (version in `.node-version`), **pnpm** (version in `package.json` `packageManager`), **mise** for tool versions and tasks
 - **Svelte 5** (runes), **React 19** (`@vitejs/plugin-react`), **Vite 8**, **TypeScript**: `svelte-check`, plus `tsc -p tsconfig.react.json` for the React side
 - **ESLint 9** on the React paths only: `eslint-plugin-react-hooks` and `eslint-plugin-jsx-a11y`, recommended configs (`eslint.config.js`; jsx-a11y supports ESLint up to 9)
-- **Storybook 10**, twice: `@storybook/svelte-vite` (`.storybook/`, Svelte CSF) and `@storybook/react-vite` (`.storybook-react/`, CSF 3 in `.tsx`) — the workbenches and the test fixture hosts
+- **Storybook 11** (release candidate), twice: `@storybook/svelte-vite` (`.storybook/`, Svelte CSF) and `@storybook/react-vite` (`.storybook-react/`, CSF 3 in `.tsx`) — the workbenches and the test fixture hosts
 - **Vitest** (browser mode, Playwright provider) and **@playwright/test**
 - **MCP servers** (`.mcp.json`): `svelte` (local `@sveltejs/mcp`: Svelte docs + autofixer), `storybook` and `storybook-react` (`@storybook/addon-mcp`, live only while `pnpm storybook` runs on :6006, or `pnpm storybook:react` on :6008), `playwright` (drive stories in a real browser)
 - **Agent skills** live in `.agents/skills/`; each is symlinked into `.claude/skills/` (`ln -s ../../.agents/skills/<name> .claude/skills/<name>`). `playwright-cli`: browser automation via `playwright cli`, from the pinned `playwright`. Refresh it after a Playwright bump with `pnpm exec playwright cli install --skills=agents`
@@ -27,7 +27,7 @@ src/
 stories/       *.stories.svelte (Svelte CSF) + story-only helper components
   parity/      <Name>.parity.stories.svelte: Toolkit / IlwUi / Side By Side pairs
   react/       the React twins: <Name>.stories.tsx, parity/<Name>.parity.stories.tsx (IlwUi only), *Demo.tsx
-  plays/       play functions both twins import (PlayFunctionContext<WebRenderer>)
+  plays/       play functions both twins import (StoryContext<WebRenderer>)
   contracts/   <story-id>.html: each story's DOM contract, shared by both frameworks
 tests/
   unit/        node Vitest: core helpers, import/sink guard, tokens.css vs the vendored toolkit.css, the twins
@@ -71,7 +71,7 @@ The package ships source (`.svelte`/`.ts`/`.tsx`); consumers' Vite compiles it. 
 
 Stories are the workbench, the review surface and the test fixtures, so each one must explain itself and look like the real thing.
 
-- **Every story says what it tests and what to look for**, in an HTML comment directly above its `<Story>` (addon-svelte-csf turns it into the story's description on the Docs page):
+- **Every story says what it tests and what to look for**, in an HTML comment directly above its `<Story>` (Storybook's Svelte CSF turns it into the story's description on the Docs page):
 
   ```svelte
   <!--
@@ -97,7 +97,7 @@ Stories are the workbench, the review surface and the test fixtures, so each one
   export const ShellOnly: Story = { name: 'Shell only', render: () => <Page …>…</Page> };
   ```
 
-  Play bodies live in `stories/plays/<name>.ts`, typed `PlayFunctionContext<WebRenderer>`, and both twins import them; write `play:` literally (not spread), so Storybook tags the story `play-fn`. React demos (`stories/react/*Demo.tsx`) reproduce the Svelte demo's ids, test ids, `<output>`s, page context and top comment; sample data (`table-data.ts`, `header-sample.ts`, …) is imported, not copied. `tests/unit/twins.test.ts` checks titles, names, tags (`play-fn` included) and descriptions, and that `ilw-ui/react` exports what `ilw-ui/svelte` does (`createDataTable` → `useDataTable`). Stories and exports not ported yet are listed in `tests/twins-pending/<Component>.txt`; the port deletes its component's file, and the test fails on any line a twin has made stale.
+  Play bodies live in `stories/plays/<name>.ts`, typed `StoryContext<WebRenderer>`, and both twins import them; write `play:` literally (not spread), so Storybook tags the story `play-fn`. React demos (`stories/react/*Demo.tsx`) reproduce the Svelte demo's ids, test ids, `<output>`s, page context and top comment; sample data (`table-data.ts`, `header-sample.ts`, …) is imported, not copied. `tests/unit/twins.test.ts` checks titles, names, tags (`play-fn` included) and descriptions, and that `ilw-ui/react` exports what `ilw-ui/svelte` does (`createDataTable` → `useDataTable`). Stories and exports not ported yet are listed in `tests/twins-pending/<Component>.txt`; the port deletes its component's file, and the test fails on any line a twin has made stale.
 - **Every story shows the component as it will look on a page.** Non-parity stories set `parameters.styles: 'ilw-ui'` (only our stylesheet, as a consumer loads it) and render inside the default shell (`<Page format>`: skip link, `<main>`, `.ilw-format`). Only whole-page stories opt out with `shell: false`, and only the Unformatted checks with `format: false`.
 - **Give the component its page context**: the label, help text and neighbouring fields of a form, the heading and prose around a table or button row, enough rows to page, a realistic width. Not a bare widget on an empty canvas. Story-only wrappers (`stories/*Demo.svelte`, `parity/*Sample.svelte`) hold that context and say in a top comment what page they stand in for. The same goes for the markup examples in the README.
 - **Story styles go in plain `.css` files**, imported by the story or helper (`stories/TooltipDemo.css`), never in a `<style>` block: Svelte's scoped `svelte-xxxx` classes would make its markup differ from the React twin's. Class names are global there, so prefix them with the helper's name (`.tooltip-demo-toolbar`). `tests/unit/stories.test.ts` checks it.

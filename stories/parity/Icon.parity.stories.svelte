@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/svelte-vite';
   import Calendar from 'phosphor-svelte/lib/Calendar';
   import Envelope from 'phosphor-svelte/lib/Envelope';
   import { expect } from 'storybook/test';
