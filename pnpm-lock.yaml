@@ -227,7 +227,7 @@ importers:
         version: 9.3.1(svelte@5.57.3(@typescript-eslint/types@8.72.1))
       '@tsconfig/svelte':
         specifier: ^5.0.8
-        version: 5.0.8
+        version: 5.0.9
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2
@@ -1162,8 +1162,8 @@ packages:
       '@tmcp/auth':
         optional: true
 
-  '@tsconfig/svelte@5.0.8':
-    resolution: {integrity: sha512-UkNnw1/oFEfecR8ypyHIQuWYdkPvHiwcQ78sh+ymIiYoF+uc5H1UBetbjyqT+vgGJ3qQN6nhucJviX6HesWtKQ==}
+  '@tsconfig/svelte@5.0.9':
+    resolution: {integrity: sha512-gbtbqsEFq9gFzGmgJMIB3+leXVmkUttoFjzeHsbqN6qFKst40fvxnN9+3Ajdl8VlIGwPevs9LNJ8YUhQgchqaw==}
 
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
@@ -3418,7 +3418,7 @@ snapshots:
       esm-env: 1.2.2
       tmcp: 1.20.1(typescript@5.9.3)
 
-  '@tsconfig/svelte@5.0.8': {}
+  '@tsconfig/svelte@5.0.9': {}
 
   '@tybys/wasm-util@0.10.4':
     dependencies:
