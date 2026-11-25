@@ -347,7 +347,7 @@ R2, R3, R4, R8, R9 and R10 are independent: `Header` imports only `DarkModeToggl
 | R5 | Data | `useDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`. Re-exports `isPaged`, `setTableFilter`, both pager class maps, and the table and pager types. |
 | R6 | Zag | The `AsyncSearch` adapter and `AsyncSource`, `Combobox`, `Autocomplete`, `MultiCombobox`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
 | R7 | Select enhancement | `SelectCombobox`, `enhanceSelect`, `enhanceSelects`. |
-| R8 | Tabs | `Tabs`, `TabPanel`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
+| R8 | Tabs | `Tabs`, `TabPanel`, `enhanceTabs`, `enhanceAllTabs` (the React tab list), and `getTabPanel` / `TabPanelContext` as a hook (`useTabPanel()`, same `id`, `label`, `active`; `active` right on the first effect, true on the server and without `Tabs`). |
 | R9 | Tooltip | `Tooltip` (C4). It merged before R0d, so it needs its own port. Re-exports `TooltipArrow` and `TooltipAttrs`. |
 | R10 | Accordion | `Accordion`, `AccordionPanel` (C2). Merged before R0d. Re-exports `AccordionAccent`. |
 | R11 | Alert | `Alert`, `dismissAlert`, `enhanceAlerts` (E1). Merged before R0d. Re-exports `AlertVariant`. |

@@ -1655,6 +1655,42 @@ default 3), `label` or `labelledby` (the tab list's name), `theme`, `width`,
 follow the panels' order in the document, so a panel inside `{#if}` or
 `{#each}` takes its place among the others when it appears.
 
+**Panel context:** anything inside a `TabPanel` can ask which panel it is in,
+and whether that panel shows, with `getTabPanel()`, instead of the page
+passing the panel's id, label and selection down. Call it while the component
+initialises; it returns `undefined` outside a `TabPanel`. Its `id`, `label`
+and `active` are live getters, so `$derived` and `$effect` follow the
+selection and a changing label (`Warnings (${n})`):
+
+```svelte
+<!-- SheetTab.svelte: loads its sheet the first time its panel shows -->
+<script lang="ts">
+  import { getTabPanel } from 'ilw-ui/svelte';
+
+  let { run, sheet }: { run: Run; sheet: string } = $props();
+  const panel = getTabPanel();
+  let rows = $state<Row[]>();
+
+  $effect(() => {
+    if (panel?.active && !rows) void loadSheet(run, sheet).then((r) => (rows = r));
+  });
+</script>
+
+<TabPanel id="matcher-validation" label="Validation">
+  <SheetTab run={sheetRun} sheet="Validation" />
+</TabPanel>
+```
+
+`active` is true for the panel that shows: `selected`, or the first panel in
+document order while `selected` is unset or names no panel. In the browser
+that holds from the first effect, so lazy content in the other panels waits
+until its tab is chosen. In a server render every panel is active, since the
+markup without script shows them all, and so is a `TabPanel` used without a
+`Tabs` (a headed section on its own): content that waits for `active` doesn't
+stay empty while it is on screen. One exception: a URL fragment that selects a
+panel on load does so once the tab list mounts, after the first panel's
+content has seen `active`, so lazy content there loads too.
+
 DOM contract, as the server sends it (and `Tabs` renders before it mounts):
 
 ```html

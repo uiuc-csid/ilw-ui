@@ -8,6 +8,11 @@ export interface TabRef {
   label: string;
 }
 
+/** The tab that shows: `selected` when it names one of `tabs`, else the first. */
+export function currentTab(tabs: TabRef[], selected: string | undefined): string | undefined {
+  return tabs.some((tab) => tab.id === selected) ? selected : tabs[0]?.id;
+}
+
 /** A server-rendered `.ilw-tabs` box, read for its tab list. */
 export interface TabsMarkup {
   /** The panels' parent, which the tab list goes in. */

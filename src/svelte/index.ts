@@ -67,3 +67,4 @@ export { dismissAlert, enhanceAlerts } from './alert.ts';
 export { default as Tabs } from './Tabs.svelte';
 export { default as TabPanel } from './TabPanel.svelte';
 export { enhanceAllTabs, enhanceTabs } from './tabs.ts';
+export { getTabPanel, type TabPanelContext } from './tabs-context.ts';

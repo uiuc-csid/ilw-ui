@@ -1,0 +1,36 @@
+<div class="ilw-page ilw-format" id="top" tabindex="-1">
+  <a class="ilw-skip-link" href="#main-content">Skip to main content</a>
+  <main id="main-content" tabindex="-1">
+    <h2 id="run-heading">Matcher run results</h2>
+    <p>Each sheet of the run's workbook is a tab. A sheet loads the first time you open it.</p>
+    <p><button aria-pressed="false" class="ilw-button" type="button">Show overview</button> <button class="ilw-button" type="button">Go to warnings</button> <button class="ilw-button" type="button">Add a warning</button></p>
+    <div class="ilw-tabs ilw-tabs--ready">
+      <div class="ilw-tabs-container">
+        <div aria-labelledby="run-heading" aria-orientation="vertical" class="ilw-tabs-list" role="tablist">
+          <button aria-controls="run-assignments" aria-selected="true" class="ilw-tabs-tab" id="run-assignments-tab" role="tab" tabindex="0" type="button">Assignments</button>
+          <button aria-controls="run-validation" aria-selected="false" class="ilw-tabs-tab" id="run-validation-tab" role="tab" tabindex="-1" type="button">Validation</button>
+          <button aria-controls="run-warnings" aria-selected="false" class="ilw-tabs-tab" id="run-warnings-tab" role="tab" tabindex="-1" type="button">Warnings (2)</button>
+        </div>
+        <section aria-labelledby="run-assignments-tab" class="ilw-tabs-panel" id="run-assignments" role="tabpanel" tabindex="0">
+          <h3 class="ilw-tabs-heading">Assignments</h3>
+          <p>Panel <output data-testid="run-assignments-id">run-assignments</output>, labelled <output data-testid="run-assignments-label">Assignments</output>; active: <output data-testid="run-assignments-active">true</output>; loads: <output data-testid="run-assignments-loads">1</output>.</p>
+          <p>The Assignments sheet: 12 rows.</p>
+        </section>
+        <section aria-labelledby="run-validation-tab" class="ilw-tabs-panel" hidden id="run-validation" role="tabpanel" tabindex="0">
+          <h3 class="ilw-tabs-heading">Validation</h3>
+          <p>Panel <output data-testid="run-validation-id">run-validation</output>, labelled <output data-testid="run-validation-label">Validation</output>; active: <output data-testid="run-validation-active">false</output>; loads: <output data-testid="run-validation-loads">0</output>.</p>
+          <p>The Validation sheet loads when its tab is chosen.</p>
+        </section>
+        <section aria-labelledby="run-warnings-tab" class="ilw-tabs-panel" hidden id="run-warnings" role="tabpanel" tabindex="0">
+          <h3 class="ilw-tabs-heading">Warnings (2)</h3>
+          <p>Panel <output data-testid="run-warnings-id">run-warnings</output>, labelled <output data-testid="run-warnings-label">Warnings (2)</output>; active: <output data-testid="run-warnings-active">false</output>; loads: <output data-testid="run-warnings-loads">0</output>.</p>
+          <p>The Warnings sheet loads when its tab is chosen.</p>
+        </section>
+      </div>
+    </div>
+    <p>Read the <a href="#run-validation">validation sheet</a> before publishing the run.</p>
+    <p>Panel <output data-testid="outside-id">none</output>, labelled <output data-testid="outside-label">none</output>; active: <output data-testid="outside-active">none</output>; loads: <output data-testid="outside-loads">0</output>.</p>
+    <p>The Summary sheet loads when its tab is chosen.</p>
+    <p>Selected: <output data-testid="selected">none</output></p>
+  </main>
+</div>
