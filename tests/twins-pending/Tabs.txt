@@ -3,7 +3,7 @@
 
 # src/svelte/index.ts
 export Tabs
-export TabItem
+export TabPanel
 export enhanceTabs
 export enhanceAllTabs
 
@@ -14,6 +14,7 @@ tabs--default
 tabs--selected
 tabs--horizontal
 tabs--narrow
+tabs--conditional-panel
 tabs--hash
 tabs--hash-fixture
 tabs--enhanced-markup

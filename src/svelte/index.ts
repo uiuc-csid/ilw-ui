@@ -64,5 +64,6 @@ export { default as AccordionPanel } from './AccordionPanel.svelte';
 export { type AccordionAccent } from './accordion.ts';
 export { default as Alert, type AlertVariant } from './Alert.svelte';
 export { dismissAlert, enhanceAlerts } from './alert.ts';
-export { default as Tabs, type TabItem } from './Tabs.svelte';
+export { default as Tabs } from './Tabs.svelte';
+export { default as TabPanel } from './TabPanel.svelte';
 export { enhanceAllTabs, enhanceTabs } from './tabs.ts';
