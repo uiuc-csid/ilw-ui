@@ -1620,7 +1620,7 @@ inside a `<p>`: the panel is a `<div>`.
 - **No `popover` support** (Safari before 17, Firefox before 125): the panel
   shows in place, always open.
 
-### `Tabs`, `enhanceTabs` and `.ilw-tabs`
+### `Tabs`, `TabPanel`, `enhanceTabs` and `.ilw-tabs`
 
 The replacement for `<ilw-tabs>`: APG tabs over a box of headed sections.
 The sections are the markup a server sends, and what a browser without script
@@ -1629,30 +1629,31 @@ the sections into tab panels. Styled by `tabs.css`.
 
 ```svelte
 <script>
-  import { Tabs } from 'ilw-ui/svelte';
+  import { TabPanel, Tabs } from 'ilw-ui/svelte';
 
   let selected = $state('degree');
 </script>
 
-{#snippet degree()}<p>Choose from more than 150 undergraduate majors.</p>{/snippet}
-{#snippet classroom()}<p>Small discussion sections and hands-on labs.</p>{/snippet}
-
 <h2 id="programs-heading">Programs</h2>
-<Tabs
-  labelledby="programs-heading"
-  tabs={[
-    { id: 'degree', label: 'Degree Programs', content: degree },
-    { id: 'classroom', label: 'Classroom Experience', content: classroom },
-  ]}
-  bind:selected
-/>
+<Tabs labelledby="programs-heading" bind:selected>
+  <TabPanel id="degree" label="Degree Programs">
+    <p>Choose from more than 150 undergraduate majors.</p>
+  </TabPanel>
+  <TabPanel id="classroom" label="Classroom Experience">
+    <p>Small discussion sections and hands-on labs.</p>
+  </TabPanel>
+</Tabs>
 ```
 
-`Tabs` props: `tabs` (`{ id, label, content }[]`, `content` a snippet),
-`selected` (bindable panel id; the first tab when unset), `automatic`, `hash`,
-`horizontal`, `level` (the panels' heading level, default 3), `label` or
-`labelledby` (the tab list's name), `theme`, `width`, `id`, `class` and
-`onchange(id)`.
+`Tabs` props: `selected` (bindable panel id; the first tab when unset),
+`automatic`, `hash`, `horizontal`, `level` (the panels' heading level,
+default 3), `label` or `labelledby` (the tab list's name), `theme`, `width`,
+`id`, `class` and `onchange(id)`; its children are the `TabPanel`s.
+
+`TabPanel` props: `id` (the panel's id; its tab's is `<id>-tab`), `label`
+(the tab's text and the panel's heading) and its content as children. The tabs
+follow the panels' order in the document, so a panel inside `{#if}` or
+`{#each}` takes its place among the others when it appears.
 
 DOM contract, as the server sends it (and `Tabs` renders before it mounts):
 

@@ -1,28 +1,17 @@
 <!--
   Tabs (C3), rendering the markup documented in the README: a box of headed
-  sections, which is what a server render (or a page without script) shows.
-  Once mounted it adds TabList, which makes the sections APG tabs. Styled by
-  tabs.css.
+  sections (its `TabPanel` children), which is what a server render (or a page
+  without script) shows. Once mounted it adds TabList, which makes the
+  sections APG tabs, in the order the panels appear. Styled by tabs.css.
 -->
-<script module lang="ts">
-  import type { Snippet } from 'svelte';
-
-  export interface TabItem {
-    /** The panel's id: the fragment that links to it, and the tab's id with `-tab`. */
-    id: string;
-    /** The tab's text, and the panel's heading. */
-    label: string;
-    /** The panel's content, after its heading. */
-    content: Snippet;
-  }
-</script>
-
 <script lang="ts">
+  import { type Snippet, untrack } from 'svelte';
+
   import { type LayoutTheme, type LayoutWidth, widthClass } from '../core/layout.ts';
   import TabList from './TabList.svelte';
+  import { type TabEntry, setTabsContext } from './tabs-context.ts';
 
   let {
-    tabs,
     selected = $bindable(),
     automatic = false,
     hash = false,
@@ -35,8 +24,10 @@
     id,
     class: className = '',
     onchange,
+    children,
   }: {
-    tabs: TabItem[];
+    /** The panels: `TabPanel`s. */
+    children: Snippet;
     /** The selected panel's id (bindable); the first tab when unset. */
     selected?: string;
     /** Select a tab when the arrow keys reach it (the toolkit's behaviour); by default Enter or Space selects. */
@@ -67,7 +58,27 @@
   let host = $state<HTMLElement>();
   // `theme` isn't a typed HTML attribute; tokens.css selects on it ([theme=blue]).
   const themeAttr = $derived(theme ? { theme } : {});
-  const refs = $derived(tabs.map((tab) => ({ id: tab.id, label: tab.label })));
+
+  // The panels, as they register once in the document; listed in document order.
+  let entries = $state.raw<TabEntry[]>([]);
+  const refs = $derived(
+    entries
+      .toSorted((a, b) => (a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
+      .map((entry) => ({ id: entry.id, label: entry.label })),
+  );
+
+  setTabsContext({
+    get level() {
+      return level;
+    },
+    add(entry) {
+      // Untracked: a panel registers from its own effect.
+      entries = [...untrack(() => entries), entry];
+      return () => {
+        entries = untrack(() => entries).filter((e) => e !== entry);
+      };
+    },
+  });
 </script>
 
 <div
@@ -77,14 +88,10 @@
   {...themeAttr}
 >
   <div class="ilw-tabs-container">
-    {#if host}
+    <!-- Once the panels have registered, so the tab list starts with all of them (and a URL fragment can select one). -->
+    {#if host && refs.length}
       <TabList {host} tabs={refs} bind:selected {automatic} {hash} {horizontal} {label} {labelledby} {onchange} />
     {/if}
-    {#each tabs as tab (tab.id)}
-      <section class="ilw-tabs-panel" id={tab.id}>
-        <svelte:element this={`h${level}`} class="ilw-tabs-heading">{tab.label}</svelte:element>
-        {@render tab.content()}
-      </section>
-    {/each}
+    {@render children()}
   </div>
 </div>

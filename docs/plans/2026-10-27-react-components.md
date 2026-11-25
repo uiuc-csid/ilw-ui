@@ -143,7 +143,9 @@ Each is settled in its port PR. They are listed here so nobody has to rediscover
 - It is synchronous only when called from outside React. React apps use `<Combobox>` directly, so there is no `ref={enhanceSelect}` form.
 - The React demo calls `enhanceSelects` from its play function, not from an effect.
 
-#### `Tabs`, `enhanceTabs`, `enhanceAllTabs`
+#### `Tabs`, `TabPanel`, `enhanceTabs`, `enhanceAllTabs`
+
+- Compound, like the Svelte twin: `<Tabs>` takes `<TabPanel id label>` children, which register with it through context (with their section element, so the tab list follows document order). `selected` + `onChange` replace the bindable.
 
 - `enhanceTabs` mounts the tab list into the server markup, just before the first panel, with no wrapper. As with `enhanceSelect`, the React version creates the `role="tablist"` element, inserts it there and renders into it. A portal would append it after the panels.
 - `enhanceTabs` is synchronous only when called from outside React, so the Svelte attachment form (`{@attach enhanceTabs}`) has no React twin. React apps use `<Tabs>`.
@@ -345,7 +347,7 @@ R2, R3, R4, R8, R9 and R10 are independent: `Header` imports only `DarkModeToggl
 | R5 | Data | `useDataTable`, `DataTable`, `DataRows`, `TableSortTh`, `Pager`. Re-exports `isPaged`, `setTableFilter`, both pager class maps, and the table and pager types. |
 | R6 | Zag | The `AsyncSearch` adapter and `AsyncSource`, `Combobox`, `Autocomplete`, `MultiCombobox`. Then the twin of Format's "Components inside" story, which needs R5 and R6. |
 | R7 | Select enhancement | `SelectCombobox`, `enhanceSelect`, `enhanceSelects`. |
-| R8 | Tabs | `Tabs`, `TabItem`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
+| R8 | Tabs | `Tabs`, `TabPanel`, `enhanceTabs`, `enhanceAllTabs` (the React tab list). |
 | R9 | Tooltip | `Tooltip` (C4). It merged before R0d, so it needs its own port. Re-exports `TooltipArrow` and `TooltipAttrs`. |
 | R10 | Accordion | `Accordion`, `AccordionPanel` (C2). Merged before R0d. Re-exports `AccordionAccent`. |
 | R11 | Alert | `Alert`, `dismissAlert`, `enhanceAlerts` (E1). Merged before R0d. Re-exports `AlertVariant`. |

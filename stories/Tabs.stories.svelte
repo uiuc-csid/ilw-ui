@@ -162,6 +162,41 @@
 </Story>
 
 <!--
+  `TabPanel`s are children of `Tabs`; here one sits inside an `{#if}`, toggled by the "Include online programs" button above the box.
+
+  **Why:** the tab list follows the panels' document order, not the order they registered in. The play function shows the panel and checks its tab lands between "Classroom Experience" and "Undergraduate Research" and selects its panel; hiding it again drops the tab and falls back to the first.
+
+  **Review:** press the button: an "Online Programs" tab appears fourth. Select it, then press the button again: the tab goes and "Degree Programs" shows.
+-->
+<Story
+  name="Conditional Panel"
+  play={async ({ canvas }) => {
+    const toggle = canvas.getByRole('button', { name: 'Include online programs' });
+    await expect(canvas.getAllByRole('tab')).toHaveLength(4);
+
+    await userEvent.click(toggle);
+    await waitFor(() => expect(canvas.getAllByRole('tab')).toHaveLength(5));
+    await expect(canvas.getAllByRole('tab').map((t) => t.textContent)).toEqual([
+      ...LABELS.slice(0, 3),
+      'Online Programs',
+      LABELS[3],
+    ]);
+    const online = canvas.getByRole('tab', { name: 'Online Programs' });
+    await expect(online).toHaveAttribute('aria-controls', 'programs-online');
+    await userEvent.click(online);
+    await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Online Programs');
+    await expect(canvas.getByRole('tabpanel')).toHaveAttribute('tabindex', '0');
+
+    await userEvent.click(toggle);
+    await waitFor(() => expect(canvas.getAllByRole('tab')).toHaveLength(4));
+    await expect(canvas.getByRole('tab', { selected: true })).toHaveTextContent('Degree Programs');
+    await expect(canvas.getByRole('tabpanel')).toHaveAttribute('id', 'programs-degree');
+  }}
+>
+  <TabsDemo online />
+</Story>
+
+<!--
   `hash`: choosing a tab writes `#<panel id>` to the URL, and a link to a panel's id selects it.
 
   **Why:** the play function clicks a tab and checks the fragment (replaced, not pushed: the history length doesn't change), then sets the fragment as the closing paragraph's in-page link would and checks its tab is selected (a `hashchange`). It puts the URL back when done.

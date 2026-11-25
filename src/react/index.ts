@@ -27,7 +27,7 @@ export { Page } from './Page.tsx';
 
 // R7 select enhancement: enhanceSelect, enhanceSelects
 
-// R8 tabs: Tabs, TabItem, enhanceTabs, enhanceAllTabs
+// R8 tabs: Tabs, TabPanel, enhanceTabs, enhanceAllTabs
 
 // R9 tooltip: Tooltip, TooltipArrow, TooltipAttrs
 
