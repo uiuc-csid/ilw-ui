@@ -31,6 +31,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Run Chromatic
-        uses: chromaui/action@25d2d37fcbe164dfbf5479a432fbd73d03bae733 # v18.15.2
+        uses: chromaui/action@0a7067e5ffc663a631b14db505d8a94b26e1bf2f # v18.15.3
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
